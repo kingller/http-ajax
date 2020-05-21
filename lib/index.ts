@@ -10,7 +10,7 @@ import signature from './extend/signature';
 // }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
-window.$feedback = window.$feedback || function(): void {};
+window.$feedback = window.$feedback || function (): void {};
 
 export class AjaxClass extends AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,11 +80,11 @@ export class AjaxClass extends AjaxBase {
 
     public AjaxClass: typeof AjaxClass;
 
-    public readonly Ajax = function(): Ajax.IAjax {
+    public readonly Ajax = function (): Ajax.IAjax {
         return new AjaxClass();
     };
-    
-    public readonly clone = function(): Ajax.IAjax {
+
+    public readonly clone = function (): Ajax.IAjax {
         const cloneAjax = new AjaxClass();
         const cloneFields = [
             'prefix',

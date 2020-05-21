@@ -7,7 +7,7 @@ function getStorageByType(type?: string): Storage {
 }
 
 const storage = {
-    getItem: function(key: string, type?: 'local' | 'session'): string | number | boolean | object {
+    getItem: function (key: string, type?: 'local' | 'session'): string | number | boolean | object {
         try {
             const _storage = getStorageByType(type);
             let value = _storage.getItem(key);
@@ -19,7 +19,7 @@ const storage = {
         }
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setItem: function(key: string, val: any, type?: 'local' | 'session'): void {
+    setItem: function (key: string, val: any, type?: 'local' | 'session'): void {
         try {
             const _storage = getStorageByType(type);
             if (typeof val === 'undefined') {
@@ -31,7 +31,7 @@ const storage = {
             console.error(`Failed to set ${key} into ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
         }
     },
-    removeItem: function(key: string, type?: 'local' | 'session'): void {
+    removeItem: function (key: string, type?: 'local' | 'session'): void {
         try {
             const _storage = getStorageByType(type);
             if (typeof _storage.getItem(key) !== 'undefined') {
@@ -41,7 +41,7 @@ const storage = {
             console.error(`Failed to remove ${key} into ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
         }
     },
-    clear: function(type?: 'local' | 'session'): void {
+    clear: function (type?: 'local' | 'session'): void {
         try {
             const _storage = getStorageByType(type);
             _storage.clear();

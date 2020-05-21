@@ -28,7 +28,7 @@ let secretKeyPromise: IRequestResult<void> = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let waitingPublicKeyPromise: { resolve: () => void; reject: (e?: any) => void }[] = [];
 
-(function(): void {
+(function (): void {
     const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
     if (secretKey) {
         Crypto.AES.setKey(window.atob(secretKey));
@@ -72,13 +72,13 @@ function cryptoExtend(): () => void {
             publicKeyPromise = (this as IAjax).get<IPublicKeyResponse>('/encryption/public-key');
             return new Promise((resolve, reject) => {
                 publicKeyPromise
-                    .then(function(data) {
+                    .then(function (data) {
                         publicKeyPromise = null;
                         return resolve(data);
                     })
-                    .catch(function(e) {
+                    .catch(function (e) {
                         publicKeyPromise = null;
-                        waitingPublicKeyPromise.forEach(function(p) {
+                        waitingPublicKeyPromise.forEach(function (p) {
                             p.reject(e);
                         });
                         waitingPublicKeyPromise = [];
@@ -105,20 +105,20 @@ function cryptoExtend(): () => void {
                                 },
                             }
                         )
-                        .then(function() {
+                        .then(function () {
                             if (!window.btoa) {
                                 console && console.error('`window.btoa` is undefined');
                             }
                             storage.setItem(STORAGE_KEY.SECRET_KEY, window.btoa(newSecretKey), 'session');
                             storage.setItem(STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
-                            waitingPublicKeyPromise.forEach(function(p) {
+                            waitingPublicKeyPromise.forEach(function (p) {
                                 p.resolve();
                             });
                             waitingPublicKeyPromise = [];
                             resolve();
                         })
-                        .catch(function(e) {
-                            waitingPublicKeyPromise.forEach(function(p) {
+                        .catch(function (e) {
+                            waitingPublicKeyPromise.forEach(function (p) {
                                 p.reject(e);
                             });
                             waitingPublicKeyPromise = [];
@@ -135,17 +135,17 @@ function cryptoExtend(): () => void {
                     return secretKeyPromise;
                 }
                 if (publicKeyPromise) {
-                    return new Promise(function(resolve, reject) {
+                    return new Promise(function (resolve, reject) {
                         waitingPublicKeyPromise.push({ resolve, reject });
                     });
                 }
                 return new Promise((resolve, reject) => {
                     (sendSecretKeyRequest.apply(this) as IRequestResult<void>)
-                        .then(function() {
+                        .then(function () {
                             secretKeyPromise = null;
                             resolve();
                         })
-                        .catch(function(e) {
+                        .catch(function (e) {
                             secretKeyPromise = null;
                             reject();
                         });
@@ -362,7 +362,9 @@ function cryptoExtend(): () => void {
                     }
                 }
             } catch (e) {
-                throw new Error(`ajax: ${props.method} ${props.url} params: ${JSON.stringify(props.params)} ${e.stack}`);
+                throw new Error(
+                    `ajax: ${props.method} ${props.url} params: ${JSON.stringify(props.params)} ${e.stack}`
+                );
             }
             return response;
         };
@@ -396,23 +398,30 @@ function cryptoExtend(): () => void {
                     );
                 },
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                function(e: any) {
+                function (e: any) {
                     _opts.reject(e);
                 }
             );
         };
 
-        (this as IAjax).processErrorResponse = <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions): void | Promise<void> => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (this as IAjax).processErrorResponse = <T = any>(
+            xhr: XMLHttpRequest,
+            _opts: IRequestOptions
+        ): void | Promise<void> => {
             if (xhr.status === 470 && this.onCryptoExpired) {
                 // 加密密钥过期
-                (this as IAjax).onCryptoExpired<T>({
-                    errorCode: xhr.status,
-                    errorMsg: xhr.statusText,
-                }, _opts);
+                (this as IAjax).onCryptoExpired<T>(
+                    {
+                        errorCode: xhr.status,
+                        errorMsg: xhr.statusText,
+                    },
+                    _opts
+                );
             } else {
                 return processErrorResponse(xhr, _opts);
             }
-        }
+        };
     };
 }
 

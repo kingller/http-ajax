@@ -30,7 +30,7 @@ function createError(message: string, code?: string | number, request?: any, res
 
 class AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public _config: { noCache: boolean; statusField?: string; } = {
+    public _config: { noCache: boolean; statusField?: string } = {
         noCache: true,
         statusField: 'result',
     };
@@ -99,7 +99,7 @@ class AjaxBase {
     public $loading = '$loading';
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void { };
+    public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void {};
 
     public processData = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions): Ajax.IParams {
         return params;
@@ -137,9 +137,8 @@ class AjaxBase {
     }
 
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void> {
-    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
+    public processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void> {}
 
     /** 添加默认AJAX错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -245,7 +244,7 @@ class AjaxBase {
             loadingComponent.start();
         }
 
-        let beforeSendPromise = this.beforeSend({ method, url, params, options });
+        const beforeSendPromise = this.beforeSend({ method, url, params, options });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return promisify(beforeSendPromise)
             .then((): void => {
@@ -334,11 +333,13 @@ class AjaxBase {
                             return;
                         }
                         const errorResponse = ajaxThis.processErrorResponse<T>(this, _opts);
-                        promisify(errorResponse).then(() => {
-                            ajaxThis.onError<T>(this, _opts);
-                        }).catch(function (e)  {
-                            reject(e);
-                        });
+                        promisify(errorResponse)
+                            .then(() => {
+                                ajaxThis.onError<T>(this, _opts);
+                            })
+                            .catch(function (e) {
+                                reject(e);
+                            });
                     }
                 };
                 xhr.open(method, `${typeof options.prefix === 'string' ? options.prefix : ajaxThis.prefix}${url}`);
@@ -504,23 +505,25 @@ class AjaxBase {
         return false;
     }
 
-    public config = (options: {
-        /**
-         * Get请求是否添加随机字符串阻止缓存
-         * @default true
-         */
-        noCache?: boolean;
-        /**
-         * url前缀
-         * @default '/api'
-         */
-        prefix?: string;
-        /**
-         * 成功失败标志字段
-         * @default 'result'
-         */
-        statusField?: string;
-    } = {}): void => {
+    public config = (
+        options: {
+            /**
+             * Get请求是否添加随机字符串阻止缓存
+             * @default true
+             */
+            noCache?: boolean;
+            /**
+             * url前缀
+             * @default '/api'
+             */
+            prefix?: string;
+            /**
+             * 成功失败标志字段
+             * @default 'result'
+             */
+            statusField?: string;
+        } = {}
+    ): void => {
         const { prefix } = options;
         if (typeof prefix === 'string') {
             this.prefix = prefix;

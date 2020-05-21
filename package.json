@@ -46,8 +46,7 @@
     "lint-staged": {
         "(src|example)/**/*.{ts,tsx}": [
             "npm run eslint",
-            "prettier .prettierrc.js --write",
-            "git add"
+            "prettier .prettierrc.js --write"
         ]
     },
     "dependencies": {

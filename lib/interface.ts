@@ -249,7 +249,6 @@ export interface IAjax {
 
 // ----- signature end ------- //
 
-
 // ----- loading start ------- //
 
 export interface ILoading {
