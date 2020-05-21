@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "outDir": "dist",
+        "target": "ES5",
+        "module": "commonjs",
+        "sourceMap": false,
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "declaration": true,
+        "lib": ["ESNext", "DOM"]
+    },
+    "include": ["lib/**/*"],
+    "files": [
+        "./lib/typings/index.d.ts",
+    ],
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "strict": true
+}
