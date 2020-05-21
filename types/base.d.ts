@@ -86,7 +86,14 @@ declare class AjaxBase {
          * 失败回调
          */
         onError?: Ajax.IOnError;
+        /**
+         * session过期回调
+         */
         onSessionExpired?: Ajax.IOnSessionExpired;
+        /**
+         * 加载进度条
+         */
+        getLoading?: (options: Ajax.IOptions) => ILoading;
     }) => void;
 }
 export default AjaxBase;

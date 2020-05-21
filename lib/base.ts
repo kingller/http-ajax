@@ -529,10 +529,17 @@ class AjaxBase {
              * 失败回调
              */
             onError?: Ajax.IOnError;
+            /**
+             * session过期回调
+             */
             onSessionExpired?: Ajax.IOnSessionExpired;
+            /**
+             * 加载进度条
+             */
+            getLoading?: (options: Ajax.IOptions) => ILoading;
         } = {}
     ): void => {
-        const { prefix, onSuccess, onError, onSessionExpired } = options;
+        const { prefix, onSuccess, onError, onSessionExpired, getLoading } = options;
         if (typeof prefix === 'string') {
             this.prefix = prefix;
         }
@@ -544,6 +551,9 @@ class AjaxBase {
         }
         if (typeof onSessionExpired === 'function') {
             this.onSessionExpired = onSessionExpired;
+        }
+        if (typeof getLoading === 'function') {
+            this.getLoading = getLoading;
         }
         const restOptions = _.omit(options, ['prefix', 'onSuccess', 'onError']);
         Object.assign(this._config, restOptions);

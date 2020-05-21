@@ -143,7 +143,7 @@ var AjaxBase = /** @class */ (function () {
         };
         this.config = function (options) {
             if (options === void 0) { options = {}; }
-            var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired;
+            var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired, getLoading = options.getLoading;
             if (typeof prefix === 'string') {
                 _this.prefix = prefix;
             }
@@ -155,6 +155,9 @@ var AjaxBase = /** @class */ (function () {
             }
             if (typeof onSessionExpired === 'function') {
                 _this.onSessionExpired = onSessionExpired;
+            }
+            if (typeof getLoading === 'function') {
+                _this.getLoading = getLoading;
             }
             var restOptions = lodash_1.default.omit(options, ['prefix', 'onSuccess', 'onError']);
             Object.assign(_this._config, restOptions);

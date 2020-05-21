@@ -195,7 +195,7 @@ export interface IAjax {
 export interface ILoading {
     start: () => void;
     finish: (num?: number) => void;
-    count: () => number;
+    count?: () => number;
     name?: string;
-    getLoading: () => any;
+    getLoading?: () => any;
 }
