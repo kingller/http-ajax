@@ -165,9 +165,8 @@ var AjaxBase = /** @class */ (function () {
         }
     };
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    AjaxBase.prototype.processErrorResponse = function (xhr, _opts) {
-    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
+    AjaxBase.prototype.processErrorResponse = function (xhr, _opts) { };
     /** 添加默认AJAX错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.onError = function (xhr, _opts) {
@@ -309,9 +308,11 @@ var AjaxBase = /** @class */ (function () {
                         return;
                     }
                     var errorResponse = ajaxThis.processErrorResponse(this, _opts);
-                    promise_1.promisify(errorResponse).then(function () {
+                    promise_1.promisify(errorResponse)
+                        .then(function () {
                         ajaxThis.onError(_this, _opts);
-                    }).catch(function (e) {
+                    })
+                        .catch(function (e) {
                         reject(e);
                     });
                 }

@@ -364,6 +364,7 @@ function cryptoExtend() {
                 _opts.reject(e);
             });
         };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.processErrorResponse = function (xhr, _opts) {
             if (xhr.status === 470 && _this.onCryptoExpired) {
                 // 加密密钥过期
