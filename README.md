@@ -74,7 +74,9 @@ ajax.extend(ajax.cryptoExtend());
 ajax.extend(ajax.signatureExtend());
 ```
 
-### get请求
+### 发送请求
+
+#### get请求
 
 ```
 import ajax from 'http-ajax';
@@ -90,7 +92,7 @@ ajax.loadable.get<T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IO
 });
 ```
 
-### post请求
+#### post请求
 
 ```
 import ajax from 'http-ajax';
@@ -106,7 +108,7 @@ ajax.loadable.post<T = any>(url: string, params?: Ajax.IParams, options?: Ajax.I
 });
 ```
 
-### put请求
+#### put请求
 
 ```
 import ajax from 'http-ajax';
@@ -122,7 +124,7 @@ ajax.loadable.put<T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IO
 });
 ```
 
-### delete请求
+#### delete请求
 
 ```
 import ajax from 'http-ajax';
@@ -137,3 +139,34 @@ ajax.loadable.del<T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IO
     this.data = data;
 });
 ```
+
+### 参数 options
+
+#### processData
+boolean.  
+为false时不格式化请求参数。
+
+#### json
+boolean.  
+为false时不格式化返回值。
+
+#### autoPopupErrorMsg
+boolean.  
+为false时，不弹出错误提示。
+
+#### responseType
+'' | 'arraybuffer' | 'blob' | 'document' | 'json' | 'text'  
+设置请求responseTyp
+
+#### cache
+boolean  
+设置为true，缓存本次请求到的数据
+
+#### onData
+(data: any) => void  
+当陆陆续续获取数据片段时的回调函数
+
+#### onProgress
+(e?: ProgressEvent) => void  
+上传文件进度
+
