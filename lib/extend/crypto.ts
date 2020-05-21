@@ -334,16 +334,18 @@ function cryptoExtend(): () => void {
                     }
                 }
                 if (decrypt) {
-                    if (response.result || typeof response.result === 'undefined') {
+                    const { statusField } = this._config;
+                    if (response[statusField] || typeof response[statusField] === 'undefined') {
                         let data = response;
-                        if (response.result) {
+                        if (response[statusField]) {
                             data = response.data;
                         }
                         if (!data) {
                             return response;
                         }
                         if (decrypt === 'all') {
-                            data = Crypto.AES.decrypt(data as string);
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            data = Crypto.AES.decrypt((data as any) as string);
                         } else {
                             if (!data || typeof data !== 'object') {
                                 return response;
@@ -354,7 +356,7 @@ function cryptoExtend(): () => void {
                                 });
                             }
                         }
-                        if (response.result) {
+                        if (response[statusField]) {
                             response.data = data;
                         } else {
                             response = data;
@@ -418,6 +420,7 @@ function cryptoExtend(): () => void {
                     },
                     _opts
                 );
+                return Promise.reject('status 470: secret key expired');
             } else {
                 return processErrorResponse(xhr, _opts);
             }

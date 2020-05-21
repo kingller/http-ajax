@@ -127,9 +127,10 @@ class AjaxBase {
             reject,
         }: { response: Ajax.IResult; options: Ajax.IOptions; resolve: Ajax.IResolve<T>; reject: Ajax.IReject }
     ): void {
-        if (response.result) {
+        const { statusField } = this._config;
+        if (response[statusField]) {
             resolve(response.data as T);
-        } else if (response.result === false) {
+        } else if (response[statusField] === false) {
             reject(response);
         } else {
             resolve(response as T);
@@ -313,8 +314,9 @@ class AjaxBase {
                     if (this.status === 200 || this.status === 201) {
                         let res: Ajax.IResult;
                         if (options.json === false) {
+                            const { statusField } = ajaxThis._config;
                             res = {
-                                result: true,
+                                [statusField]: true,
                                 data: this.response || this.responseText,
                             };
                         } else {
@@ -333,13 +335,9 @@ class AjaxBase {
                             return;
                         }
                         const errorResponse = ajaxThis.processErrorResponse<T>(this, _opts);
-                        promisify(errorResponse)
-                            .then(() => {
-                                ajaxThis.onError<T>(this, _opts);
-                            })
-                            .catch(function (e) {
-                                reject(e);
-                            });
+                        promisify(errorResponse).then(() => {
+                            ajaxThis.onError<T>(this, _opts);
+                        });
                     }
                 };
                 xhr.open(method, `${typeof options.prefix === 'string' ? options.prefix : ajaxThis.prefix}${url}`);
@@ -523,13 +521,31 @@ class AjaxBase {
              * @default 'result'
              */
             statusField?: string;
+            /**
+             * 成功回调
+             */
+            onSuccess?: Ajax.IOnSuccess;
+            /**
+             * 失败回调
+             */
+            onError?: Ajax.IOnError;
+            onSessionExpired?: Ajax.IOnSessionExpired;
         } = {}
     ): void => {
-        const { prefix } = options;
+        const { prefix, onSuccess, onError, onSessionExpired } = options;
         if (typeof prefix === 'string') {
             this.prefix = prefix;
         }
-        const restOptions = _.omit(options, ['prefix']);
+        if (typeof onSuccess === 'function') {
+            this.onSuccess = onSuccess;
+        }
+        if (typeof onError === 'function') {
+            this.onError = onError;
+        }
+        if (typeof onSessionExpired === 'function') {
+            this.onSessionExpired = onSessionExpired;
+        }
+        const restOptions = _.omit(options, ['prefix', 'onSuccess', 'onError']);
         Object.assign(this._config, restOptions);
     };
 }

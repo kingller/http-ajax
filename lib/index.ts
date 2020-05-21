@@ -5,10 +5,6 @@ import AjaxBase from './base';
 import crypto from './extend/crypto';
 import signature from './extend/signature';
 
-// function onForbidden(): void {
-//     window.$alert(i18next.t('confirm.forbidden'));
-// }
-
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 window.$feedback = window.$feedback || function (): void {};
 
@@ -23,9 +19,10 @@ export class AjaxClass extends AjaxBase {
             reject,
         }: { response: Ajax.IResult; options: Ajax.IOptions; resolve: Ajax.IResolve<T>; reject: Ajax.IReject }
     ): void {
-        if (response.result) {
+        const { statusField } = this._config;
+        if (response[statusField]) {
             if (response.confirmMsg) {
-                delete response.result;
+                delete response[statusField];
                 resolve(response as T);
             } else {
                 if (response.warnMsg) {
@@ -33,7 +30,7 @@ export class AjaxClass extends AjaxBase {
                 }
                 resolve(response.data as T);
             }
-        } else if (response.result === false) {
+        } else if (response[statusField] === false) {
             reject(response);
             if (options && options.autoPopupErrorMsg === false) {
                 return;
@@ -47,36 +44,16 @@ export class AjaxClass extends AjaxBase {
     /** 添加默认AJAX错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public onError<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void {
-        _opts.reject(xhr);
+        const error = {
+            errorCode: xhr.status,
+            errorMsg: xhr.statusText,
+        };
+        if (xhr.status === 401 || xhr.status === 406) {
+            this.onSessionExpired<T>(error, _opts);
+        } else {
+            _opts.reject(xhr);
+        }
     }
-
-    // // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    // public onSessionExpired<T = any>(
-    //     error?: { errorCode: number; errorMsg: string },
-    //     props?: Ajax.IRequestOptions
-    // ): void {
-    //     const { method, url, params, loading, resolve, reject, options, cancelExecutor } = props;
-    //     if (!window.unlock) {
-    //         reject(error);
-    //         return;
-    //     }
-    //     //当Session过期之后显示解锁对话框
-    //     window.unlock.show((): void => {
-    //         //解锁之后重新发送AJAX请求
-    //         // prettier-ignore
-    //         this.sendRequest<T>(
-    //             method,
-    //             url,
-    //             params,
-    //             loading,
-    //             resolve,
-    //             reject,
-    //             window.unlock.logout,
-    //             options,
-    //             cancelExecutor
-    //         );
-    //     });
-    // }
 
     public AjaxClass: typeof AjaxClass;
 

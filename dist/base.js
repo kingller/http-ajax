@@ -143,21 +143,31 @@ var AjaxBase = /** @class */ (function () {
         };
         this.config = function (options) {
             if (options === void 0) { options = {}; }
-            var prefix = options.prefix;
+            var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired;
             if (typeof prefix === 'string') {
                 _this.prefix = prefix;
             }
-            var restOptions = lodash_1.default.omit(options, ['prefix']);
+            if (typeof onSuccess === 'function') {
+                _this.onSuccess = onSuccess;
+            }
+            if (typeof onError === 'function') {
+                _this.onError = onError;
+            }
+            if (typeof onSessionExpired === 'function') {
+                _this.onSessionExpired = onSessionExpired;
+            }
+            var restOptions = lodash_1.default.omit(options, ['prefix', 'onSuccess', 'onError']);
             Object.assign(_this._config, restOptions);
         };
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.onSuccess = function (xhr, _a) {
         var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject;
-        if (response.result) {
+        var statusField = this._config.statusField;
+        if (response[statusField]) {
             resolve(response.data);
         }
-        else if (response.result === false) {
+        else if (response[statusField] === false) {
             reject(response);
         }
         else {
@@ -247,6 +257,7 @@ var AjaxBase = /** @class */ (function () {
             var chunked = [];
             var ajaxThis = _this;
             xhr.onreadystatechange = function () {
+                var _a;
                 var _this = this;
                 if (options.onData) {
                     if (this.readyState === 3 || this.readyState === 4) {
@@ -285,10 +296,11 @@ var AjaxBase = /** @class */ (function () {
                 if (this.status === 200 || this.status === 201) {
                     var res = void 0;
                     if (options.json === false) {
-                        res = {
-                            result: true,
-                            data: this.response || this.responseText,
-                        };
+                        var statusField = ajaxThis._config.statusField;
+                        res = (_a = {},
+                            _a[statusField] = true,
+                            _a.data = this.response || this.responseText,
+                            _a);
                     }
                     else {
                         res = JSON.parse(this.response || this.responseText || '{}');
@@ -308,12 +320,8 @@ var AjaxBase = /** @class */ (function () {
                         return;
                     }
                     var errorResponse = ajaxThis.processErrorResponse(this, _opts);
-                    promise_1.promisify(errorResponse)
-                        .then(function () {
+                    promise_1.promisify(errorResponse).then(function () {
                         ajaxThis.onError(_this, _opts);
-                    })
-                        .catch(function (e) {
-                        reject(e);
                     });
                 }
             };

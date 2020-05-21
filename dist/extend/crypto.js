@@ -311,15 +311,17 @@ function cryptoExtend() {
                     }
                 }
                 if (decrypt) {
-                    if (response.result || typeof response.result === 'undefined') {
+                    var statusField = _this._config.statusField;
+                    if (response[statusField] || typeof response[statusField] === 'undefined') {
                         var data_1 = response;
-                        if (response.result) {
+                        if (response[statusField]) {
                             data_1 = response.data;
                         }
                         if (!data_1) {
                             return response;
                         }
                         if (decrypt === 'all') {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             data_1 = client_crypto_1.default.AES.decrypt(data_1);
                         }
                         else {
@@ -332,7 +334,7 @@ function cryptoExtend() {
                                 });
                             }
                         }
-                        if (response.result) {
+                        if (response[statusField]) {
                             response.data = data_1;
                         }
                         else {
@@ -372,6 +374,7 @@ function cryptoExtend() {
                     errorCode: xhr.status,
                     errorMsg: xhr.statusText,
                 }, _opts);
+                return Promise.reject('status 470: secret key expired');
             }
             else {
                 return processErrorResponse(xhr, _opts);

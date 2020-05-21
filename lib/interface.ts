@@ -89,6 +89,8 @@ export interface IResult {
     data?: any;
     confirmMsg?: string;
     warnMsg?: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    [name: string]: any;
 }
 
 // 返回错误
@@ -145,6 +147,19 @@ export interface IRequestOptions {
     onSessionExpired: IOnSessionExpired;
     options?: IOptions;
     cancelExecutor: ICancelExecutor;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface IOnSuccess<T = any> {
+    (
+        xhr: XMLHttpRequest | undefined,
+        props: { response: IResult; options: IOptions; resolve: IResolve<T>; reject: IReject }
+    ): void;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface IOnError<T = any> {
+    (xhr: XMLHttpRequest, _opts: IRequestOptions): void;
 }
 
 // Ajax

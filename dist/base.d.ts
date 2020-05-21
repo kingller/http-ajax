@@ -78,6 +78,15 @@ declare class AjaxBase {
          * @default 'result'
          */
         statusField?: string;
+        /**
+         * 成功回调
+         */
+        onSuccess?: Ajax.IOnSuccess;
+        /**
+         * 失败回调
+         */
+        onError?: Ajax.IOnError;
+        onSessionExpired?: Ajax.IOnSessionExpired;
     }) => void;
 }
 export default AjaxBase;

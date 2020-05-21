@@ -66,6 +66,7 @@ export interface IResult {
     data?: any;
     confirmMsg?: string;
     warnMsg?: string;
+    [name: string]: any;
 }
 export interface IError {
     name: string;
@@ -99,6 +100,17 @@ export interface IRequestOptions {
     onSessionExpired: IOnSessionExpired;
     options?: IOptions;
     cancelExecutor: ICancelExecutor;
+}
+export interface IOnSuccess<T = any> {
+    (xhr: XMLHttpRequest | undefined, props: {
+        response: IResult;
+        options: IOptions;
+        resolve: IResolve<T>;
+        reject: IReject;
+    }): void;
+}
+export interface IOnError<T = any> {
+    (xhr: XMLHttpRequest, _opts: IRequestOptions): void;
 }
 export interface IAjax {
     get: IRequest;
