@@ -27,14 +27,15 @@
     },
     "files": [
         "dist/*",
+        "types/*",
         "package.json",
         "README.md"
     ],
     "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
+    "types": "./types/index.d.ts",
     "scripts": {
         "build": "npm run clean && tsc --build tsconfig.json",
-        "clean": "rimraf ./dist",
+        "clean": "rimraf ./dist && rimraf ./types",
         "eslint": "eslint --ext .tsx,.ts --fix ./lib",
         "prepublishOnly": "npm run build"
     },
