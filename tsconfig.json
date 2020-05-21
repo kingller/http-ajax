@@ -9,7 +9,7 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "declaration": true,
-        "lib": ["ESNext", "DOM"]
+        "lib": ["ES6", "DOM"]
     },
     "include": ["lib/**/*"],
     "files": [

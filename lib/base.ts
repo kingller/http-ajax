@@ -275,7 +275,7 @@ class AjaxBase {
                 const ajaxThis = this;
                 xhr.onreadystatechange = function (): void {
                     if (options.onData) {
-                        if ([3, 4].includes(this.readyState)) {
+                        if (this.readyState === 3 || this.readyState === 4) {
                             // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
                             if (this.response) {
                                 let chunks: string[] = this.response.match(/<chunk>(.*?)<\/chunk>/g);
@@ -351,7 +351,8 @@ class AjaxBase {
                 xhr.setRequestHeader('X-Request-Id', uuid());
                 let isContentTypeExist = false;
                 if (options.headers) {
-                    for (const [k, v] of Object.entries(options.headers)) {
+                    for (const k of Object.keys(options.headers)) {
+                        const v = options.headers[k];
                         if (_.toLower(k) === 'content-type') {
                             isContentTypeExist = true;
                             // 支持不设置Content-Type

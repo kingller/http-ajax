@@ -249,7 +249,7 @@ var AjaxBase = /** @class */ (function () {
             xhr.onreadystatechange = function () {
                 var _this = this;
                 if (options.onData) {
-                    if ([3, 4].includes(this.readyState)) {
+                    if (this.readyState === 3 || this.readyState === 4) {
                         // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
                         if (this.response) {
                             var chunks = this.response.match(/<chunk>(.*?)<\/chunk>/g);
@@ -326,8 +326,9 @@ var AjaxBase = /** @class */ (function () {
             xhr.setRequestHeader('X-Request-Id', v4_1.default());
             var isContentTypeExist = false;
             if (options.headers) {
-                for (var _i = 0, _a = Object.entries(options.headers); _i < _a.length; _i++) {
-                    var _b = _a[_i], k = _b[0], v = _b[1];
+                for (var _i = 0, _a = Object.keys(options.headers); _i < _a.length; _i++) {
+                    var k = _a[_i];
+                    var v = options.headers[k];
                     if (lodash_1.default.toLower(k) === 'content-type') {
                         isContentTypeExist = true;
                         // 支持不设置Content-Type
