@@ -15,7 +15,7 @@ const TARGET = `${__dirname}/dist`;
 const ROOT_PATH = require('path').resolve(__dirname);
 
 const mode = args.mode;
-const port = 9300;
+const port = 9700;
 
 const alias = require('./webpack.alias.js');
 
@@ -61,6 +61,14 @@ let config = {
             {
                 test: /\.css$/,
                 use: [MiniCssExtractPlugin.loader, 'css-loader']
+            },
+            {
+                test: /\.(svg?)(\?[a-z0-9]+)?$/,
+                loader: 'url-loader'
+            },
+            {
+                test: /\.woff$/,
+                loader: 'url-loader'
             },
         ],
     },
@@ -149,6 +157,7 @@ switch (mode) {
                 useLocalIp: true,
                 proxy: {
                     '/app'  : {target: `http://localhost:${port}/`, pathRewrite: {'$':'.html'}},
+                    '/api/*': { target: `http://localhost:${port + 1}` },
                 }
             },
             devtool: '#source-map'
