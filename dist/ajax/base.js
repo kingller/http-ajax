@@ -24,9 +24,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var lodash_1 = __importDefault(require("lodash"));
 var v4_1 = __importDefault(require("uuid/v4"));
-var promise_1 = require("./utils/promise");
-var form_1 = require("./utils/form");
-var Ajax = __importStar(require("./interface"));
+var promise_1 = require("../utils/promise");
+var form_1 = require("../utils/form");
+var Ajax = __importStar(require("../interface"));
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message, code, request, response) {
     var error = new Error(message);

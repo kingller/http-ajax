@@ -1,0 +1,24 @@
+@size-large: 40px;
+@size-default: 32px;
+@size-medium: 28px;
+@size-small: 28px;
+@font-size-large: 16px;
+@font-size-small: 12px;
+
+.size() {
+    &.size-small {
+      font-size: @font-size-small;
+    
+      input[type=text], input[type=password], textarea{
+        font-size: @font-size-small;
+      }
+    }
+    
+    &.size-large {
+      font-size: @font-size-large;
+    
+      input[type=text], input[type=password], textarea{
+        font-size: @font-size-large;
+      }
+    }
+  }

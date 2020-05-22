@@ -12,7 +12,7 @@ npm install http-ajax
 ### config 配置项
 
 ```
-import ajax from 'http-ajax';
+import ajax, { Ajax } from 'http-ajax';
 
 ajax.config({
     /**
@@ -46,7 +46,7 @@ ajax.config({
             resolve: Ajax.IResolve<T>; 
             reject: Ajax.IReject;
         }
-    ): void {
+    ): void => {
         // 处理成功回调
         // 下面是默认处理代码
         const { statusField } = ajax.getConfig();
@@ -73,7 +73,7 @@ ajax.config({
     /**
      * 失败回调
      */
-    onError: <T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void {
+    onError: <T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void => {
         // 处理错误回调
         // 下面是默认处理代码
         const error = {
@@ -89,7 +89,7 @@ ajax.config({
     getLoading: (options: Ajax.IOptions): {
         start: () => void;
         finish: (num?: number) => void;
-    } {
+    } => {
         // 自定义加载进度条显示
         // 必须返回一个对象 { start: () => void; finish: () => void; }
         // 调用ajax.loadable时会调用start显示进度条，请求结束调用finish结束进度条

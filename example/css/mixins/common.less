@@ -1,0 +1,303 @@
+@import '../variables.less';
+@import '../themes/default.less';
+
+.hide {
+  display: none;
+}
+
+.clearfix{
+    &:after{
+        display: block;
+        height: 0;
+        content: '';
+        clear: both;
+        visibility: hidden;
+    }
+}
+
+.pdr-absolute-cover{
+	position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.font-size(@size){
+    font-size: 100px;
+    transform: scale(0.1, 0.1);
+}
+
+.popup-default{
+	position: relative;
+	background: #FFF;
+	border-radius: 5px;
+	box-shadow: 0px 2px 20px 0px rgba(0,0,0,0.30);
+}
+
+.popup-decoration(@bgColor:@green){
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 30px;
+	height: 80px;
+	border-radius: 5px;
+	overflow: hidden;
+	&:before{
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 30px;
+		height: 62px;
+		background: @bgColor;
+		content: '';
+		transform: translate(-6px,-10px) rotate(20deg);
+		transform-origin: 0% 0%;
+	}
+}
+
+.mixins-shadow{
+    box-shadow: 0 0 10px rgba(0, 0, 0, .3);
+}
+
+.layout-table-row{
+    display: table-row;
+    & > *{
+        display: table-cell;
+        vertical-align: top;
+    }
+}
+
+.center{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.icon-hoverable{
+    color: #CCC;
+    cursor: pointer;
+    &:hover{
+        color: @theme-color;
+    }
+}
+
+.icon-hoverable-white{
+    color: #CCC;
+    cursor: pointer;
+    &:hover{
+        color: #FFF;
+    }
+}
+
+.icon-hoverable-black{
+    color: #CCC;
+    cursor: pointer;
+    &:hover{
+        color: #999;
+    }
+}
+
+.mixins-click-effect {
+  animation: pdrClickEffect .36s ease-in-out;
+  animation-fill-mode: both;
+}
+
+@keyframes pdrClickEffect {
+  0% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+.fade-enter {
+  opacity: 0;
+  animation-timing-function: linear;
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+
+  &.fade-enter-active {
+    animation-name: pdrFadeIn;
+    animation-play-state: running;
+  }
+}
+
+.fade-leave {
+  animation-timing-function: linear;
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+
+  &.fade-leave-active {
+    animation-name: pdrFadeOut;
+    animation-play-state: running;
+    pointer-events: none;
+  }
+}
+
+@keyframes pdrFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes pdrFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.zoom-enter {
+  transform: scale(0);
+  animation-timing-function: cubic-bezier(0.08, 0.82, 0.17, 1);
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+
+  &.zoom-enter-active {
+    animation-name: pdrZoomIn;
+    animation-play-state: running;
+  }
+}
+
+.zoom-leave {
+  animation-timing-function: cubic-bezier(0.78, 0.14, 0.15, 0.86);
+  animation-duration: 0.2s;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+
+  &.zoom-leave-active {
+    animation-name: pdrZoomOut;
+    animation-play-state: running;
+    pointer-events: none;
+  }
+}
+
+.zoom-big-fast-enter {
+  transform: scale(0);
+  animation-timing-function: cubic-bezier(0.08, 0.82, 0.17, 1);
+  animation-duration: .1s;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+
+  &.zoom-big-fast-enter-active {
+    animation-name: pdrZoomBigIn;
+    animation-play-state: running;
+  }
+}
+
+.zoom-big-fast-leave {
+  animation-timing-function: cubic-bezier(0.78, 0.14, 0.15, 0.86);
+  animation-duration: .1s;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+
+  &.zoom-big-fast-leave-active {
+    animation-name: pdrZoomBigOut;
+    animation-play-state: running;
+    pointer-events: none;
+  }
+}
+
+.zoom-down-enter {
+  transform: scale(0);
+  animation-timing-function: cubic-bezier(0.08, 0.82, 0.17, 1);
+  animation-duration: .2s;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+
+  &.zoom-down-enter-active {
+    animation-name: pdrZoomDownIn;
+    animation-play-state: running;
+  }
+}
+
+.zoom-down-leave {
+  animation-timing-function: cubic-bezier(0.78, 0.14, 0.15, 0.86);
+  animation-duration: .2s;
+  animation-fill-mode: both;
+  animation-play-state: paused;
+
+  &.zoom-down-leave-active {
+    animation-name: pdrZoomDownOut;
+    animation-play-state: running;
+    pointer-events: none;
+  }
+}
+
+@keyframes pdrZoomIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pdrZoomOut {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+}
+
+@keyframes pdrZoomBigIn {
+  0% {
+    opacity: 0;
+    transform: scale(.8);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes pdrZoomBigOut {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(.8);
+  }
+}
+
+@keyframes pdrZoomDownIn {
+  0% {
+    opacity: 0;
+    transform-origin: 50% 100%;
+    transform: scale(.8);
+  }
+  100% {
+    transform-origin: 50% 100%;
+    transform: scale(1);
+  }
+}
+
+@keyframes pdrZoomDownOut {
+  0% {
+    transform-origin: 50% 100%;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform-origin: 50% 100%;
+    transform: scale(.8);
+  }
+}

@@ -1,0 +1,246 @@
+@import '../../css/variables.less';
+@import '../../css/themes/default.less';
+@import '../../css/mixins/size.less';
+@import '../../css/mixins/color.less';
+
+input[type=text], input[type=password], textarea{
+    width: 100%;
+    height: @size-default;
+    border: 1px solid @border-color;
+    padding: 0 15px;
+    background: #FFF;
+    color: #333;
+    vertical-align: middle;
+    font-size: @font-size;
+    outline: none;
+    border-radius: @border-radius;
+    transition: all .3s;
+    -webkit-appearance: none;
+
+    &:focus{
+        border-color: @theme-color;
+        box-shadow: 0 0 0 2px @theme-fade-secondary-color;
+    }
+    &.error{
+        border-color: @color-error;
+        &:focus{
+            border-color: @color-error;
+            box-shadow: 0 0 0 2px @color-error-fade;
+        }
+    }
+    &[readonly]{
+        color: #999;
+        &:focus{
+            border-color: @border-color;
+            box-shadow: none;
+        }
+    }
+    &[disabled]{
+        color: #999;
+        background: @input-disabled-bg-color;
+        border-color: @border-color;
+    }
+}
+
+input::-ms-clear, input::-ms-reveal {
+    display: none;
+}
+
+textarea{
+    height: 100%;
+    resize: none;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    &::-webkit-scrollbar-track-piece{
+        margin: 0 -2px;
+    }
+}
+
+.pdr-form-input,
+.pdr-textarea{
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.pdr-form-input{
+    &.icon-appended{
+        & input{
+            padding-right: 30px;
+        }
+        & .appended-icon{
+            right: 0;
+
+            &.clickable {
+                cursor: pointer;
+            }
+
+            &.pdr-form-input-trigger-clear {
+                display: none;
+            }
+
+            & > *{
+                color: #666;
+                &::before{
+                    vertical-align: middle;
+                    width: 8px;
+                    height: 4px;
+                }
+            }
+
+            & > .trigger-clear-icon {
+                display: inline-block;
+                vertical-align: middle;
+                opacity: 0;
+                background-color: #EEEDF0;
+                width: 12px;
+                height: 12px;
+                line-height: 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: color .3s ease, opacity .15s ease;
+
+                &:before {
+                    display: inline-block;
+                    width: 12px;
+                    height: 12px;
+                    vertical-align: baseline;
+                    transform: scale(.5);
+                }
+                  
+            }
+
+            &:hover {
+                & > .trigger-clear-icon {
+                    color: @text-color;
+                }
+            }
+          
+            &:active {
+                & > .trigger-clear-icon {
+                    color: @text-color-third;
+                }
+            }
+        }
+    }
+    &.icon-prepended{
+        & input{
+            padding-left: 30px;
+        }
+        & .prepended-icon{
+            left: 0;
+        }
+    }
+    & .appended-icon,
+    & .prepended-icon{
+        position: absolute;
+        top: 0;
+        width: 30px;
+        line-height: @size-default;
+        text-align: center;
+        color: #CCC;
+    }
+    &.allow-clear {
+        &:hover {
+            & .appended-icon{
+                display: none;
+                &.pdr-form-input-trigger-clear {
+                    display: block;
+                }
+
+                & > .trigger-clear-icon {
+                    opacity: 1;
+                }
+            }
+        }
+    }
+    &.money {
+        & > input {
+            text-align: right;
+        }
+    }
+
+    &.with-thumb{
+        & input{
+            padding-left: 44px;
+        }
+        & img{
+            position: absolute;
+            left: 0;
+            width: 24px;
+            height: 24px;
+            margin: 4px 10px;
+            border-radius: 50%;
+        }
+    }
+
+    &.size-medium, &.size-small {
+        &:not(.icon-appended) {
+            input[type=text], input[type=password], textarea {
+                padding-right: 10px;
+            }
+        }
+        &:not(.icon-prepended) {
+            input[type=text], input[type=password], textarea {
+                padding-left: 10px;
+            }
+        }
+    }
+}
+
+.pdr-form-input, .pdr-form-number, .pdr-form-select,
+.pdr-form-search, .pdr-select-tree, .pdr-select-department,
+.date-picker-control, .time-picker-control, .date-range-control {
+    &.size-medium {
+        input[type=text], input[type=password] {
+            height: @size-medium;
+        }
+
+        & .appended-icon,
+        & .prepended-icon{
+            line-height: @size-medium;
+        }
+    }
+
+    &.size-small {
+        input[type=text], input[type=password] {
+            height: @size-small;
+        }
+
+        & .appended-icon,
+        & .prepended-icon{
+            line-height: @size-small;
+        }
+    }
+
+    &.size-large {
+        input[type=text], input[type=password] {
+            height: @size-large;
+        }
+
+        & .appended-icon,
+        & .prepended-icon{
+            line-height: @size-large;
+        }
+    }
+}
+
+.pdr-textarea {
+    textarea {
+        height: auto;
+    }
+
+    &.resizable {
+        textarea {
+            resize: both;
+        }
+    }
+}
+
+.size-medium, .size-small {
+    input[type=password], textarea{
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+}

@@ -1,10 +1,10 @@
 'use strict';
 import _ from 'lodash';
 import uuid from 'uuid/v4';
-import { promisify } from './utils/promise';
-import { isFormData } from './utils/form';
-import { ILoading } from './interface';
-import * as Ajax from './interface';
+import { promisify } from '../utils/promise';
+import { isFormData } from '../utils/form';
+import { ILoading } from '../interface';
+import * as Ajax from '../interface';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message: string, code?: string | number, request?: any, response?: any): Ajax.IError {

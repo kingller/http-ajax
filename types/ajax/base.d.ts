@@ -1,5 +1,5 @@
-import { ILoading } from './interface';
-import * as Ajax from './interface';
+import { ILoading } from '../interface';
+import * as Ajax from '../interface';
 interface IConfigItem {
     noCache: boolean;
     statusField?: string;

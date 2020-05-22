@@ -1,0 +1,409 @@
+/* 所有按钮通用样式 */
+@import '../../css/variables.less';
+@import '../../css/themes/default.less';
+@import '../../css/mixins/size.less';
+@import '../../css/mixins/button.less';
+@import '../../css/mixins/color.less';
+@import '../../css/mixins/active.less';
+
+
+.pdr-btn,
+a.pdr-btn,
+a[href].pdr-btn {
+    display: inline-block;
+    min-width: 60px;
+    height: @size-default;
+    border: 1px solid @border-color;
+    padding: 0 @btn-padding;
+    line-height: @size-default;
+    font-size: @font-size;
+    text-align: center;
+    text-decoration: none;
+    color: #4C4C4C;
+    background: @btn-bg-color;
+    border-radius: @button-border-radius;
+    cursor: pointer;
+    outline: none;
+    .size();
+
+    &:not(.pdr-btn-link) {
+        vertical-align: middle;
+    }
+
+    &:hover{
+        text-decoration: none;
+        background: @bg-color-hover;
+    }
+
+    .mixins-active;
+
+    &.size-small{
+        min-width: 50px;
+        height: @size-small;
+        line-height: @size-small;
+        padding: 0 @btn-small-padding;
+    }
+    &.size-medium {
+        height: @size-medium;
+        line-height: @size-medium;
+    }
+    &.size-large {
+        height: @size-large;
+        line-height: @size-large;
+    }
+
+    &.primary, &.danger, &.important {
+        min-width: 80px;
+        padding: 0 (@btn-padding + 1);
+        border-width: 0;
+
+        &.size-small {
+            min-width: 70px;
+            padding: 0 (@btn-small-padding + 1);
+        }
+    }
+}
+
+/* 主要按钮 */
+.pdr-btn[type=submit],
+.pdr-btn.primary{
+    color: @btn-primary-color;
+    background: @theme-color;
+    &:hover {
+        background: @theme-hover-color;
+    }
+    &:active {
+        background: @theme-active-color;
+    }
+}
+
+.pdr-btn.danger{
+    color: #FFF;
+    background: @color-danger;
+    &:hover {
+        background: shade(@color-danger, 15%);
+    }
+    &:active {
+        background: shade(@color-danger, 30%);
+    }
+}
+
+.pdr-btn.important{
+    color: #FFF;
+    background: @color-important;
+    &:hover {
+        background: shade(@color-important ,15%);
+    }
+    &:active {
+        background: shade(@color-important ,30%);
+    }
+}
+
+.pdr-btn,
+a.pdr-btn{
+    /* 禁用：优先级较高 */
+    &:disabled, &.disabled,
+    &.primary:disabled, &.primary.disabled,
+    &.danger:disabled, &.danger.disabled,
+    &.important:disabled, &.important.disabled {
+        color: #CCC;
+        cursor: default;
+        background: @btn-bg-color;
+        box-shadow: initial;
+    }
+    &.primary:disabled, &.primary.disabled {
+        color: #ffffff;
+        background: @theme-color-disabled;
+    }
+    &.danger:disabled, &.danger.disabled {
+        color: #ffffff;
+        background: fade(@color-danger, @disabled-opacity-percent);
+    }
+    &.important:disabled, &.important.disabled {
+        color: #ffffff;
+        background: fade(@color-important, @disabled-opacity-percent);
+    }
+}
+
+.pdr-btn {
+    & > i, & > span {
+        display: inline-block;
+        line-height: 1;
+    }
+}
+
+.pdr-btn-icon, .pdr-btn-icon.size-small {
+    padding: 0 9px;
+
+    &.primary, &.danger, &.important {
+        padding: 0 10px;
+    }
+}
+
+.pdr-btn-icon {
+    & > .icon {
+        vertical-align: -0.125em;
+
+        &:before {
+            margin-right: 0;
+        }
+    }
+    & > .icon + span {
+        margin-left: 8px;
+    }
+}
+
+.pdr-btn {
+    &.pdr-btn-ghost, &.pdr-btn-link {
+        min-width: 0;
+
+        &.size-small {
+            min-width: 0;
+        }
+
+        &:not(:disabled):not(.disabled) {
+            background: transparent;
+            border-width: 0;
+            color: @text-color-secondary;
+            min-width: 0;
+
+            &:hover {
+                background: transparent;
+                color: @theme-color;
+            }
+
+            &:active {
+                color: @theme-active-color;
+            }
+
+            &:hover, &:active {
+                box-shadow: none;
+            }
+
+            &.primary, &.danger, &.important {
+                background: transparent;
+                border-width: 0;
+
+                &:hover, &:active {
+                    background: transparent;
+                    border-width: 0;
+                    box-shadow: none;
+                }
+            }
+
+            &.primary {
+                color: @theme-color;
+
+                &:hover {
+                    color: @theme-hover-color;
+                }
+
+                &:active {
+                    color: @theme-active-color;
+                }
+            }
+
+            &.danger {
+                color: @color-danger;
+
+                &:hover {
+                    color: shade(@color-danger, 15%);
+                }
+
+                &:active {
+                    color: shade(@color-danger, 30%);
+                }
+            }
+            &.important {
+                color: @color-important;
+
+                &:hover {
+                    color: shade(@color-important, 15%);
+                }
+
+                &:active {
+                    color: shade(@color-important, 30%);
+                }
+            }
+        }
+
+        &:disabled, &.disabled,
+        &.primary:disabled, &.primary.disabled {
+            color: #CCC;
+            background: transparent;
+            border-width: 0;
+        }
+
+        &:disabled, &.disabled {
+            &:hover {
+                background: transparent;
+            }
+        }
+    }
+
+    &.pdr-btn-ghost {
+        padding: 0 @btn-padding;
+
+        &.size-small{
+            padding: 0 @btn-small-padding;
+        }
+
+        &.pdr-btn-icon {
+            padding: 0 10px;
+        }
+    }
+
+    &.pdr-btn-link {
+        height: auto;
+        line-height: 1;
+        padding: 0;
+
+        &.size-small {
+            padding: 0;
+        }
+    }
+}
+
+.pdr-btn,
+a.pdr-btn {
+    &.thin, &.thin:not(:disabled):not(.disabled), &.thin.size-small:not(:disabled):not(.disabled) {
+        min-width: 0;
+        padding: 0 5px;
+    }
+}
+
+.pdr-btn-dropdown{
+    display: inline-block;
+    position: relative;
+    font-size: 0;
+    vertical-align: middle;
+
+    .pdr-btn-dropdown-trigger {
+        & > * {
+            font-size: @font-size;
+            vertical-align: middle;
+        }
+    }
+
+    &:not(.empty-child) {
+        .pdr-btn-dropdown-trigger {
+            & > :first-child, & > :first-child:not(:disabled):not(.disabled) {
+                min-width: 0;
+                padding: 0 15px;
+            }
+        }
+    }
+
+    &.dropdown {
+        .pdr-btn-dropdown-trigger {
+            & > :first-child, & > :first-child:not(:disabled):not(.disabled) {
+                padding-right: 8px;
+                min-width: 60px;
+
+                &.size-small {
+                    min-width: 50px;
+
+                    .pdr-dropdown-icon {
+                        &:before {
+                            line-height: 2;
+                            vertical-align: middle;
+                        }
+                    }
+                }
+
+                &.primary, &.danger, &.important {
+                    padding-right: 9px;
+                }
+            }
+        }
+    }
+    &:not(.dropdown):not(.empty-child) {
+        .pdr-btn-dropdown-trigger {
+            & > :first-child {
+                border-top-right-radius: 0;
+                border-bottom-right-radius: 0;
+            }
+        }
+    }
+    &:not(.dropdown) {
+        .pdr-btn-dropdown-trigger {
+            & > :first-child {
+                &.size-small {
+                    min-width: 0;
+                }
+            }
+        }
+    }
+
+    .pdr-btn-dropdown-trigger {
+        & > :last-child {
+            border-top-right-radius: @button-border-radius;
+            border-bottom-right-radius: @button-border-radius;
+        }
+    }
+    & .btn-dropdown{
+        display: inline-block;
+
+        & > .pdr-btn {
+            min-width: 0;
+            border-left-width: 0;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+
+            &.primary, &.danger, &.important {
+                border-left-width: 1px;
+            }
+        }
+        & .pdr-dropdown{
+            width: auto;
+        }
+        &.hoverable:hover .pdr-dropdown{
+            display: block;
+        }
+    }
+
+    .pdr-btn-dropdown-trigger {
+        & > :first-child {
+            &:disabled, &.disabled {
+                & + .btn-dropdown {
+                    & > .pdr-btn {
+                        &.primary, &.danger, &.important {
+                            border-left-width: 0;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    &.dropdown {
+        .btn-dropdown {
+            display: block;
+        }
+    }
+
+    .pdr-dropdown-icon {
+        margin-left: 8px;
+    }
+
+    .pdr-dropdown, .pdr-dropdown-icon, .btn-dropdown > .pdr-btn {
+        font-size: @font-size;
+    }
+
+    .pdr-dropdown-icon, .btn-dropdown > .pdr-btn {
+        &:before {
+            display: inline-block;
+            transform: scale(0.7, 0.7);
+            transition: transform 0.2s ease;
+            line-height: 2.5;
+        }
+    }
+
+    &.expand {
+        .pdr-dropdown-icon, .btn-dropdown > .pdr-btn {
+            &:before {
+                transform: rotate(180deg) scale(0.7, 0.7);
+            }
+        }
+    }
+}

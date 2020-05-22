@@ -1,0 +1,66 @@
+@rect-background-color: #FFF;
+
+.pdr-rect-with-arrow{
+    display: inline-block;
+    position: relative;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: left;
+    background: @rect-background-color;
+    box-shadow: 0 2px 8px rgba(30, 30, 30, 0.1);
+
+    &::after{
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 5px solid @rect-background-color;
+        border-radius: inherit;
+        background: inherit;
+        z-index: 1;
+        content: '';
+    }
+    & > .rect-arrow{
+        position: absolute;
+        width: 7px;
+        height: 7px;
+        background: inherit;
+        box-shadow: 0 2px 8px rgba(30, 30, 30, 0.1);
+        z-index: 0;
+        content: '';
+        transform: rotate(45deg);
+    }
+    & > :not(.rect-arrow){
+        position: relative;
+        z-index: 2;
+    }
+    &[data-arrow^=top] > .rect-arrow {
+        bottom: -4px;
+    }
+    &[data-arrow^=bottom] > .rect-arrow{
+        top: -4px;
+    }
+    &[data-arrow=top], &[data-arrow=bottom] {
+        & > .rect-arrow {
+            left: calc(50% - 4px);
+        }
+    }
+    &[data-arrow^=left] > .rect-arrow{
+        right: -4px;
+    }
+    &[data-arrow^=right] > .rect-arrow{
+        left: -4px;
+    }
+    &[data-arrow=left], &[data-arrow=right] {
+        & > .rect-arrow {
+            top: calc(50% - 4px);
+        }
+    }
+    &[data-arrow$=Right] > .rect-arrow{
+        right: 10px;
+    }
+    &[data-arrow$=Bottom] > .rect-arrow{
+        bottom: 10px;
+    }
+}

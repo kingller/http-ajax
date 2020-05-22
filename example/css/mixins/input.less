@@ -1,0 +1,38 @@
+@import '../variables.less';
+@import '../themes/default.less';
+@import './color.less';
+
+.pdr-input-simulation {
+    display: inline-block;
+    width: 100%;
+    border: 1px solid @border-color;
+    font-size: @font-size;
+    background: #FFF;
+    vertical-align: middle;
+    border-radius: @border-radius;
+    transition: all .3s;
+
+    &.focus {
+        border-color: @theme-color;
+        box-shadow: 0 0 0 2px @theme-fade-secondary-color;
+    }
+
+    &.read-only,
+    &.disabled {
+        border-color: @border-color;
+        box-shadow: none;
+    }
+
+    &.disabled {
+        background-color: @input-disabled-bg-color;
+    }
+
+    &.error {
+        border-color: @color-error;
+
+        &.focus{
+            border-color: @color-error;
+            box-shadow: 0 0 0 2px @color-error-fade;
+        }
+    }
+}

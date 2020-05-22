@@ -1,0 +1,45 @@
+.pdr-arrow(@side){
+    &::before{
+        position: absolute;
+        top: 0;
+        left: 50%;
+        display: block;
+        width: @side;
+        height: @side;
+        background: inherit;
+        transform: rotate(45deg) translate(0px);
+        transform-origin: 50% -50%;
+        content: '';
+    }
+    &[arrow^=t]::before{
+        top: -7px;
+    }
+    &[arrow^=b]::before{
+        bottom: -7px;
+    }
+    &[arrow$=l]::before{
+        left: 32px;
+    }
+    &[arrow$=c]::before{
+        left: calc(50% - 8px);
+    }
+    &[arrow$=r]::before{
+        right: 32px;
+    }
+
+    &[arrow^=l]::before{
+        left: -7px;
+    }
+    &[arrow^=r]::before{
+        right: -7px;
+    }
+    &[arrow$=t]::before{
+        top: 32px;
+    }
+    &[arrow$=m]::before{
+        top: calc(50% - 8px);
+    }
+    &[arrow$=b]::before{
+        bottom: 32px;
+    }
+}
