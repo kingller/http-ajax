@@ -6,31 +6,9 @@ import Button from '../../../components/button';
 type IPromise<T = any> = Ajax.IPromise<T>;
 
 export default class Code extends React.PureComponent {
-    promise = undefined as IPromise;
+    cancelToken = undefined as string;
 
     onStart = (): void => {
-        const promise = ajax.loadable.get('/load');
-        this.promise = promise;
-        promise.then(
-            (): void => {
-                window.$feedback('loaded', 'success');
-            },
-            (error): void => {
-                if (ajax.isCancel(error)) {
-                    window.$feedback('request canceled', 'warning');
-                }
-            }
-        );
-    };
-
-    onCancel = (): void => {
-        // 取消请求
-        this.promise && this.promise.cancel();
-        this.promise = undefined;
-    };
-
-    cancelToken = undefined as string;
-    onStart2 = (): void => {
         if (!this.cancelToken) {
             this.cancelToken = ajax.cancelToken();
         }
@@ -47,9 +25,33 @@ export default class Code extends React.PureComponent {
         );
     };
 
-    onCancel2 = (): void => {
+    onCancel = (): void => {
         // 取消请求
         ajax.cancel(this.cancelToken);
+    };
+
+    cancelToken2 = undefined as string;
+
+    onStart2 = (): void => {
+        if (!this.cancelToken2) {
+            this.cancelToken2 = ajax.cancelToken();
+        }
+        // 请求发送前，会取消未结束的同一cancelToken的请求
+        ajax.loadable.get('/load', undefined, { cancelToken: this.cancelToken2 }).then(
+            (): void => {
+                window.$feedback('loaded', 'success');
+            },
+            (error): void => {
+                if (ajax.isCancel(error)) {
+                    window.$feedback('request canceled', 'warning');
+                }
+            }
+        );
+    };
+
+    onCancel2 = (): void => {
+        // 取消请求
+        ajax.cancel(this.cancelToken2);
     };
 
     render(): React.ReactNode {

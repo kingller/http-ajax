@@ -24,8 +24,7 @@ const PUBLIC_KEY = Buffer.from(rsaKey.exportKey('pkcs8-public-der')).toString('b
 // ------ 生成 key end ------//
 
 function checkSecretKey(ctx: any): boolean {
-    const test = Math.floor(Math.random() * 1000) % 2;
-    if (!ctx.session.secretKey || test) {
+    if (!ctx.session.secretKey) {
         // 密钥过期
         ctx.status = 470;
         return false;
