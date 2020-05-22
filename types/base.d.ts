@@ -1,10 +1,12 @@
 import { ILoading } from './interface';
 import * as Ajax from './interface';
+interface IConfigItem {
+    noCache: boolean;
+    statusField?: string;
+}
 declare class AjaxBase {
-    _config: {
-        noCache: boolean;
-        statusField?: string;
-    };
+    _config: IConfigItem;
+    readonly getConfig: () => IConfigItem;
     readonly get: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T>;
     readonly post: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T>;
     readonly put: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T>;

@@ -28,11 +28,19 @@ function createError(message: string, code?: string | number, request?: any, res
     return error;
 }
 
+interface IConfigItem {
+    noCache: boolean;
+    statusField?: string;
+}
+
 class AjaxBase {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public _config: { noCache: boolean; statusField?: string } = {
+    public _config: IConfigItem = {
         noCache: true,
         statusField: 'result',
+    };
+
+    public readonly getConfig = (): IConfigItem => {
+        return this._config;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public readonly get = <T = any>(

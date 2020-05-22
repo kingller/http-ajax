@@ -48,21 +48,50 @@ ajax.config({
         }
     ): void {
         // 处理成功回调
-        // ...
+        // 下面是默认处理代码
+        const { statusField } = ajax.getConfig();
+        if (response[statusField]) {
+            if (response.confirmMsg) {
+                delete response[statusField];
+                resolve(response as T);
+            } else {
+                if (response.warnMsg) {
+                    window.$feedback(response.warnMsg, 'warning');
+                }
+                resolve(response.data as T);
+            }
+        } else if (response[statusField] === false) {
+            reject(response);
+            if (options && options.autoPopupErrorMsg === false) {
+                return;
+            }
+            window.$feedback(response.errorMsg);
+        } else {
+            resolve(response as T);
+        }
     },
     /**
      * 失败回调
      */
     onError: <T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void {
         // 处理错误回调
-        _opts.reject(xhr);
+        // 下面是默认处理代码
+        const error = {
+            errorCode: xhr.status,
+            errorMsg: xhr.statusText,
+        };
+        if (xhr.status === 401 || xhr.status === 406) {
+            ajax.onSessionExpired<T>(error, _opts);
+        } else {
+            _opts.reject(xhr);
+        }
     },
     getLoading: (options: Ajax.IOptions): {
         start: () => void;
         finish: (num?: number) => void;
     } {
         // 自定义加载进度条显示
-        // 必须返回一个对象 { start: () => void; finish: (num?: number) => void; }
+        // 必须返回一个对象 { start: () => void; finish: () => void; }
         // 调用ajax.loadable时会调用start显示进度条，请求结束调用finish结束进度条
     };
 });

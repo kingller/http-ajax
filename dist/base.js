@@ -48,10 +48,12 @@ function createError(message, code, request, response) {
 var AjaxBase = /** @class */ (function () {
     function AjaxBase() {
         var _this = this;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this._config = {
             noCache: true,
             statusField: 'result',
+        };
+        this.getConfig = function () {
+            return _this._config;
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.get = function (url, params, options) {
