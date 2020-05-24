@@ -1,6 +1,5 @@
 import React from 'react';
-import { CodeBox } from '../../../components';
-import { IBoxProps } from '../../../components';
+import { CodeBox, IBoxProps } from '../../../components';
 import Demo from './code';
 import sourceCode from '!raw-loader!./code';
 

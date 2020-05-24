@@ -8,10 +8,13 @@ export default class Box extends React.PureComponent<IBoxProps> {
         return (
             <CodeBox {...this.props} demo={<Demo />} sourceCode={sourceCode}>
                 <div className="code-box-title">
-                    <a>Ajax Loading</a>
+                    <a>请求失败自动提示</a>
                 </div>
                 <div>
-                    <p>启用loading</p>
+                    <p>
+                        请求失败返回 <code>result: false</code> 时，会自动调用{' '}
+                        <code>window.$feedback(response.errorMsg)</code> 显示错误信息提示
+                    </p>
                 </div>
             </CodeBox>
         );

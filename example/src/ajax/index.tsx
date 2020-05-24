@@ -5,6 +5,7 @@ import Loading from './loading/box';
 import Download from './download/box';
 import Crypto from './crypto/box';
 import Signature from './signature/box';
+import ErrorRequest from './error/box';
 import './index.css';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -34,6 +35,7 @@ export default class Ajax extends React.PureComponent {
                             <Download />
                             <Crypto />
                             <Signature />
+                            <ErrorRequest />
                         </div>
                     </Page>
                     <PropsTable title="Options" of={optionsDoc} />

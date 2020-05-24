@@ -1,9 +1,6 @@
 import React from 'react';
-import { Ajax } from 'http-ajax';
 import ajax from 'ajax';
 import Button from '../../../components/button';
-
-type IPromise<T = any> = Ajax.IPromise<T>;
 
 export default class Code extends React.PureComponent {
     cancelToken = undefined as string;

@@ -1,4 +1,5 @@
 import '@babel/polyfill';
+import '../components/feedback/index';
 
 import React from 'react';
 import ReactDOM from 'react-dom';

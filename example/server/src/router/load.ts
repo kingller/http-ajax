@@ -10,4 +10,16 @@ export default class Load {
             result: true,
         };
     }
+
+    @get('/load2')
+    public async getLoad2(ctx) {
+        await new Promise((resolve) => {
+            setTimeout(resolve, 500);
+        });
+        ctx.body = {
+            result: false,
+            errorCode: '',
+            errorMsg: '请求失败',
+        };
+    }
 }
