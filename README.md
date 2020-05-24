@@ -9,7 +9,7 @@ npm install http-ajax
 ``` 
 
 
-## Demo & API
+## Demo
 
 [示例](https://kingller.github.io/http-ajax/)
 
