@@ -12,38 +12,38 @@ export enum METHODS {
 export type IMethod = METHODS.get | METHODS.post | METHODS.put | METHODS.del;
 
 export interface IOptionsBase {
-    /** prefix: 设置url前缀 */
+    /** 设置url前缀 */
     prefix?: string;
-    /** headers: 设置请求头 */
+    /** 设置请求头 */
     headers?: {
         [name: string]: string;
     };
-    /** loadingName: 使用当前loading名称来显示loading */
+    /** 使用当前loading名称来显示loading */
     loadingName?: string;
-    /** context: 上下文，loading也可以从context.loading里取 */
+    /** 上下文，loading也可以从context.loading里取 */
     context?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [name: string]: any;
     };
-    /** cancelToken: 可以根据该值cancel请求，相同的cancelToken会取消掉前一个请求 */
+    /** 可以根据该值cancel请求，相同的cancelToken会取消掉前一个请求 */
     cancelToken?: string;
 }
 
 export interface IOptions extends IOptionsBase {
-    /** processData: 为false时不格式化请求参数 */
+    /** 为false时不格式化请求参数 */
     processData?: boolean;
-    /** json: 为false时不格式化返回值 */
+    /** 为false时不调用JSON.parse处理返回值 */
     json?: boolean;
-    /** autoPopupErrorMsg: 为false时，不弹出错误提示 */
+    /** 为false时，不弹出错误提示 */
     autoPopupErrorMsg?: boolean;
-    /** responseType: 设置请求responseType */
+    /** 设置请求responseType */
     responseType?: '' | 'arraybuffer' | 'blob' | 'document' | 'json' | 'text';
-    /** cache: 设置为true，缓存本次请求到的数据 */
+    /** 设置为true，缓存本次请求到的数据 */
     cache?: boolean | string;
-    /** onData: 当陆陆续续获取数据片段时的回调函数 */
+    /** 当陆陆续续获取数据片段时的回调函数 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onData?: (data: any) => void;
-    /** onProgress: 上传文件进度 */
+    /** 上传文件进度 */
     onProgress?: (e?: ProgressEvent) => void;
     /** 自定义选项，用来传递值自定义处理逻辑 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -245,7 +245,7 @@ export interface IAjax {
 export interface IOptions {
     /** 加密字段 */
     encrypt?: 'all' | string[];
-    /** 解密字段 */
+    /** 解密字段（该字段暂不使用，目前请求解密是通过请求响应头传递加密字段来解密的） */
     decrypt?: 'all' | string[];
 }
 

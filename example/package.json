@@ -6,6 +6,7 @@
         "build": "webpack --mode=production --progress",
         "start": "webpack-dev-server --mode=development --config ./webpack.config.js --hot --inline --progress --colors"
     },
+    "dependencies": {},
     "devDependencies": {
         "@babel/cli": "7.7.0",
         "@babel/core": "7.7.2",
@@ -59,6 +60,7 @@
         "less-plugin-autoprefix": "2.0.0",
         "line-height": "^0.3.1",
         "lodash": "4.17.15",
+        "metadata-ts-loader": "^1.1.0",
         "mini-css-extract-plugin": "0.8.0",
         "mobx": "4.15.0",
         "mobx-react": "5.4.4",

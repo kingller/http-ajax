@@ -69,10 +69,10 @@ class AjaxCryptoFieldCode extends React.PureComponent {
         const encryptField = method === 'get' ? this.state.getEncrypt : this.state.encrypt;
         const encryptParams = method === 'get' ? this.state.getParams : this.state.params;
         return (
-            <div>
+            <div className="example-ajax-crypto">
                 <h3>加密解密类型：字段</h3>
                 <strong>{JSON.stringify(encryptField)}</strong>
-                <div className="example-ajax-crypto">
+                <div>
                     <Button
                         type="primary"
                         onClick={(): void => {
@@ -190,9 +190,9 @@ class AjaxCryptoArrayCode extends React.PureComponent {
 
     render(): React.ReactNode {
         return (
-            <div>
+            <div className="example-ajax-crypto">
                 <h3>加密解密类型：数组（Java端未实现）</h3>
-                <div className="example-ajax-crypto">
+                <div>
                     <Button
                         type="primary"
                         onClick={(): void => {
@@ -285,9 +285,9 @@ class AjaxCryptoAllCode extends React.PureComponent {
 
     render(): React.ReactNode {
         return (
-            <div>
+            <div className="example-ajax-crypto">
                 <h3>加密解密类型：all</h3>
-                <div className="example-ajax-crypto">
+                <div>
                     <Button
                         type="primary"
                         onClick={(): void => {

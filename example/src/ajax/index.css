@@ -21,6 +21,11 @@
     width: 100%;
 }
 
+.example-ajax-crypto {
+    line-height: 2;
+    margin-bottom: 25px;
+}
+
 .example-ajax-crypto .btn-decrypt {
     margin-top: 10px;
 }
