@@ -156,7 +156,7 @@ switch (mode) {
                 disableHostCheck: true,
                 useLocalIp: true,
                 proxy: {
-                    '/app'  : {target: `http://localhost:${port}/`, pathRewrite: {'$':'.html'}},
+                    '/app'  : {target: `http://localhost:${port}`, pathRewrite: { '^/app': '/index.html' }},
                     '/api/*': { target: `http://localhost:${port + 1}` },
                 }
             },
