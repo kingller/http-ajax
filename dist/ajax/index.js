@@ -37,6 +37,7 @@ var HttpAjax = /** @class */ (function (_super) {
                 'beforeSend',
                 'processData',
                 'processResponse',
+                'processErrorResponse',
                 'onSuccess',
                 'onError',
                 'onSessionExpired',

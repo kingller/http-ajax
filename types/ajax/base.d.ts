@@ -96,6 +96,23 @@ declare class AjaxBase {
          * 加载进度条
          */
         getLoading?: (options: Ajax.IOptions) => ILoading;
+        /**
+         * 请求发送前
+         */
+        beforeSend?: (props: {
+            method: Ajax.IMethod;
+            url: string;
+            params: Ajax.IParams;
+            options: Ajax.IOptions;
+        }) => Ajax.IRequestResult | void;
+        /**
+         * 数据处理
+         */
+        processData?: (params: Ajax.IParams, props: {
+            method: Ajax.IMethod;
+            url: string;
+            options: Ajax.IOptions;
+        }) => Ajax.IParams;
     }) => void;
 }
 export default AjaxBase;

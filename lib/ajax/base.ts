@@ -545,9 +545,25 @@ class AjaxBase {
              * 加载进度条
              */
             getLoading?: (options: Ajax.IOptions) => ILoading;
+            /**
+             * 请求发送前
+             */
+            beforeSend?: (props: {
+                method: Ajax.IMethod;
+                url: string;
+                params: Ajax.IParams;
+                options: Ajax.IOptions;
+            }) => Ajax.IRequestResult | void;
+            /**
+             * 数据处理
+             */
+            processData?: (
+                params: Ajax.IParams,
+                props: { method: Ajax.IMethod; url: string; options: Ajax.IOptions }
+            ) => Ajax.IParams;
         } = {}
     ): void => {
-        const { prefix, onSuccess, onError, onSessionExpired, getLoading } = options;
+        const { prefix, onSuccess, onError, onSessionExpired, getLoading, beforeSend, processData } = options;
         if (typeof prefix === 'string') {
             this.prefix = prefix;
         }
@@ -563,7 +579,21 @@ class AjaxBase {
         if (typeof getLoading === 'function') {
             this.getLoading = getLoading;
         }
-        const restOptions = _.omit(options, ['prefix', 'onSuccess', 'onError']);
+        if (typeof beforeSend === 'function') {
+            this.beforeSend = beforeSend;
+        }
+        if (typeof processData === 'function') {
+            this.processData = processData;
+        }
+        const restOptions = _.omit(options, [
+            'prefix',
+            'onSuccess',
+            'onError',
+            'onSessionExpired',
+            'getLoading',
+            'beforeSend',
+            'processData',
+        ]);
         Object.assign(this._config, restOptions);
     };
 }

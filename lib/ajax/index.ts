@@ -68,6 +68,7 @@ export class HttpAjax extends AjaxBase {
             'beforeSend',
             'processData',
             'processResponse',
+            'processErrorResponse',
             'onSuccess',
             'onError',
             'onSessionExpired',

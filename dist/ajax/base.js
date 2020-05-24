@@ -145,7 +145,7 @@ var AjaxBase = /** @class */ (function () {
         };
         this.config = function (options) {
             if (options === void 0) { options = {}; }
-            var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired, getLoading = options.getLoading;
+            var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired, getLoading = options.getLoading, beforeSend = options.beforeSend, processData = options.processData;
             if (typeof prefix === 'string') {
                 _this.prefix = prefix;
             }
@@ -161,7 +161,21 @@ var AjaxBase = /** @class */ (function () {
             if (typeof getLoading === 'function') {
                 _this.getLoading = getLoading;
             }
-            var restOptions = lodash_1.default.omit(options, ['prefix', 'onSuccess', 'onError']);
+            if (typeof beforeSend === 'function') {
+                _this.beforeSend = beforeSend;
+            }
+            if (typeof processData === 'function') {
+                _this.processData = processData;
+            }
+            var restOptions = lodash_1.default.omit(options, [
+                'prefix',
+                'onSuccess',
+                'onError',
+                'onSessionExpired',
+                'getLoading',
+                'beforeSend',
+                'processData',
+            ]);
             Object.assign(_this._config, restOptions);
         };
     }

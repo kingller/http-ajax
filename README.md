@@ -14,6 +14,8 @@ npm install http-ajax
 ```
 import ajax, { Ajax } from 'http-ajax';
 
+const { beforeSend, processData } = ajax;
+
 ajax.config({
     /**
      * Get请求是否添加随机字符串阻止缓存
@@ -86,6 +88,9 @@ ajax.config({
             _opts.reject(xhr);
         }
     },
+    /**
+     * 自定义加载进度条
+     */
     getLoading: (options: Ajax.IOptions): {
         start: () => void;
         finish: (num?: number) => void;
@@ -94,6 +99,33 @@ ajax.config({
         // 必须返回一个对象 { start: () => void; finish: () => void; }
         // 调用ajax.loadable时会调用start显示进度条，请求结束调用finish结束进度条
     };
+    /**
+     * 请求发送前
+     */
+    beforeSend: (props: {
+        method: Ajax.IMethod;
+        url: string;
+        params: Ajax.IParams;
+        options: Ajax.IOptions;
+    }): Ajax.IRequestResult | void => {
+        let { options } = props;
+        // 添加默认请求头
+        _.defaultsDeep(options, {
+            headers: {
+                version: '1.0',
+                dataFrom: 0,
+            },
+        });
+        return beforeSend(props);
+    },
+    /**
+     * 数据处理
+     */
+    processData: (params: Ajax.IParams, props: { method: Ajax.IMethod; url: string; options: Ajax.IOptions }): Ajax.IParams => {
+        // 自定义处理 params，比如 trim
+        // ...
+        return processData(params, props);
+    }
 });
 
 // 添加加解密扩展
@@ -177,7 +209,7 @@ boolean.
 
 #### json
 boolean.  
-为false时不格式化返回值。
+为false时不调用JSON.parse处理返回值。
 
 #### autoPopupErrorMsg
 boolean.  
@@ -198,4 +230,11 @@ boolean
 #### onProgress
 (e?: ProgressEvent) => void  
 上传文件进度
+
+#### headers
+设置请求头
+
+#### encrypt
+"all" | string[]
+加密字段
 
