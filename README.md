@@ -13,6 +13,17 @@ npm install http-ajax
 
 [示例](https://kingller.github.io/http-ajax/)
 
+本地运行example示例
+```
+cd example
+npm install
+npm start
+cd server
+npm install
+npm start
+```
+打开本地网址[http://localhost:9700/app](http://localhost:9700/app)访问
+
 
 ## Usage
 
