@@ -2,6 +2,7 @@
     "name": "example-http-ajax",
     "version": "0.0.0",
     "private": true,
+    "main": "./dist/app.html",
     "scripts": {
         "build": "webpack --mode=production --progress",
         "start": "webpack-dev-server --mode=development --config ./webpack.config.js --hot --inline --progress --colors"
