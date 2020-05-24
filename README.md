@@ -1,13 +1,21 @@
 # http-ajax
 Promise based HTTP client for the browser
 
+
 ## Install
 
 ```bash
 npm install http-ajax
 ``` 
 
+
+## Demo & API
+
+[文档](https://kingller.github.io/http-ajax/)
+
+
 ## Usage
+
 
 ### config 配置项
 
@@ -135,6 +143,7 @@ ajax.extend(ajax.cryptoExtend());
 ajax.extend(ajax.signatureExtend());
 ```
 
+
 ### 发送请求
 
 #### get请求
@@ -200,6 +209,7 @@ ajax.loadable.del<T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IO
     this.data = data;
 });
 ```
+
 
 ### 参数 options
 
