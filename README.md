@@ -32,6 +32,7 @@ npm start
 
 ```
 import ajax, { Ajax } from 'http-ajax';
+import _ from 'lodash';
 
 const { beforeSend, processData } = ajax;
 
