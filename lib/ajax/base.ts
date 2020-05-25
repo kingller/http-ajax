@@ -370,7 +370,10 @@ class AjaxBase {
                 if (options.responseType) {
                     xhr.responseType = options.responseType;
                 }
-                xhr.setRequestHeader('token', window.localStorage.getItem('token') || '');
+                const token = window.localStorage.getItem('token') || '';
+                if (token) {
+                    xhr.setRequestHeader('token', token);
+                }
                 xhr.setRequestHeader('X-Request-Id', uuid());
                 let isContentTypeExist = false;
                 if (options.headers) {

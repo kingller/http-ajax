@@ -368,7 +368,10 @@ var AjaxBase = /** @class */ (function () {
             if (options.responseType) {
                 xhr.responseType = options.responseType;
             }
-            xhr.setRequestHeader('token', window.localStorage.getItem('token') || '');
+            var token = window.localStorage.getItem('token') || '';
+            if (token) {
+                xhr.setRequestHeader('token', token);
+            }
             xhr.setRequestHeader('X-Request-Id', v4_1.default());
             var isContentTypeExist = false;
             if (options.headers) {
