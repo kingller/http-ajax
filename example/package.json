@@ -4,7 +4,7 @@
     "private": true,
     "scripts": {
         "build": "webpack --mode=production --progress",
-        "deploy": "gh-pages -d dist",
+        "deploy": "npm run build && gh-pages -d dist",
         "start": "webpack-dev-server --mode=development --config ./webpack.config.js --hot --inline --progress --colors"
     },
     "homepage": "https://kingller.github.io/http-ajax/",
@@ -56,7 +56,7 @@
         "css-loader": "1.0.1",
         "gh-pages": "^2.2.0",
         "html-webpack-plugin": "^3.2.0",
-        "http-ajax": "^1.1.0",
+        "http-ajax": "^1.2.0",
         "json-format": "^1.0.1",
         "less": "3.10.3",
         "less-loader": "5.0.0",
