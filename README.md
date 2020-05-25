@@ -11,7 +11,7 @@ npm install http-ajax
 
 ## Demo
 
-[示例](https://kingller.github.io/http-ajax/)
+[在线示例](https://kingller.github.io/http-ajax/)
 
 本地运行example示例
 ```
