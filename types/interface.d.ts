@@ -42,6 +42,12 @@ export interface IOptions extends IOptionsBase {
     /** 自定义选项，用来传递值自定义处理逻辑 */
     [name: string]: any;
 }
+export declare type IResolve<T = any> = (value?: T | PromiseLike<T>) => void;
+export declare type IReject = (reason?: any) => void;
+export declare type ICancelExecutor = (c: () => void) => void;
+export interface IPromise<T> extends Promise<T> {
+    cancel?: () => void;
+}
 export declare type IParams = {
     [name: string]: any;
 } | string | Document | Blob | ArrayBufferView | ArrayBuffer | FormData | URLSearchParams | ReadableStream<Uint8Array>;
@@ -55,9 +61,11 @@ export interface IAjaxProcessDataOptions {
     method: IMethod;
     url: string;
     options: IOptions;
+    reject?: IReject;
 }
 export interface IProcessResponseOptions extends IAjaxArgsOptions {
     xhr: XMLHttpRequest;
+    reject: IReject;
 }
 export interface IResult {
     result?: boolean;
@@ -84,12 +92,6 @@ export declare type IOnSessionExpired = <T = any>(error?: {
     errorCode: number;
     errorMsg: string;
 }, _opts?: IRequestOptions) => void;
-export declare type IResolve<T = any> = (value?: T | PromiseLike<T>) => void;
-export declare type IReject = (reason?: any) => void;
-export declare type ICancelExecutor = (c: () => void) => void;
-export interface IPromise<T> extends Promise<T> {
-    cancel?: () => void;
-}
 export interface IRequestOptions {
     method: IMethod;
     url: string;
@@ -112,6 +114,17 @@ export interface IOnSuccess<T = any> {
 export interface IOnError<T = any> {
     (xhr: XMLHttpRequest, _opts: IRequestOptions): void;
 }
+export interface ICatchErrorOptions {
+    /** 错误消息 */
+    errorMsg: string;
+    /** 错误代码 */
+    errorCode?: string | number;
+    /** 类型 */
+    type?: 'uncaught' | 'log';
+    /** 备注 */
+    remark?: string;
+}
+export declare type ICatchError = (props: ICatchErrorOptions) => void;
 export interface IAjax {
     get: IRequest;
     put: IRequest;
@@ -135,6 +148,7 @@ export interface IAjax {
         method: IMethod;
         url: string;
         options: IOptions;
+        reject?: IReject;
     }) => IParams;
     processResponse: (response: IResult, props: IProcessResponseOptions) => IResult;
     readonly stringifyParams: (params: {
@@ -147,9 +161,16 @@ export interface IAjax {
         reject: IReject;
     }) => void;
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
-    processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
+    processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void | Promise<void>;
     /** 添加默认AJAX错误处理程序 */
     onError: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
+    /** 捕获错误 */
+    catchError: (props: {
+        errorMsg: string;
+        errorCode?: string | number;
+        type?: 'uncaught' | 'log';
+        remark?: string;
+    }) => void;
     sendRequest: <T>(method: IMethod, url: string, params: IParams | undefined, loading: boolean, resolve: IResolve<T>, reject: IReject, onSessionExpired: IOnSessionExpired, options: IOptions, cancelExecutor: ICancelExecutor) => Promise<any>;
     onSessionExpired: IOnSessionExpired;
     removeCache: (url: string, params: IParams | undefined, options?: IOptions) => void;

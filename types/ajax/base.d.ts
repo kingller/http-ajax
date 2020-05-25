@@ -36,6 +36,8 @@ declare class AjaxBase {
     processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void>;
     /** 添加默认AJAX错误处理程序 */
     onError<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void;
+    /** 捕获错误 */
+    catchError(props: Ajax.ICatchErrorOptions): void;
     setLoading(loadingName: string): void;
     getLoading(options: Ajax.IOptions): ILoading | undefined;
     readonly stringifyParams: (params: string | {
@@ -113,6 +115,8 @@ declare class AjaxBase {
             url: string;
             options: Ajax.IOptions;
         }) => Ajax.IParams;
+        /** 捕获错误 */
+        catchError?: (props: Ajax.ICatchErrorOptions) => void;
     }) => void;
 }
 export default AjaxBase;

@@ -24,4 +24,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var ajax_1 = __importDefault(require("./ajax"));
 exports.Ajax = __importStar(require("./interface"));
+var base_1 = require("./ajax/base");
+Object.defineProperty(exports, "AjaxBase", { enumerable: true, get: function () { return base_1.default; } });
 exports.default = ajax_1.default;

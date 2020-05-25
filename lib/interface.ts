@@ -50,6 +50,19 @@ export interface IOptions extends IOptionsBase {
     [name: string]: any;
 }
 
+// Promise resolve
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IResolve<T = any> = (value?: T | PromiseLike<T>) => void;
+// Promise reject
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type IReject = (reason?: any) => void;
+// 取消请求
+export type ICancelExecutor = (c: () => void) => void;
+
+export interface IPromise<T> extends Promise<T> {
+    cancel?: () => void;
+}
+
 // 请求参数
 export type IParams =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -74,10 +87,12 @@ export interface IAjaxProcessDataOptions {
     method: IMethod;
     url: string;
     options: IOptions;
+    reject?: IReject;
 }
 
 export interface IProcessResponseOptions extends IAjaxArgsOptions {
     xhr: XMLHttpRequest;
+    reject: IReject;
 }
 
 // 返回结果
@@ -123,19 +138,6 @@ export type IOnSessionExpired = <T = any>(
     _opts?: IRequestOptions
 ) => void;
 
-// Promise resolve
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type IResolve<T = any> = (value?: T | PromiseLike<T>) => void;
-// Promise reject
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type IReject = (reason?: any) => void;
-// 取消请求
-export type ICancelExecutor = (c: () => void) => void;
-
-export interface IPromise<T> extends Promise<T> {
-    cancel?: () => void;
-}
-
 // 请求传递选项
 export interface IRequestOptions {
     method: IMethod;
@@ -162,6 +164,19 @@ export interface IOnError<T = any> {
     (xhr: XMLHttpRequest, _opts: IRequestOptions): void;
 }
 
+export interface ICatchErrorOptions {
+    /** 错误消息 */
+    errorMsg: string; 
+    /** 错误代码 */
+    errorCode?: string | number;
+    /** 类型 */
+    type?: 'uncaught' | 'log';
+    /** 备注 */
+    remark?: string;
+}
+
+export type ICatchError = (props: ICatchErrorOptions) => void;
+
 // Ajax
 export interface IAjax {
     get: IRequest;
@@ -177,7 +192,7 @@ export interface IAjax {
     prefix: string;
     $loading: string;
     beforeSend: (props: { method: IMethod; url: string; params: IParams; options: IOptions }) => IRequestResult | void;
-    processData: (params: IParams, props: { method: IMethod; url: string; options: IOptions }) => IParams;
+    processData: (params: IParams, props: { method: IMethod; url: string; options: IOptions; reject?: IReject; }) => IParams;
     processResponse: (response: IResult, props: IProcessResponseOptions) => IResult;
     readonly stringifyParams: (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -192,10 +207,12 @@ export interface IAjax {
     ) => void;
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
+    processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void | Promise<void>;
     /** 添加默认AJAX错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
+    /** 捕获错误 */
+    catchError: (props: { errorMsg: string; errorCode?: string | number; type?: 'uncaught' | 'log'; remark?: string; }) => void;
     sendRequest: <T>(
         method: IMethod,
         url: string,

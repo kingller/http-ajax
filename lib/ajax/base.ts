@@ -3,6 +3,7 @@ import _ from 'lodash';
 import uuid from 'uuid/v4';
 import { promisify } from '../utils/promise';
 import { isFormData } from '../utils/form';
+import { catchAjaxError } from '../utils/catch';
 import { ILoading } from '../interface';
 import * as Ajax from '../interface';
 
@@ -155,6 +156,14 @@ class AjaxBase {
         _opts.reject(xhr);
     }
 
+    /** 捕获错误 */
+    public catchError(props: Ajax.ICatchErrorOptions): void {
+        const { errorCode, errorMsg, remark, type } = props;
+        if (type === 'uncaught') {
+            throw new Error(`${errorCode || ''} ${errorMsg} ${remark || ''}`);
+        }
+    }
+
     public setLoading(loadingName: string): void {
         this.$loading = loadingName;
     }
@@ -216,10 +225,11 @@ class AjaxBase {
         method: Ajax.IMethod,
         url: string,
         params: Ajax.IParams | undefined,
-        options: Ajax.IOptions = {}
+        options: Ajax.IOptions = {},
+        reject?: Ajax.IReject
     ): Ajax.IParams | undefined {
         if (options.processData !== false) {
-            params = this.processData(params, { method, url, options });
+            params = this.processData(params, { method, url, options, reject });
             if (!isFormData(params)) {
                 params = this.stringifyParams(params, method, options);
             }
@@ -265,7 +275,7 @@ class AjaxBase {
                 if (options.onData) {
                     options.json = false;
                 }
-                params = this.getProcessedParams(method, url, params, options);
+                params = this.getProcessedParams(method, url, params, options, reject);
                 if (method === Ajax.METHODS.get) {
                     url = `${url}?${params}`;
                     params = undefined;
@@ -289,7 +299,7 @@ class AjaxBase {
                             if (this.response) {
                                 let chunks: string[] = this.response.match(/<chunk>(.*?)<\/chunk>/g);
                                 if (!chunks) {
-                                    console.error(`${method} ${url} Incorrect response`);
+                                    console && console.error(`${method} ${url} Incorrect response`);
                                     return;
                                 }
                                 chunks = chunks.map((item: string): string => item.replace(/<\/?chunk>/g, ''));
@@ -333,7 +343,14 @@ class AjaxBase {
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
                         }
-                        res = ajaxThis.processResponse(res, { xhr, method, url, params: _opts.params, options });
+                        res = ajaxThis.processResponse(res, {
+                            xhr,
+                            method,
+                            url,
+                            params: _opts.params,
+                            options,
+                            reject,
+                        });
                         ajaxThis.onSuccess<T>(xhr, { response: res, options, resolve, reject });
                     } else if (this.status === 204) {
                         resolve(null);
@@ -404,6 +421,14 @@ class AjaxBase {
             })
             .catch((e: Error): void => {
                 reject(e);
+                catchAjaxError({
+                    e,
+                    method,
+                    url,
+                    params,
+                    callback: this.catchError,
+                    type: 'log',
+                });
             });
     }
 
@@ -561,9 +586,20 @@ class AjaxBase {
                 params: Ajax.IParams,
                 props: { method: Ajax.IMethod; url: string; options: Ajax.IOptions }
             ) => Ajax.IParams;
+            /** 捕获错误 */
+            catchError?: (props: Ajax.ICatchErrorOptions) => void;
         } = {}
     ): void => {
-        const { prefix, onSuccess, onError, onSessionExpired, getLoading, beforeSend, processData } = options;
+        const {
+            prefix,
+            onSuccess,
+            onError,
+            onSessionExpired,
+            getLoading,
+            beforeSend,
+            processData,
+            catchError,
+        } = options;
         if (typeof prefix === 'string') {
             this.prefix = prefix;
         }
@@ -585,6 +621,9 @@ class AjaxBase {
         if (typeof processData === 'function') {
             this.processData = processData;
         }
+        if (typeof catchError === 'function') {
+            this.catchError = catchError;
+        }
         const restOptions = _.omit(options, [
             'prefix',
             'onSuccess',
@@ -593,6 +632,7 @@ class AjaxBase {
             'getLoading',
             'beforeSend',
             'processData',
+            'catchError',
         ]);
         Object.assign(this._config, restOptions);
     };

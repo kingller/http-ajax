@@ -47,6 +47,14 @@ export class HttpAjax extends AjaxBase {
             errorCode: xhr.status,
             errorMsg: xhr.statusText,
         };
+        this.catchError(
+            Object.assign(
+                {
+                    remark: `ajax: ${_opts.method} ${_opts.url} params: ${JSON.stringify(_opts.params)}`,
+                },
+                error
+            )
+        );
         if (xhr.status === 401 || xhr.status === 406) {
             this.onSessionExpired<T>(error, _opts);
         } else {

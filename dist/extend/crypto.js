@@ -10,16 +10,11 @@ var enums_1 = require("../utils/enums");
 var clone_1 = require("../utils/clone");
 var array_1 = require("../utils/array");
 var promise_1 = require("../utils/promise");
+var catch_1 = require("../utils/catch");
 var publicKeyPromise = null;
 var secretKeyPromise = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 var waitingPublicKeyPromise = [];
-(function () {
-    var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
-    if (secretKey) {
-        client_crypto_1.default.AES.setKey(window.atob(secretKey));
-    }
-})();
 /**
  * 加解密扩展
  * 加密请求前未获取到密钥或返回470状态时，首先发送请求/api/encryption/public-key获取服务端RSA公钥
@@ -28,17 +23,23 @@ var waitingPublicKeyPromise = [];
  * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密
  */
 function cryptoExtend() {
+    (function () {
+        var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+        if (secretKey) {
+            client_crypto_1.default.AES.setKey(window.atob(secretKey));
+        }
+    })();
     return function crypto() {
         var _this = this;
         var _a = this, beforeSend = _a.beforeSend, processData = _a.processData, processResponse = _a.processResponse, processErrorResponse = _a.processErrorResponse, clear = _a.clear;
         // 校验该扩展是否已添加过
         if (this._cryptoExtendAdded) {
-            console.error('Error: `cryptoExtend` can only be added to ajax once!');
+            console && console.error('Error: `cryptoExtend` can only be added to ajax once!');
         }
         else {
             // 校验加密扩展必须在签名扩展前添加
             if (this._signatureExtendAdded) {
-                console.warn('Warning: `cryptoExtend` should be added to ajax before `signatureExtend`!');
+                console && console.warn('Warning: `cryptoExtend` should be added to ajax before `signatureExtend`!');
             }
         }
         // 添加标志符用来校验该扩展是否已添加
@@ -273,7 +274,7 @@ function cryptoExtend() {
         this.processData = function (params, props) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             params = processData(params, props);
-            var options = props.options;
+            var options = props.options, reject = props.reject;
             try {
                 if (params && options && options.encrypt) {
                     params = clone_1.cloneDeep(params);
@@ -294,7 +295,15 @@ function cryptoExtend() {
                 }
             }
             catch (e) {
-                throw new Error("ajax: " + props.method + " " + props.url + " params: " + JSON.stringify(params) + " " + e.stack);
+                reject && reject(e);
+                catch_1.catchAjaxError({
+                    e: e,
+                    method: props.method,
+                    url: props.url,
+                    params: params,
+                    callback: _this.catchError,
+                    type: reject ? 'log' : 'uncaught',
+                });
             }
             return params;
         };
@@ -344,7 +353,15 @@ function cryptoExtend() {
                 }
             }
             catch (e) {
-                throw new Error("ajax: " + props.method + " " + props.url + " params: " + JSON.stringify(props.params) + " " + e.stack);
+                props.reject(e);
+                catch_1.catchAjaxError({
+                    e: e,
+                    method: props.method,
+                    url: props.url,
+                    params: props.params,
+                    callback: _this.catchError,
+                    type: 'log',
+                });
             }
             return response;
         };

@@ -26,6 +26,7 @@ var lodash_1 = __importDefault(require("lodash"));
 var v4_1 = __importDefault(require("uuid/v4"));
 var promise_1 = require("../utils/promise");
 var form_1 = require("../utils/form");
+var catch_1 = require("../utils/catch");
 var Ajax = __importStar(require("../interface"));
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message, code, request, response) {
@@ -145,7 +146,7 @@ var AjaxBase = /** @class */ (function () {
         };
         this.config = function (options) {
             if (options === void 0) { options = {}; }
-            var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired, getLoading = options.getLoading, beforeSend = options.beforeSend, processData = options.processData;
+            var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired, getLoading = options.getLoading, beforeSend = options.beforeSend, processData = options.processData, catchError = options.catchError;
             if (typeof prefix === 'string') {
                 _this.prefix = prefix;
             }
@@ -167,6 +168,9 @@ var AjaxBase = /** @class */ (function () {
             if (typeof processData === 'function') {
                 _this.processData = processData;
             }
+            if (typeof catchError === 'function') {
+                _this.catchError = catchError;
+            }
             var restOptions = lodash_1.default.omit(options, [
                 'prefix',
                 'onSuccess',
@@ -175,6 +179,7 @@ var AjaxBase = /** @class */ (function () {
                 'getLoading',
                 'beforeSend',
                 'processData',
+                'catchError',
             ]);
             Object.assign(_this._config, restOptions);
         };
@@ -201,6 +206,13 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.onError = function (xhr, _opts) {
         _opts.reject(xhr);
     };
+    /** 捕获错误 */
+    AjaxBase.prototype.catchError = function (props) {
+        var errorCode = props.errorCode, errorMsg = props.errorMsg, remark = props.remark, type = props.type;
+        if (type === 'uncaught') {
+            throw new Error((errorCode || '') + " " + errorMsg + " " + (remark || ''));
+        }
+    };
     AjaxBase.prototype.setLoading = function (loadingName) {
         this.$loading = loadingName;
     };
@@ -220,10 +232,10 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.removeCacheCancel = function (token) {
         this._cacheCancel[token] && delete this._cacheCancel[token];
     };
-    AjaxBase.prototype.getProcessedParams = function (method, url, params, options) {
+    AjaxBase.prototype.getProcessedParams = function (method, url, params, options, reject) {
         if (options === void 0) { options = {}; }
         if (options.processData !== false) {
-            params = this.processData(params, { method: method, url: url, options: options });
+            params = this.processData(params, { method: method, url: url, options: options, reject: reject });
             if (!form_1.isFormData(params)) {
                 params = this.stringifyParams(params, method, options);
             }
@@ -258,7 +270,7 @@ var AjaxBase = /** @class */ (function () {
             if (options.onData) {
                 options.json = false;
             }
-            params = _this.getProcessedParams(method, url, params, options);
+            params = _this.getProcessedParams(method, url, params, options, reject);
             if (method === Ajax.METHODS.get) {
                 url = url + "?" + params;
                 params = undefined;
@@ -284,7 +296,7 @@ var AjaxBase = /** @class */ (function () {
                         if (this.response) {
                             var chunks = this.response.match(/<chunk>(.*?)<\/chunk>/g);
                             if (!chunks) {
-                                console.error(method + " " + url + " Incorrect response");
+                                console && console.error(method + " " + url + " Incorrect response");
                                 return;
                             }
                             chunks = chunks.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
@@ -327,7 +339,14 @@ var AjaxBase = /** @class */ (function () {
                     if (options.cache) {
                         ajaxThis._cache[url] = res;
                     }
-                    res = ajaxThis.processResponse(res, { xhr: xhr, method: method, url: url, params: _opts.params, options: options });
+                    res = ajaxThis.processResponse(res, {
+                        xhr: xhr,
+                        method: method,
+                        url: url,
+                        params: _opts.params,
+                        options: options,
+                        reject: reject,
+                    });
                     ajaxThis.onSuccess(xhr, { response: res, options: options, resolve: resolve, reject: reject });
                 }
                 else if (this.status === 204) {
@@ -389,6 +408,14 @@ var AjaxBase = /** @class */ (function () {
         })
             .catch(function (e) {
             reject(e);
+            catch_1.catchAjaxError({
+                e: e,
+                method: method,
+                url: url,
+                params: params,
+                callback: _this.catchError,
+                type: 'log',
+            });
         });
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

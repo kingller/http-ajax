@@ -27,7 +27,7 @@ function signatureExtend() {
         var signField = 'si' + "gn";
         // 校验该扩展是否已添加过
         if (this._signatureExtendAdded) {
-            console.error('`signatureExtend` can only be added to ajax once!');
+            console && console.error('`signatureExtend` can only be added to ajax once!');
         }
         // 添加标志符用来校验该扩展是否已添加
         this._signatureExtendAdded = true;

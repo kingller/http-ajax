@@ -5,6 +5,7 @@ import { STORAGE_KEY } from '../utils/enums';
 import { cloneDeep } from '../utils/clone';
 import { isArray } from '../utils/array';
 import { promisify } from '../utils/promise';
+import { catchAjaxError } from '../utils/catch';
 import {
     IAjax,
     IAjaxArgsOptions,
@@ -28,13 +29,6 @@ let secretKeyPromise: IRequestResult<void> = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let waitingPublicKeyPromise: { resolve: () => void; reject: (e?: any) => void }[] = [];
 
-(function (): void {
-    const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
-    if (secretKey) {
-        Crypto.AES.setKey(window.atob(secretKey));
-    }
-})();
-
 /**
  * 加解密扩展
  * 加密请求前未获取到密钥或返回470状态时，首先发送请求/api/encryption/public-key获取服务端RSA公钥
@@ -43,16 +37,23 @@ let waitingPublicKeyPromise: { resolve: () => void; reject: (e?: any) => void }[
  * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密
  */
 function cryptoExtend(): () => void {
+    (function (): void {
+        const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
+        if (secretKey) {
+            Crypto.AES.setKey(window.atob(secretKey));
+        }
+    })();
+
     return function crypto(): void {
         const { beforeSend, processData, processResponse, processErrorResponse, clear } = this as IAjax;
 
         // 校验该扩展是否已添加过
         if (this._cryptoExtendAdded) {
-            console.error('Error: `cryptoExtend` can only be added to ajax once!');
+            console && console.error('Error: `cryptoExtend` can only be added to ajax once!');
         } else {
             // 校验加密扩展必须在签名扩展前添加
             if (this._signatureExtendAdded) {
-                console.warn('Warning: `cryptoExtend` should be added to ajax before `signatureExtend`!');
+                console && console.warn('Warning: `cryptoExtend` should be added to ajax before `signatureExtend`!');
             }
         }
 
@@ -297,7 +298,7 @@ function cryptoExtend(): () => void {
         (this as IAjax).processData = (params: IParams, props: IAjaxProcessDataOptions): IParams => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             params = processData(params, props);
-            const { options } = props;
+            const { options, reject } = props;
             try {
                 if (params && options && options.encrypt) {
                     params = cloneDeep(params);
@@ -316,7 +317,15 @@ function cryptoExtend(): () => void {
                     }
                 }
             } catch (e) {
-                throw new Error(`ajax: ${props.method} ${props.url} params: ${JSON.stringify(params)} ${e.stack}`);
+                reject && reject(e);
+                catchAjaxError({
+                    e,
+                    method: props.method,
+                    url: props.url,
+                    params,
+                    callback: (this as IAjax).catchError,
+                    type: reject ? 'log' : 'uncaught',
+                });
             }
             return params;
         };
@@ -364,9 +373,15 @@ function cryptoExtend(): () => void {
                     }
                 }
             } catch (e) {
-                throw new Error(
-                    `ajax: ${props.method} ${props.url} params: ${JSON.stringify(props.params)} ${e.stack}`
-                );
+                props.reject(e);
+                catchAjaxError({
+                    e,
+                    method: props.method,
+                    url: props.url,
+                    params: props.params,
+                    callback: (this as IAjax).catchError,
+                    type: 'log',
+                });
             }
             return response;
         };

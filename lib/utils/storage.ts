@@ -14,7 +14,8 @@ const storage = {
             if (value) value = JSON.parse(value);
             return value;
         } catch (e) {
-            console.error(`Failed to get ${key} from ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
+            console &&
+                console.error(`Failed to get ${key} from ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
             return undefined;
         }
     },
@@ -28,7 +29,8 @@ const storage = {
                 _storage.setItem(key, JSON.stringify(val));
             }
         } catch (e) {
-            console.error(`Failed to set ${key} into ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
+            console &&
+                console.error(`Failed to set ${key} into ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
         }
     },
     removeItem: function (key: string, type?: 'local' | 'session'): void {
@@ -38,7 +40,8 @@ const storage = {
                 _storage.removeItem(key);
             }
         } catch (e) {
-            console.error(`Failed to remove ${key} into ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
+            console &&
+                console.error(`Failed to remove ${key} into ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
         }
     },
     clear: function (type?: 'local' | 'session'): void {
@@ -46,7 +49,7 @@ const storage = {
             const _storage = getStorageByType(type);
             _storage.clear();
         } catch (e) {
-            console.error(`Failed to clear ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
+            console && console.error(`Failed to clear ${type === 'session' ? 'sessionStorage' : 'localStorage'}`);
         }
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function

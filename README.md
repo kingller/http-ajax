@@ -18,7 +18,8 @@ npm install http-ajax
 cd example
 npm install
 npm start
-cd server
+
+cd example/server
 npm install
 npm start
 ```
@@ -102,8 +103,16 @@ ajax.config({
             errorCode: xhr.status,
             errorMsg: xhr.statusText,
         };
+        this.catchError(
+            Object.assign(
+                {
+                    remark: `ajax: ${_opts.method} ${_opts.url} params: ${JSON.stringify(_opts.params)}`,
+                },
+                error
+            )
+        );
         if (xhr.status === 401 || xhr.status === 406) {
-            ajax.onSessionExpired<T>(error, _opts);
+            this.onSessionExpired<T>(error, _opts);
         } else {
             _opts.reject(xhr);
         }
@@ -145,6 +154,10 @@ ajax.config({
         // 自定义处理 params，比如 trim
         // ...
         return processData(params, props);
+    },
+    /** 捕获错误 */
+    catchError: (props: Ajax.ICatchErrorOptions): void => {
+        // 这里可以自定义记录错误日志
     }
 });
 
