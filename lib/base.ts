@@ -394,7 +394,7 @@ class AjaxBase {
                     }
                 }
                 if (!isContentTypeExist && !isFormData(params) && (!options || options.encrypt !== 'all')) {
-                    xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+                    xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
                 }
 
                 if (options.onProgress) {

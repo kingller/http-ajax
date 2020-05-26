@@ -395,7 +395,7 @@ var AjaxBase = /** @class */ (function () {
                 }
             }
             if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {
-                xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+                xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
             }
             if (options.onProgress) {
                 xhr.upload.onprogress = options.onProgress;
