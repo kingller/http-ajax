@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import * as Ajax from './interface';
 import AjaxBase from './base';
 
