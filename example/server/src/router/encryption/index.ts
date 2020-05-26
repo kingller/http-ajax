@@ -24,7 +24,7 @@ const PUBLIC_KEY = Buffer.from(rsaKey.exportKey('pkcs8-public-der')).toString('b
 // ------ 生成 key end ------//
 
 function checkSecretKey(ctx: any): boolean {
-    if (!ctx.session.secretKey) {
+    if (!ctx.request.header.uuid || !ctx.session.secretKey) {
         // 密钥过期
         ctx.status = 470;
         return false;
