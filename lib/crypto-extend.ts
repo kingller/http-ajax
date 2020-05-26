@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import Crypto from 'client-crypto';
-import storage from '../utils/storage';
-import { STORAGE_KEY } from '../utils/enums';
-import { cloneDeep } from '../utils/clone';
-import { isArray } from '../utils/array';
-import { promisify } from '../utils/promise';
-import { catchAjaxError } from '../utils/catch';
+import storage from './utils/storage';
+import { STORAGE_KEY } from './utils/enums';
+import { cloneDeep } from './utils/clone';
+import { isArray } from './utils/array';
+import { promisify } from './utils/promise';
+import { catchAjaxError } from './utils/catch';
 import {
     IAjax,
     IAjaxArgsOptions,
@@ -15,7 +15,7 @@ import {
     IResult,
     IRequestOptions,
     IProcessResponseOptions,
-} from '../interface';
+} from './interface';
 
 interface IPublicKeyResponse {
     publicKey: string;
@@ -30,11 +30,11 @@ let secretKeyPromise: IRequestResult<void> = null;
 let waitingPublicKeyPromise: { resolve: () => void; reject: (e?: any) => void }[] = [];
 
 /**
- * 加解密扩展
- * 加密请求前未获取到密钥或返回470状态时，首先发送请求/api/encryption/public-key获取服务端RSA公钥
- * 客户端生成AES密钥，并使用RSA加密后发送请求/api/encryption/token传输给服务端，服务端客户端使用该密钥加解密
- * 请求头中将会添加字段uuid，encrypt（uuid:唯一标识码，服务端根据该uuid获取密钥；encrypt：加密字段，服务端根据该字段解密）
- * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密
+ * 加解密扩展。
+ * 加密请求前未获取到密钥或返回470状态时，首先发送请求/api/encryption/public-key获取服务端RSA公钥。
+ * 客户端生成AES密钥，并使用RSA加密后发送请求/api/encryption/token传输给服务端，服务端客户端使用该密钥加解密。
+ * 请求头中将会添加字段uuid，encrypt（uuid:唯一标识码，服务端根据该uuid获取密钥；encrypt：加密字段，服务端根据该字段解密）。
+ * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密。
  */
 function cryptoExtend(): () => void {
     (function (): void {

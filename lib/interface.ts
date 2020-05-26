@@ -226,6 +226,10 @@ export interface IAjax {
     ) => // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Promise<any>;
     onSessionExpired: IOnSessionExpired;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getCache: <T = any>(url: string, params: IParams | undefined, options?: IOptions) => T | undefined;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    getAllCache: () => { [name: string]: any };
     removeCache: (url: string, params: IParams | undefined, options?: IOptions) => void;
     clearCache: () => void;
     clear: () => void;
@@ -234,7 +238,63 @@ export interface IAjax {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     isCancel: (error: { errorMsg: string; errorCode: string | number } | any) => boolean;
     setLoading: (loadingName: string) => void;
-    config: (options: object) => void;
+    /**
+     * 加载进度条
+     */
+    getLoading?: (options: IOptions) => ILoading;
+    /** 配置 */
+    config: (options?: {
+        /**
+         * Get请求是否添加随机字符串阻止缓存
+         * @default true
+         */
+        noCache?: boolean;
+        /**
+         * url前缀
+         * @default '/api'
+         */
+        prefix?: string;
+        /**
+         * 成功失败标志字段
+         * @default 'result'
+         */
+        statusField?: string;
+        /**
+         * 成功回调
+         */
+        onSuccess?: IOnSuccess;
+        /**
+         * 失败回调
+         */
+        onError?: IOnError;
+        /**
+         * session过期回调
+         */
+        onSessionExpired?: IOnSessionExpired;
+        /**
+         * 加载进度条
+         */
+        getLoading?: (options: IOptions) => ILoading;
+        /**
+         * 请求发送前
+         */
+        beforeSend?: (props: {
+            method: IMethod;
+            url: string;
+            params: IParams;
+            options: IOptions;
+        }) => IRequestResult | void;
+        /**
+         * 数据处理
+         */
+        processData?: (params: IParams, props: {
+            method: IMethod;
+            url: string;
+            options: IOptions;
+        }) => IParams;
+        /** 捕获错误 */
+        catchError?: (props: ICatchErrorOptions) => void;
+    }) => void;
     Ajax: () => IAjax;
     clone: () => IAjax;
 }
@@ -253,9 +313,7 @@ export type IOnCryptoExpired = <T = any>(
 ) => void;
 
 export interface IAjax {
-    /** 加密解密扩展 */
-    readonly cryptoExtend?: ICryptoExtend;
-    /** 密钥过期 */
+    /** 密钥过期回调 */
     onCryptoExpired?: IOnCryptoExpired;
 }
 
@@ -272,11 +330,6 @@ export interface IOptions {
 
 export interface ISignatureExtend {
     (): () => void;
-}
-
-export interface IAjax {
-    /** 签名扩展 */
-    readonly signatureExtend?: ISignatureExtend;
 }
 
 // ----- signature end ------- //

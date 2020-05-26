@@ -13,9 +13,12 @@ export default class Box extends React.PureComponent {
                 <div>
                     <ul>
                         <li>发送请求并签名。</li>
+                        <li>启用签名需添加</li>
                         <li>
-                            启用签名需添加 <code>ajax.extend(ajax.signatureExtend())</code>{' '}
-                            （注意：保证该代码只执行一次）。
+                            <code>import signatureExtend from &apos;http-ajax/dist/signature-extend&apos;;</code>
+                        </li>
+                        <li>
+                            <code>ajax.extend(signatureExtend());</code> （注意：保证该代码只执行一次）。
                         </li>
                         <li>如果启用加密，该扩展必须添加在加密扩展之后。</li>
                     </ul>

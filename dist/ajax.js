@@ -18,8 +18,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpAjax = void 0;
 var base_1 = __importDefault(require("./base"));
-var crypto_1 = __importDefault(require("../extend/crypto"));
-var signature_1 = __importDefault(require("../extend/signature"));
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 window.$feedback = window.$feedback || function () { };
 var HttpAjax = /** @class */ (function (_super) {
@@ -53,8 +51,6 @@ var HttpAjax = /** @class */ (function (_super) {
             }
             return cloneAjax;
         };
-        _this.cryptoExtend = crypto_1.default;
-        _this.signatureExtend = signature_1.default;
         return _this;
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -101,6 +97,7 @@ var HttpAjax = /** @class */ (function (_super) {
             _opts.reject(xhr);
         }
     };
+    /** 添加扩展 */
     HttpAjax.prototype.extend = function (pluginFunc) {
         pluginFunc.apply(this);
     };

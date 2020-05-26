@@ -1,8 +1,6 @@
 import _ from 'lodash';
-import * as Ajax from '../interface';
+import * as Ajax from './interface';
 import AjaxBase from './base';
-import crypto from '../extend/crypto';
-import signature from '../extend/signature';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 window.$feedback = window.$feedback || function (): void {};
@@ -92,12 +90,10 @@ export class HttpAjax extends AjaxBase {
         return cloneAjax;
     };
 
-    public readonly cryptoExtend: Ajax.ICryptoExtend = crypto;
-
+    /** 密钥过期回调 */
     public onCryptoExpired?: Ajax.IOnCryptoExpired;
 
-    public readonly signatureExtend: Ajax.ISignatureExtend = signature;
-
+    /** 添加扩展 */
     public extend(pluginFunc: () => void): void {
         pluginFunc.apply(this);
     }

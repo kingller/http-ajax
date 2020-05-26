@@ -1,4 +1,4 @@
-import * as Ajax from '../interface';
+import * as Ajax from './interface';
 import AjaxBase from './base';
 export declare class HttpAjax extends AjaxBase {
     onSuccess<T = any>(xhr: XMLHttpRequest, { response, options, resolve, reject, }: {
@@ -12,9 +12,9 @@ export declare class HttpAjax extends AjaxBase {
     HttpAjax: typeof HttpAjax;
     readonly Ajax: () => Ajax.IAjax;
     readonly clone: () => Ajax.IAjax;
-    readonly cryptoExtend: Ajax.ICryptoExtend;
+    /** 密钥过期回调 */
     onCryptoExpired?: Ajax.IOnCryptoExpired;
-    readonly signatureExtend: Ajax.ISignatureExtend;
+    /** 添加扩展 */
     extend(pluginFunc: () => void): void;
 }
 declare const ajax: HttpAjax;

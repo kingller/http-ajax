@@ -1,11 +1,11 @@
 'use strict';
 import _ from 'lodash';
 import uuid from 'uuid/v4';
-import { promisify } from '../utils/promise';
-import { isFormData } from '../utils/form';
-import { catchAjaxError } from '../utils/catch';
-import { ILoading } from '../interface';
-import * as Ajax from '../interface';
+import { promisify } from './utils/promise';
+import { isFormData } from './utils/form';
+import { catchAjaxError } from './utils/catch';
+import { ILoading } from './interface';
+import * as Ajax from './interface';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message: string, code?: string | number, request?: any, response?: any): Ajax.IError {
@@ -107,9 +107,11 @@ class AjaxBase {
 
     public $loading = '$loading';
 
+    /** 请求发送前 */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void {};
 
+    /** 数据处理 */
     public processData = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions): Ajax.IParams {
         return params;
     };
@@ -168,6 +170,7 @@ class AjaxBase {
         this.$loading = loadingName;
     }
 
+    /** 加载进度条 */
     public getLoading(options: Ajax.IOptions): ILoading | undefined {
         // @ts-ignore
         if (options.loadingName && window[options.loadingName]) {
@@ -473,6 +476,7 @@ class AjaxBase {
         return promise;
     }
 
+    /** session过期回调 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public onSessionExpired<T = any>(
         error?: { errorCode: number; errorMsg: string },
@@ -482,16 +486,11 @@ class AjaxBase {
         reject(error);
     }
 
-    public getCacheKey(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): string {
+    private getCacheKey(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): string {
         const method = Ajax.METHODS.get;
         const _options = Object.assign({}, options, { cache: true });
         params = this.getProcessedParams(method, url, params, _options);
         return `${url}?${params}`;
-    }
-
-    public removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): void {
-        const key = this.getCacheKey(url, params, options);
-        delete this._cache[key];
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -503,6 +502,11 @@ class AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public getAllCache(): { [name: string]: any } {
         return this._cache;
+    }
+
+    public removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): void {
+        const key = this.getCacheKey(url, params, options);
+        delete this._cache[key];
     }
 
     public clearCache(): void {
@@ -540,6 +544,7 @@ class AjaxBase {
         return false;
     }
 
+    /** 配置 */
     public config = (
         options: {
             /**

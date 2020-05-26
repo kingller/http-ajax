@@ -1,4 +1,6 @@
 import ajax, { Ajax } from 'http-ajax';
+import cryptoExtend from 'http-ajax/dist/crypto-extend';
+import signatureExtend from 'http-ajax/dist/signature-extend';
 
 ajax.config({
     /**
@@ -65,9 +67,9 @@ ajax.config({
 });
 
 // 添加加解密扩展
-ajax.extend(ajax.cryptoExtend());
+ajax.extend(cryptoExtend());
 
 // 添加签名扩展
-ajax.extend(ajax.signatureExtend());
+ajax.extend(signatureExtend());
 
 export default ajax;

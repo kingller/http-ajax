@@ -1,5 +1,5 @@
-import { ILoading } from '../interface';
-import * as Ajax from '../interface';
+import { ILoading } from './interface';
+import * as Ajax from './interface';
 interface IConfigItem {
     noCache: boolean;
     statusField?: string;
@@ -48,16 +48,17 @@ declare class AjaxBase {
     private getProcessedParams;
     sendRequest<T>(method: Ajax.IMethod, url: string, params: Ajax.IParams | undefined, loading: boolean, resolve: Ajax.IResolve<T>, reject: Ajax.IReject, onSessionExpired: Ajax.IOnSessionExpired, options: Ajax.IOptions, cancelExecutor: Ajax.ICancelExecutor): Promise<any>;
     private request;
+    /** session过期回调 */
     onSessionExpired<T = any>(error?: {
         errorCode: number;
         errorMsg: string;
     }, props?: Ajax.IRequestOptions): void;
-    getCacheKey(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): string;
-    removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): void;
+    private getCacheKey;
     getCache<T = any>(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): T | undefined;
     getAllCache(): {
         [name: string]: any;
     };
+    removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): void;
     clearCache(): void;
     clear(): void;
     /** 生成cancel token */
@@ -66,6 +67,7 @@ declare class AjaxBase {
     cancel(token: string): void;
     /** 判断错误类型是否为取消请求 */
     isCancel(error: any): boolean;
+    /** 配置 */
     config: (options?: {
         /**
          * Get请求是否添加随机字符串阻止缓存

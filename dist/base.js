@@ -24,10 +24,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var lodash_1 = __importDefault(require("lodash"));
 var v4_1 = __importDefault(require("uuid/v4"));
-var promise_1 = require("../utils/promise");
-var form_1 = require("../utils/form");
-var catch_1 = require("../utils/catch");
-var Ajax = __importStar(require("../interface"));
+var promise_1 = require("./utils/promise");
+var form_1 = require("./utils/form");
+var catch_1 = require("./utils/catch");
+var Ajax = __importStar(require("./interface"));
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message, code, request, response) {
     var error = new Error(message);
@@ -144,6 +144,7 @@ var AjaxBase = /** @class */ (function () {
             }
             return array.join('&');
         };
+        /** 配置 */
         this.config = function (options) {
             if (options === void 0) { options = {}; }
             var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired, getLoading = options.getLoading, beforeSend = options.beforeSend, processData = options.processData, catchError = options.catchError;
@@ -443,6 +444,7 @@ var AjaxBase = /** @class */ (function () {
         }
         return promise;
     };
+    /** session过期回调 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.onSessionExpired = function (error, props) {
         var reject = props.reject;
@@ -454,10 +456,6 @@ var AjaxBase = /** @class */ (function () {
         params = this.getProcessedParams(method, url, params, _options);
         return url + "?" + params;
     };
-    AjaxBase.prototype.removeCache = function (url, params, options) {
-        var key = this.getCacheKey(url, params, options);
-        delete this._cache[key];
-    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.getCache = function (url, params, options) {
         var key = this.getCacheKey(url, params, options);
@@ -466,6 +464,10 @@ var AjaxBase = /** @class */ (function () {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.getAllCache = function () {
         return this._cache;
+    };
+    AjaxBase.prototype.removeCache = function (url, params, options) {
+        var key = this.getCacheKey(url, params, options);
+        delete this._cache[key];
     };
     AjaxBase.prototype.clearCache = function () {
         this._cache = {};
