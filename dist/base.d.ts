@@ -19,7 +19,9 @@ declare class AjaxBase {
     };
     prefix: string;
     $loading: string;
+    /** 请求发送前 */
     beforeSend: (props: Ajax.IAjaxArgsOptions) => Ajax.IRequestResult | void;
+    /** 数据处理 */
     processData: (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions) => Ajax.IParams;
     processResponse: (response: Ajax.IResult, props: Ajax.IProcessResponseOptions) => Ajax.IResult;
     /** 私有变量，请勿使用 */
@@ -39,6 +41,7 @@ declare class AjaxBase {
     /** 捕获错误 */
     catchError(props: Ajax.ICatchErrorOptions): void;
     setLoading(loadingName: string): void;
+    /** 加载进度条 */
     getLoading(options: Ajax.IOptions): ILoading | undefined;
     readonly stringifyParams: (params: string | {
         [name: string]: any;

@@ -100,8 +100,10 @@ var AjaxBase = /** @class */ (function () {
         };
         this.prefix = '/api';
         this.$loading = '$loading';
+        /** 请求发送前 */
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         this.beforeSend = function (props) { };
+        /** 数据处理 */
         this.processData = function (params, props) {
             return params;
         };
@@ -217,6 +219,7 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.setLoading = function (loadingName) {
         this.$loading = loadingName;
     };
+    /** 加载进度条 */
     AjaxBase.prototype.getLoading = function (options) {
         // @ts-ignore
         if (options.loadingName && window[options.loadingName]) {
