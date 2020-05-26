@@ -270,6 +270,6 @@ boolean
 设置请求头
 
 #### encrypt
-"all" | string[]
+"all" | string[]  
 加密字段
 
