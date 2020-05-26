@@ -10,6 +10,8 @@ const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const args = require('node-args');
 
+const isAnalyzer = args.analyzer;
+
 const TARGET = `${__dirname}/dist`;
 
 const ROOT_PATH = require('path').resolve(__dirname);
@@ -22,7 +24,7 @@ const alias = require('./webpack.alias.js');
 let config = {
     mode,
     entry: {},
-    stats: 'errors-warnings',
+    stats: isAnalyzer? 'normal': 'errors-warnings',
     output: {
         path: TARGET,
         filename: '[name].[hash:8].js',

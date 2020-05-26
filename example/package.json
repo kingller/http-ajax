@@ -2,12 +2,13 @@
     "name": "example-http-ajax",
     "version": "0.0.0",
     "private": true,
+    "homepage": "https://kingller.github.io/http-ajax/",
     "scripts": {
+        "analyzer": "webpack --mode=production --analyzer=true --progress --profile --json > stats.json && webpack-bundle-analyzer stats.json ./dist/",
         "build": "webpack --mode=production --progress",
         "deploy": "npm run build && gh-pages -d dist",
         "start": "webpack-dev-server --mode=development --config ./webpack.config.js --hot --inline --progress --colors"
     },
-    "homepage": "https://kingller.github.io/http-ajax/",
     "dependencies": {
         "crypto-js": "^4.0.0"
     },
@@ -84,6 +85,7 @@
         "uglifyjs-webpack-plugin": "^2.2.0",
         "url-loader": "1.1.2",
         "webpack": "^4.41.2",
+        "webpack-bundle-analyzer": "3.6.0",
         "webpack-cli": "^3.3.10",
         "webpack-dev-server": "^3.10.1",
         "webpack-merge": "^4.2.2"
