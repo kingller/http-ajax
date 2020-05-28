@@ -124,12 +124,22 @@ ajax.config({
      */
     getLoading: (options: Ajax.IOptions): {
         start: () => void;
-        finish: (num?: number) => void;
+        finish: () => void;
     } => {
         // 自定义加载进度条显示
         // 必须返回一个对象 { start: () => void; finish: () => void; }
         // 调用ajax.loadable时会调用start显示进度条，请求结束调用finish结束进度条
-    };
+        return {
+            start: () => {
+                // 添加显示loading逻辑
+                console.log('start loading');
+            },
+            finish: () => {
+                // 添加隐藏loading逻辑
+                console.log('end loading');
+            },
+        }
+    },
     /**
      * 请求发送前
      */

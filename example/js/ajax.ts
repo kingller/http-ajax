@@ -2,6 +2,8 @@ import ajax, { Ajax } from 'http-ajax';
 import cryptoExtend from 'http-ajax/dist/crypto-extend';
 import signatureExtend from 'http-ajax/dist/signature-extend';
 
+let refreshTokenPromise: Promise<any> = null;
+
 ajax.config({
     /**
      * url前缀
@@ -53,13 +55,49 @@ ajax.config({
      */
     onError: <T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void => {
         // 处理错误回调
-        // 下面是默认处理代码
         const error = {
             errorCode: xhr.status,
             errorMsg: xhr.statusText,
         };
+        ajax.catchError(
+            Object.assign(
+                {
+                    remark: `ajax: ${_opts.method} ${_opts.url} params: ${JSON.stringify(_opts.params)}`,
+                },
+                error
+            )
+        );
         if (xhr.status === 401 || xhr.status === 406) {
             ajax.onSessionExpired<T>(error, _opts);
+        } else if (xhr.status === 402) {
+            if (!refreshTokenPromise) {
+                refreshTokenPromise = ajax.get('/cloud/rebuildToken', {
+                    refreshToken: sessionStorage.getItem('refreshToken'),
+                });
+            }
+            refreshTokenPromise
+                .then((data) => {
+                    refreshTokenPromise = null;
+                    localStorage.setItem('token', data.token);
+                    sessionStorage.setItem('refreshToken', data.refreshToken);
+                    // 刷新token后重新发送请求
+                    ajax.sendRequest<T>(
+                        _opts.method,
+                        _opts.url,
+                        _opts.params,
+                        false,
+                        _opts.resolve,
+                        _opts.reject,
+                        ajax.onSessionExpired,
+                        _opts.options,
+                        // eslint-disable-next-line @typescript-eslint/no-empty-function
+                        function () {}
+                    );
+                })
+                .catch((e) => {
+                    refreshTokenPromise = null;
+                    _opts.reject(xhr);
+                });
         } else {
             _opts.reject(xhr);
         }

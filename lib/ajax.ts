@@ -77,11 +77,15 @@ export class HttpAjax extends AjaxBase {
             'onSuccess',
             'onError',
             'onSessionExpired',
+            'onCryptoExpired',
+            'getLoading',
+            'catchError',
+            'clear',
             '_config',
         ];
         for (const field of cloneFields) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            if ((this as { [name: string]: any })[field]) {
+            if (typeof (this as { [name: string]: any })[field] !== 'undefined') {
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (cloneAjax as { [name: string]: any })[field] = (this as { [name: string]: any })[field];
             }

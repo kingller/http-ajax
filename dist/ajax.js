@@ -39,12 +39,16 @@ var HttpAjax = /** @class */ (function (_super) {
                 'onSuccess',
                 'onError',
                 'onSessionExpired',
+                'onCryptoExpired',
+                'getLoading',
+                'catchError',
+                'clear',
                 '_config',
             ];
             for (var _i = 0, cloneFields_1 = cloneFields; _i < cloneFields_1.length; _i++) {
                 var field = cloneFields_1[_i];
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                if (this[field]) {
+                if (typeof this[field] !== 'undefined') {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     cloneAjax[field] = this[field];
                 }
