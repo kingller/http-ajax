@@ -430,11 +430,15 @@ var AjaxBase = /** @class */ (function () {
         var _this = this;
         var cancel;
         var promise;
-        function cancelExecutor(c) {
+        var cancelExecutor = function (c) {
             // An executor function receives a cancel function as a parameter
             cancel = c;
             promise && (promise.cancel = cancel);
-        }
+            // 如果是再次发送的请求， 前一请求缓存已从_cacheCancel清除，这里需要重新设置
+            if (options && options.cancelToken && promise && !_this._cacheCancel[options.cancelToken]) {
+                _this._cacheCancel[options.cancelToken] = promise;
+            }
+        };
         promise = new Promise(function (resolve, reject) {
             // prettier-ignore
             _this.sendRequest(method, url, params, loading, resolve, reject, _this.onSessionExpired, options, cancelExecutor);

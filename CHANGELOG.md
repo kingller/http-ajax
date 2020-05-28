@@ -8,6 +8,7 @@
 
 # 2.0.2
 1. <font color=red>修复</font> 使用`ajax.clone`时没有克隆`onCryptoExpired`, `getLoading`, `catchError`, `clear`
+2. <font color=red>修复</font> 使用`sendRequest`再次发送请求时，无法取消请求
 
 
 # 2.0.1

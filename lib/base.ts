@@ -109,7 +109,7 @@ class AjaxBase {
 
     /** 请求发送前 */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void {};
+    public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void { };
 
     /** 数据处理 */
     public processData = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions): Ajax.IParams {
@@ -150,7 +150,7 @@ class AjaxBase {
 
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
-    public processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void> {}
+    public processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void> { }
 
     /** 添加默认AJAX错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -448,10 +448,15 @@ class AjaxBase {
     ): Ajax.IRequestResult<T> {
         let cancel;
         let promise: Ajax.IRequestResult<T>;
-        function cancelExecutor(c: () => void): void {
+        const cancelExecutor = (c: () => void): void => {
             // An executor function receives a cancel function as a parameter
             cancel = c;
             promise && (promise.cancel = cancel);
+            
+            // 如果是再次发送的请求， 前一请求缓存已从_cacheCancel清除，这里需要重新设置
+            if (options && options.cancelToken && promise && !this._cacheCancel[options.cancelToken]) {
+                this._cacheCancel[options.cancelToken] = promise;
+            }
         }
         promise = new Promise((resolve, reject): void => {
             // prettier-ignore

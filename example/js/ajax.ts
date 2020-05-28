@@ -70,6 +70,7 @@ ajax.config({
         if (xhr.status === 401 || xhr.status === 406) {
             ajax.onSessionExpired<T>(error, _opts);
         } else if (xhr.status === 402) {
+            // token过期，刷新token
             if (!refreshTokenPromise) {
                 refreshTokenPromise = ajax.get('/cloud/rebuildToken', {
                     refreshToken: sessionStorage.getItem('refreshToken'),
@@ -85,13 +86,12 @@ ajax.config({
                         _opts.method,
                         _opts.url,
                         _opts.params,
-                        false,
+                        _opts.loading,
                         _opts.resolve,
                         _opts.reject,
                         ajax.onSessionExpired,
                         _opts.options,
-                        // eslint-disable-next-line @typescript-eslint/no-empty-function
-                        function () {}
+                        _opts.cancelExecutor
                     );
                 })
                 .catch((e) => {
