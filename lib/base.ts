@@ -240,18 +240,107 @@ class AjaxBase {
         return params;
     }
 
-    public sendRequest<T>(
+    /**
+     * 发送请求
+     */
+    public sendRequest<T>(props: {
+        /** 
+         * method
+         * 'GET' | 'POST' | 'PUT' | 'DELETE' 
+         */
         method: Ajax.IMethod,
+        /** url */
         url: string,
-        params: Ajax.IParams | undefined,
+        /** 请求参数 */
+        params?: Ajax.IParams | undefined,
+        /** 是否显示loading */
         loading: boolean,
+        /** resolve */
         resolve: Ajax.IResolve<T>,
+        /** reject */
         reject: Ajax.IReject,
-        onSessionExpired: Ajax.IOnSessionExpired,
-        options: Ajax.IOptions,
+        /** options */
+        options?: Ajax.IOptions,
+        /** 取消请求方法 */
         cancelExecutor: Ajax.ICancelExecutor
+        /** 请求session过期回调 */
+        onSessionExpired?: Ajax.IOnSessionExpired,
+    }): Promise<any>;
+
+    /**
+     * 发送请求
+     */
+    public sendRequest<T>(
+        /** method */
+        method: Ajax.IMethod,
+        /** url */
+        url: string,
+        /** 请求参数 */
+        params: Ajax.IParams | undefined,
+        /** 是否显示loading */
+        loading: boolean,
+        /** resolve */
+        resolve: Ajax.IResolve<T>,
+        /** reject */
+        reject: Ajax.IReject,
+        /** 请求session过期回调 */
+        onSessionExpired: Ajax.IOnSessionExpired,
+        /** options */
+        options: Ajax.IOptions,
+        /** 取消请求方法 */
+        cancelExecutor: Ajax.ICancelExecutor
+    ): Promise<any>;
+
+    public sendRequest<T>(
+        props: Ajax.IMethod | {
+            /** method */
+            method: Ajax.IMethod,
+            /** url */
+            url: string,
+            /** 请求参数 */
+            params?: Ajax.IParams | undefined,
+            /** 是否显示loading */
+            loading: boolean,
+            /** resolve */
+            resolve: Ajax.IResolve<T>,
+            /** reject */
+            reject: Ajax.IReject,
+            /** options */
+            options?: Ajax.IOptions,
+            /** 取消请求方法 */
+            cancelExecutor: Ajax.ICancelExecutor
+            /** 请求session过期回调 */
+            onSessionExpired?: Ajax.IOnSessionExpired,
+        },
+        url?: string,
+        params?: Ajax.IParams | undefined,
+        loading?: boolean,
+        resolve?: Ajax.IResolve<T>,
+        reject?: Ajax.IReject,
+        onSessionExpired?: Ajax.IOnSessionExpired,
+        options?: Ajax.IOptions,
+        cancelExecutor?: Ajax.ICancelExecutor
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<any> {
+        let method: Ajax.IMethod;
+        if (typeof props === 'object') {
+            method = props.method;
+            url = props.url;
+            params = props.params;
+            loading = props.loading;
+            resolve = props.resolve;
+            reject = props.reject;
+            options = props.options;
+            cancelExecutor = props.cancelExecutor;
+            if (props.onSessionExpired) {
+                onSessionExpired = props.onSessionExpired;
+            }
+        } else {
+            method = props;
+        }
+        if (!onSessionExpired) {
+            onSessionExpired = this.onSessionExpired;
+        }
         const _opts = { method, url, params, loading, resolve, reject, onSessionExpired, options, cancelExecutor };
         !options && (options = {});
         let _cancel = false;
@@ -452,7 +541,7 @@ class AjaxBase {
             // An executor function receives a cancel function as a parameter
             cancel = c;
             promise && (promise.cancel = cancel);
-            
+
             // 如果是再次发送的请求， 前一请求缓存已从_cacheCancel清除，这里需要重新设置
             if (options && options.cancelToken && promise && !this._cacheCancel[options.cancelToken]) {
                 this._cacheCancel[options.cancelToken] = promise;

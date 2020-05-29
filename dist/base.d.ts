@@ -49,7 +49,54 @@ declare class AjaxBase {
     /** 移除缓存的cancel请求 */
     private removeCacheCancel;
     private getProcessedParams;
-    sendRequest<T>(method: Ajax.IMethod, url: string, params: Ajax.IParams | undefined, loading: boolean, resolve: Ajax.IResolve<T>, reject: Ajax.IReject, onSessionExpired: Ajax.IOnSessionExpired, options: Ajax.IOptions, cancelExecutor: Ajax.ICancelExecutor): Promise<any>;
+    /**
+     * 发送请求
+     */
+    sendRequest<T>(props: {
+        /**
+         * method
+         * 'GET' | 'POST' | 'PUT' | 'DELETE'
+         */
+        method: Ajax.IMethod;
+        /** url */
+        url: string;
+        /** 请求参数 */
+        params?: Ajax.IParams | undefined;
+        /** 是否显示loading */
+        loading: boolean;
+        /** resolve */
+        resolve: Ajax.IResolve<T>;
+        /** reject */
+        reject: Ajax.IReject;
+        /** options */
+        options?: Ajax.IOptions;
+        /** 取消请求方法 */
+        cancelExecutor: Ajax.ICancelExecutor;
+        /** 请求session过期回调 */
+        onSessionExpired?: Ajax.IOnSessionExpired;
+    }): Promise<any>;
+    /**
+     * 发送请求
+     */
+    sendRequest<T>(
+    /** method */
+    method: Ajax.IMethod, 
+    /** url */
+    url: string, 
+    /** 请求参数 */
+    params: Ajax.IParams | undefined, 
+    /** 是否显示loading */
+    loading: boolean, 
+    /** resolve */
+    resolve: Ajax.IResolve<T>, 
+    /** reject */
+    reject: Ajax.IReject, 
+    /** 请求session过期回调 */
+    onSessionExpired: Ajax.IOnSessionExpired, 
+    /** options */
+    options: Ajax.IOptions, 
+    /** 取消请求方法 */
+    cancelExecutor: Ajax.ICancelExecutor): Promise<any>;
     private request;
     /** session过期回调 */
     onSessionExpired<T = any>(error?: {

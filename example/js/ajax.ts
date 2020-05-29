@@ -82,17 +82,7 @@ ajax.config({
                     localStorage.setItem('token', data.token);
                     sessionStorage.setItem('refreshToken', data.refreshToken);
                     // 刷新token后重新发送请求
-                    ajax.sendRequest<T>(
-                        _opts.method,
-                        _opts.url,
-                        _opts.params,
-                        _opts.loading,
-                        _opts.resolve,
-                        _opts.reject,
-                        ajax.onSessionExpired,
-                        _opts.options,
-                        _opts.cancelExecutor
-                    );
+                    ajax.sendRequest<T>(_opts);
                 })
                 .catch((e) => {
                     refreshTokenPromise = null;

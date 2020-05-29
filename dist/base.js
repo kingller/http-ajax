@@ -246,10 +246,30 @@ var AjaxBase = /** @class */ (function () {
         }
         return params;
     };
-    AjaxBase.prototype.sendRequest = function (method, url, params, loading, resolve, reject, onSessionExpired, options, cancelExecutor
+    AjaxBase.prototype.sendRequest = function (props, url, params, loading, resolve, reject, onSessionExpired, options, cancelExecutor
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) {
         var _this = this;
+        var method;
+        if (typeof props === 'object') {
+            method = props.method;
+            url = props.url;
+            params = props.params;
+            loading = props.loading;
+            resolve = props.resolve;
+            reject = props.reject;
+            options = props.options;
+            cancelExecutor = props.cancelExecutor;
+            if (props.onSessionExpired) {
+                onSessionExpired = props.onSessionExpired;
+            }
+        }
+        else {
+            method = props;
+        }
+        if (!onSessionExpired) {
+            onSessionExpired = this.onSessionExpired;
+        }
         var _opts = { method: method, url: url, params: params, loading: loading, resolve: resolve, reject: reject, onSessionExpired: onSessionExpired, options: options, cancelExecutor: cancelExecutor };
         !options && (options = {});
         var _cancel = false;

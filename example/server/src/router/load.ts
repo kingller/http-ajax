@@ -7,6 +7,9 @@ export default class Load {
         await new Promise((resolve) => {
             setTimeout(resolve, 2000);
         });
+        if (Math.floor(Math.random() * 1000) % 2) {
+            ctx.status = 402;
+        }
         ctx.body = {
             result: true,
         };

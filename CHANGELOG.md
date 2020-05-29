@@ -6,6 +6,62 @@
 <font color=red><strong>删除</strong></font>
 
 
+# 2.1.0
+1. <font color=blue>增强</font> `sendRequest`参数增加支持传入对象
+```
+    /**
+     * 发送请求
+     */
+    sendRequest<T>(props: {
+        /**
+         * method
+         * 'GET' | 'POST' | 'PUT' | 'DELETE'
+         */
+        method: Ajax.IMethod;
+        /** url */
+        url: string;
+        /** 请求参数 */
+        params?: Ajax.IParams | undefined;
+        /** 是否显示loading */
+        loading: boolean;
+        /** resolve */
+        resolve: Ajax.IResolve<T>;
+        /** reject */
+        reject: Ajax.IReject;
+        /** options */
+        options?: Ajax.IOptions;
+        /** 取消请求方法 */
+        cancelExecutor: Ajax.ICancelExecutor;
+        /** 请求session过期回调 */
+        onSessionExpired?: Ajax.IOnSessionExpired;
+    }): Promise<any>;
+
+    /**
+     * 发送请求
+     */
+    sendRequest<T>(
+        /** method */
+        method: Ajax.IMethod, 
+        /** url */
+        url: string, 
+        /** 请求参数 */
+        params: Ajax.IParams | undefined, 
+        /** 是否显示loading */
+        loading: boolean, 
+        /** resolve */
+        resolve: Ajax.IResolve<T>, 
+        /** reject */
+        reject: Ajax.IReject, 
+        /** 请求session过期回调 */
+        onSessionExpired: Ajax.IOnSessionExpired, 
+        /** options */
+        options: Ajax.IOptions, 
+        /** 取消请求方法 */
+        cancelExecutor: Ajax.ICancelExecutor
+    ): Promise<any>;
+```
+
+
 # 2.0.2
 1. <font color=red>修复</font> 使用`ajax.clone`时没有克隆`onCryptoExpired`, `getLoading`, `catchError`, `clear`
 2. <font color=red>修复</font> 使用`sendRequest`再次发送请求时，无法取消请求

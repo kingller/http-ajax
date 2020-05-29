@@ -171,7 +171,26 @@ export interface IAjax {
         type?: 'uncaught' | 'log';
         remark?: string;
     }) => void;
-    sendRequest: <T>(method: IMethod, url: string, params: IParams | undefined, loading: boolean, resolve: IResolve<T>, reject: IReject, onSessionExpired: IOnSessionExpired, options: IOptions, cancelExecutor: ICancelExecutor) => Promise<any>;
+    sendRequest: <T>(method: IMethod | {
+        /** method */
+        method: IMethod;
+        /** url */
+        url: string;
+        /** 请求参数 */
+        params?: IParams | undefined;
+        /** 是否显示loading */
+        loading: boolean;
+        /** resolve */
+        resolve: IResolve<T>;
+        /** reject */
+        reject: IReject;
+        /** options */
+        options?: IOptions;
+        /** 取消请求方法 */
+        cancelExecutor: ICancelExecutor;
+        /** 请求session过期回调 */
+        onSessionExpired?: IOnSessionExpired;
+    }, url?: string, params?: IParams | undefined, loading?: boolean, resolve?: IResolve<T>, reject?: IReject, onSessionExpired?: IOnSessionExpired, options?: IOptions, cancelExecutor?: ICancelExecutor) => Promise<any>;
     onSessionExpired: IOnSessionExpired;
     getCache: <T = any>(url: string, params: IParams | undefined, options?: IOptions) => T | undefined;
     getAllCache: () => {
