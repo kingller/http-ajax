@@ -13,7 +13,7 @@
 
 # 2.1.0
 > 2020.05.29  
-1. <font color=blue>增强</font> `sendRequest`参数增加支持传入对象
+1. <font color=blue>增强</font> `sendRequest`参数支持传入对象
 ```
     /**
      * 发送请求
