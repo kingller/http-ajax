@@ -177,6 +177,11 @@ export interface ICatchErrorOptions {
 
 export type ICatchError = (props: ICatchErrorOptions) => void;
 
+export interface IStringifyParamsOptions extends IOptions {
+    /** GET请求时是否对值用encodeURIComponent编码（签名时使用，签名不对value编码。内部参数，请勿使用） */
+    encodeValue?: boolean;
+}
+
 // Ajax
 export interface IAjax {
     get: IRequest;
@@ -198,7 +203,7 @@ export interface IAjax {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         params: { [name: string]: any } | string,
         method: IMethod,
-        options?: IOptions
+        options?: IStringifyParamsOptions
     ) => string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: <T = any>(

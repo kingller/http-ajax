@@ -188,7 +188,7 @@ class AjaxBase {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         params: { [name: string]: any } | string,
         method: Ajax.IMethod,
-        options: Ajax.IOptions
+        options: Ajax.IStringifyParamsOptions
     ): string => {
         //如果调用方已经将参数序列化成字符串，直接返回
         if (typeof params === 'string') return params;
@@ -200,15 +200,16 @@ class AjaxBase {
         const array = [];
         params = _.pick(params, _.keys(params).sort());
         for (const key in params) {
+            let value = params[key] === null || params[key] === undefined
+                ? ''
+                : params[key] instanceof Array
+                    ? params[key].join(',')
+                    : params[key];
+            if (!options || options.encodeValue !== false) {
+                value = encodeURIComponent(value);
+            }
             array.push(
-                `${key}=${encodeURIComponent(
-                    // prettier-ignore
-                    params[key] === null || params[key] === undefined
-                        ? ''
-                        : params[key] instanceof Array
-                            ? params[key].join(',')
-                            : params[key]
-                )}`
+                `${key}=${value}`
             );
         }
         if (this._config.noCache) {

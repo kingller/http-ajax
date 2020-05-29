@@ -131,13 +131,15 @@ var AjaxBase = /** @class */ (function () {
             var array = [];
             params = lodash_1.default.pick(params, lodash_1.default.keys(params).sort());
             for (var key in params) {
-                array.push(key + "=" + encodeURIComponent(
-                // prettier-ignore
-                params[key] === null || params[key] === undefined
+                var value = params[key] === null || params[key] === undefined
                     ? ''
                     : params[key] instanceof Array
                         ? params[key].join(',')
-                        : params[key]));
+                        : params[key];
+                if (!options || options.encodeValue !== false) {
+                    value = encodeURIComponent(value);
+                }
+                array.push(key + "=" + value);
             }
             if (_this._config.noCache) {
                 if (!options || !options.cache) {

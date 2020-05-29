@@ -45,7 +45,7 @@ declare class AjaxBase {
     getLoading(options: Ajax.IOptions): ILoading | undefined;
     readonly stringifyParams: (params: string | {
         [name: string]: any;
-    }, method: Ajax.IMethod, options: Ajax.IOptions) => string;
+    }, method: Ajax.IMethod, options: Ajax.IStringifyParamsOptions) => string;
     /** 移除缓存的cancel请求 */
     private removeCacheCancel;
     private getProcessedParams;

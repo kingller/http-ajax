@@ -40,7 +40,7 @@ function signatureExtend(): () => void {
             method: IMethod;
             options: IOptions;
         }): void => {
-            const signatureStr = (this as IAjax).stringifyParams(params, method, { cache: true });
+            const signatureStr = (this as IAjax).stringifyParams(params, method, { cache: true, encodeValue: false });
             if (!signatureStr) {
                 return;
             }

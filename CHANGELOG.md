@@ -6,7 +6,13 @@
 <font color=red><strong>删除</strong></font>
 
 
+# 3.0.0
+> 2020.05.29  
+1. <font color=orange>修改</font> 发送`GET`请求时签名不再对value使用`encodeURIComponent`编码
+
+
 # 2.1.0
+> 2020.05.29  
 1. <font color=blue>增强</font> `sendRequest`参数增加支持传入对象
 ```
     /**
@@ -63,6 +69,7 @@
 
 
 # 2.0.2
+> 2020.05.28  
 1. <font color=red>修复</font> 使用`ajax.clone`时没有克隆`onCryptoExpired`, `getLoading`, `catchError`, `clear`
 2. <font color=red>修复</font> 使用`sendRequest`再次发送请求时，无法取消请求
 

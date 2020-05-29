@@ -34,7 +34,7 @@ function signatureExtend() {
         var signData = function (_a) {
             var _b;
             var params = _a.params, method = _a.method, options = _a.options;
-            var signatureStr = _this.stringifyParams(params, method, { cache: true });
+            var signatureStr = _this.stringifyParams(params, method, { cache: true, encodeValue: false });
             if (!signatureStr) {
                 return;
             }
