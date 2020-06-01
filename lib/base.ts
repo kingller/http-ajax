@@ -1,5 +1,4 @@
 'use strict';
-import _ from 'lodash';
 import uuid from 'uuid/v4';
 import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
@@ -109,7 +108,7 @@ class AjaxBase {
 
     /** 请求发送前 */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void { };
+    public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void {};
 
     /** 数据处理 */
     public processData = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions): Ajax.IParams {
@@ -150,7 +149,7 @@ class AjaxBase {
 
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
-    public processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void> { }
+    public processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void> {}
 
     /** 添加默认AJAX错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -198,19 +197,21 @@ class AjaxBase {
         if (method !== Ajax.METHODS.get) return (params !== null && JSON.stringify(params)) || '';
         //对于GET请求，将参数拼成key1=val1&key2=val2的格式
         const array = [];
-        params = _.pick(params, _.keys(params).sort());
-        for (const key in params) {
-            let value = params[key] === null || params[key] === undefined
-                ? ''
-                : params[key] instanceof Array
-                    ? params[key].join(',')
-                    : params[key];
-            if (!options || options.encodeValue !== false) {
-                value = encodeURIComponent(value);
+        if (params && typeof params === 'object') {
+            const paramsKeys = Object.keys(params).sort();
+            for (let i = 0; i < paramsKeys.length; i++) {
+                const key = paramsKeys[i];
+                let value =
+                    params[key] === null || params[key] === undefined
+                        ? ''
+                        : params[key] instanceof Array
+                        ? params[key].join(',')
+                        : params[key];
+                if (!options || options.encodeValue !== false) {
+                    value = encodeURIComponent(value);
+                }
+                array.push(`${key}=${value}`);
             }
-            array.push(
-                `${key}=${value}`
-            );
         }
         if (this._config.noCache) {
             if (!options || !options.cache) {
@@ -245,27 +246,27 @@ class AjaxBase {
      * 发送请求
      */
     public sendRequest<T>(props: {
-        /** 
+        /**
          * method
-         * 'GET' | 'POST' | 'PUT' | 'DELETE' 
+         * 'GET' | 'POST' | 'PUT' | 'DELETE'
          */
-        method: Ajax.IMethod,
+        method: Ajax.IMethod;
         /** url */
-        url: string,
+        url: string;
         /** 请求参数 */
-        params?: Ajax.IParams | undefined,
+        params?: Ajax.IParams | undefined;
         /** 是否显示loading */
-        loading: boolean,
+        loading: boolean;
         /** resolve */
-        resolve: Ajax.IResolve<T>,
+        resolve: Ajax.IResolve<T>;
         /** reject */
-        reject: Ajax.IReject,
+        reject: Ajax.IReject;
         /** options */
-        options?: Ajax.IOptions,
+        options?: Ajax.IOptions;
         /** 取消请求方法 */
-        cancelExecutor: Ajax.ICancelExecutor
+        cancelExecutor: Ajax.ICancelExecutor;
         /** 请求session过期回调 */
-        onSessionExpired?: Ajax.IOnSessionExpired,
+        onSessionExpired?: Ajax.IOnSessionExpired;
     }): Promise<any>;
 
     /**
@@ -293,26 +294,28 @@ class AjaxBase {
     ): Promise<any>;
 
     public sendRequest<T>(
-        props: Ajax.IMethod | {
-            /** method */
-            method: Ajax.IMethod,
-            /** url */
-            url: string,
-            /** 请求参数 */
-            params?: Ajax.IParams | undefined,
-            /** 是否显示loading */
-            loading: boolean,
-            /** resolve */
-            resolve: Ajax.IResolve<T>,
-            /** reject */
-            reject: Ajax.IReject,
-            /** options */
-            options?: Ajax.IOptions,
-            /** 取消请求方法 */
-            cancelExecutor: Ajax.ICancelExecutor
-            /** 请求session过期回调 */
-            onSessionExpired?: Ajax.IOnSessionExpired,
-        },
+        props:
+            | Ajax.IMethod
+            | {
+                  /** method */
+                  method: Ajax.IMethod;
+                  /** url */
+                  url: string;
+                  /** 请求参数 */
+                  params?: Ajax.IParams | undefined;
+                  /** 是否显示loading */
+                  loading: boolean;
+                  /** resolve */
+                  resolve: Ajax.IResolve<T>;
+                  /** reject */
+                  reject: Ajax.IReject;
+                  /** options */
+                  options?: Ajax.IOptions;
+                  /** 取消请求方法 */
+                  cancelExecutor: Ajax.ICancelExecutor;
+                  /** 请求session过期回调 */
+                  onSessionExpired?: Ajax.IOnSessionExpired;
+              },
         url?: string,
         params?: Ajax.IParams | undefined,
         loading?: boolean,
@@ -472,7 +475,7 @@ class AjaxBase {
                 if (options.headers) {
                     for (const k of Object.keys(options.headers)) {
                         const v = options.headers[k];
-                        if (_.toLower(k) === 'content-type') {
+                        if (k.toLowerCase() === 'content-type') {
                             isContentTypeExist = true;
                             // 支持不设置Content-Type
                             if (v) {
@@ -547,7 +550,7 @@ class AjaxBase {
             if (options && options.cancelToken && promise && !this._cacheCancel[options.cancelToken]) {
                 this._cacheCancel[options.cancelToken] = promise;
             }
-        }
+        };
         promise = new Promise((resolve, reject): void => {
             // prettier-ignore
             this.sendRequest<T>(
@@ -693,51 +696,31 @@ class AjaxBase {
             catchError?: (props: Ajax.ICatchErrorOptions) => void;
         } = {}
     ): void => {
-        const {
-            prefix,
-            onSuccess,
-            onError,
-            onSessionExpired,
-            getLoading,
-            beforeSend,
-            processData,
-            catchError,
-        } = options;
-        if (typeof prefix === 'string') {
-            this.prefix = prefix;
+        for (const key in options) {
+            const value = options[key];
+            if (
+                key === 'prefix' ||
+                key === 'onSuccess' ||
+                key === 'onError' ||
+                key === 'onSessionExpired' ||
+                key === 'getLoading' ||
+                key === 'beforeSend' ||
+                key === 'processData' ||
+                key === 'catchError'
+            ) {
+                if (key === 'prefix') {
+                    if (typeof value === 'string') {
+                        this.prefix = value;
+                    }
+                } else {
+                    if (typeof value === 'function') {
+                        this[key as keyof Ajax.IConfigOptions] = value;
+                    }
+                }
+            } else {
+                this._config[key] = value;
+            }
         }
-        if (typeof onSuccess === 'function') {
-            this.onSuccess = onSuccess;
-        }
-        if (typeof onError === 'function') {
-            this.onError = onError;
-        }
-        if (typeof onSessionExpired === 'function') {
-            this.onSessionExpired = onSessionExpired;
-        }
-        if (typeof getLoading === 'function') {
-            this.getLoading = getLoading;
-        }
-        if (typeof beforeSend === 'function') {
-            this.beforeSend = beforeSend;
-        }
-        if (typeof processData === 'function') {
-            this.processData = processData;
-        }
-        if (typeof catchError === 'function') {
-            this.catchError = catchError;
-        }
-        const restOptions = _.omit(options, [
-            'prefix',
-            'onSuccess',
-            'onError',
-            'onSessionExpired',
-            'getLoading',
-            'beforeSend',
-            'processData',
-            'catchError',
-        ]);
-        Object.assign(this._config, restOptions);
     };
 }
 

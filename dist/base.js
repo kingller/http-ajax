@@ -22,7 +22,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var lodash_1 = __importDefault(require("lodash"));
 var v4_1 = __importDefault(require("uuid/v4"));
 var promise_1 = require("./utils/promise");
 var form_1 = require("./utils/form");
@@ -129,17 +128,20 @@ var AjaxBase = /** @class */ (function () {
                 return (params !== null && JSON.stringify(params)) || '';
             //对于GET请求，将参数拼成key1=val1&key2=val2的格式
             var array = [];
-            params = lodash_1.default.pick(params, lodash_1.default.keys(params).sort());
-            for (var key in params) {
-                var value = params[key] === null || params[key] === undefined
-                    ? ''
-                    : params[key] instanceof Array
-                        ? params[key].join(',')
-                        : params[key];
-                if (!options || options.encodeValue !== false) {
-                    value = encodeURIComponent(value);
+            if (params && typeof params === 'object') {
+                var paramsKeys = Object.keys(params).sort();
+                for (var i = 0; i < paramsKeys.length; i++) {
+                    var key = paramsKeys[i];
+                    var value = params[key] === null || params[key] === undefined
+                        ? ''
+                        : params[key] instanceof Array
+                            ? params[key].join(',')
+                            : params[key];
+                    if (!options || options.encodeValue !== false) {
+                        value = encodeURIComponent(value);
+                    }
+                    array.push(key + "=" + value);
                 }
-                array.push(key + "=" + value);
             }
             if (_this._config.noCache) {
                 if (!options || !options.cache) {
@@ -151,42 +153,31 @@ var AjaxBase = /** @class */ (function () {
         /** 配置 */
         this.config = function (options) {
             if (options === void 0) { options = {}; }
-            var prefix = options.prefix, onSuccess = options.onSuccess, onError = options.onError, onSessionExpired = options.onSessionExpired, getLoading = options.getLoading, beforeSend = options.beforeSend, processData = options.processData, catchError = options.catchError;
-            if (typeof prefix === 'string') {
-                _this.prefix = prefix;
+            for (var key in options) {
+                var value = options[key];
+                if (key === 'prefix' ||
+                    key === 'onSuccess' ||
+                    key === 'onError' ||
+                    key === 'onSessionExpired' ||
+                    key === 'getLoading' ||
+                    key === 'beforeSend' ||
+                    key === 'processData' ||
+                    key === 'catchError') {
+                    if (key === 'prefix') {
+                        if (typeof value === 'string') {
+                            _this.prefix = value;
+                        }
+                    }
+                    else {
+                        if (typeof value === 'function') {
+                            _this[key] = value;
+                        }
+                    }
+                }
+                else {
+                    _this._config[key] = value;
+                }
             }
-            if (typeof onSuccess === 'function') {
-                _this.onSuccess = onSuccess;
-            }
-            if (typeof onError === 'function') {
-                _this.onError = onError;
-            }
-            if (typeof onSessionExpired === 'function') {
-                _this.onSessionExpired = onSessionExpired;
-            }
-            if (typeof getLoading === 'function') {
-                _this.getLoading = getLoading;
-            }
-            if (typeof beforeSend === 'function') {
-                _this.beforeSend = beforeSend;
-            }
-            if (typeof processData === 'function') {
-                _this.processData = processData;
-            }
-            if (typeof catchError === 'function') {
-                _this.catchError = catchError;
-            }
-            var restOptions = lodash_1.default.omit(options, [
-                'prefix',
-                'onSuccess',
-                'onError',
-                'onSessionExpired',
-                'getLoading',
-                'beforeSend',
-                'processData',
-                'catchError',
-            ]);
-            Object.assign(_this._config, restOptions);
         };
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -404,7 +395,7 @@ var AjaxBase = /** @class */ (function () {
                 for (var _i = 0, _a = Object.keys(options.headers); _i < _a.length; _i++) {
                     var k = _a[_i];
                     var v = options.headers[k];
-                    if (lodash_1.default.toLower(k) === 'content-type') {
+                    if (k.toLowerCase() === 'content-type') {
                         isContentTypeExist = true;
                         // 支持不设置Content-Type
                         if (v) {

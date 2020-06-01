@@ -129,6 +129,58 @@ export interface IStringifyParamsOptions extends IOptions {
     /** GET请求时是否对值用encodeURIComponent编码（签名时使用，签名不对value编码。内部参数，请勿使用） */
     encodeValue?: boolean;
 }
+export interface IConfigOptions {
+    /**
+     * Get请求是否添加随机字符串阻止缓存
+     * @default true
+     */
+    noCache?: boolean;
+    /**
+     * url前缀
+     * @default '/api'
+     */
+    prefix?: string;
+    /**
+     * 成功失败标志字段
+     * @default 'result'
+     */
+    statusField?: string;
+    /**
+     * 成功回调
+     */
+    onSuccess?: IOnSuccess;
+    /**
+     * 失败回调
+     */
+    onError?: IOnError;
+    /**
+     * session过期回调
+     */
+    onSessionExpired?: IOnSessionExpired;
+    /**
+     * 加载进度条
+     */
+    getLoading?: (options: IOptions) => ILoading;
+    /**
+     * 请求发送前
+     */
+    beforeSend?: (props: {
+        method: IMethod;
+        url: string;
+        params: IParams;
+        options: IOptions;
+    }) => IRequestResult | void;
+    /**
+     * 数据处理
+     */
+    processData?: (params: IParams, props: {
+        method: IMethod;
+        url: string;
+        options: IOptions;
+    }) => IParams;
+    /** 捕获错误 */
+    catchError?: (props: ICatchErrorOptions) => void;
+}
 export interface IAjax {
     get: IRequest;
     put: IRequest;
@@ -215,58 +267,7 @@ export interface IAjax {
      */
     getLoading?: (options: IOptions) => ILoading;
     /** 配置 */
-    config: (options?: {
-        /**
-         * Get请求是否添加随机字符串阻止缓存
-         * @default true
-         */
-        noCache?: boolean;
-        /**
-         * url前缀
-         * @default '/api'
-         */
-        prefix?: string;
-        /**
-         * 成功失败标志字段
-         * @default 'result'
-         */
-        statusField?: string;
-        /**
-         * 成功回调
-         */
-        onSuccess?: IOnSuccess;
-        /**
-         * 失败回调
-         */
-        onError?: IOnError;
-        /**
-         * session过期回调
-         */
-        onSessionExpired?: IOnSessionExpired;
-        /**
-         * 加载进度条
-         */
-        getLoading?: (options: IOptions) => ILoading;
-        /**
-         * 请求发送前
-         */
-        beforeSend?: (props: {
-            method: IMethod;
-            url: string;
-            params: IParams;
-            options: IOptions;
-        }) => IRequestResult | void;
-        /**
-         * 数据处理
-         */
-        processData?: (params: IParams, props: {
-            method: IMethod;
-            url: string;
-            options: IOptions;
-        }) => IParams;
-        /** 捕获错误 */
-        catchError?: (props: ICatchErrorOptions) => void;
-    }) => void;
+    config: (options?: IConfigOptions) => void;
     Ajax: () => IAjax;
     clone: () => IAjax;
 }
