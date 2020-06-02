@@ -285,3 +285,6 @@ boolean
 'all' | string[]  
 加密字段
 
+
+## 兼容性
+兼容主流浏览器。兼容IE需引入`@babel/polyfill`。
