@@ -6,6 +6,11 @@
 <font color=red><strong>删除</strong></font>
 
 
+# 3.1.0
+> 2020.06.02  
+1. <font color=blue>增强</font> 将`lodash`引用从ajax基础包里移除, 减少基础包大小。加解密及签名扩展仍保持该依赖。
+
+
 # 3.0.0
 > 2020.05.29  
 1. <font color=orange>修改</font> 发送`GET`请求时签名不再对value使用`encodeURIComponent`编码

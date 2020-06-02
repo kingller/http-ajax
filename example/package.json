@@ -9,9 +9,7 @@
         "deploy": "npm run build && gh-pages -d dist",
         "start": "webpack-dev-server --mode=development --config ./webpack.config.js --hot --inline --progress --colors"
     },
-    "dependencies": {
-        "crypto-js": "^4.0.0"
-    },
+    "dependencies": {},
     "devDependencies": {
         "@babel/cli": "7.7.0",
         "@babel/core": "7.7.2",
@@ -41,7 +39,7 @@
         "@babel/runtime": "7.7.2",
         "@types/autosize": "^3.0.7",
         "@types/classnames": "2.2.9",
-        "@types/lodash": "4.14.147",
+        "@types/lodash": "^4.14.154",
         "@types/pubsub-js": "1.5.18",
         "@types/react": "^16.9.35",
         "@types/react-copy-to-clipboard": "^4.3.0",
