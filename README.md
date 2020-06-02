@@ -287,4 +287,17 @@ boolean
 
 
 ## 兼容性
-兼容主流浏览器。兼容IE需引入`@babel/polyfill`。
+兼容各主流浏览器。兼容IE需引入`@babel/polyfill`。  
+
+安装
+
+```
+npm install @babel/polyfill
+```
+
+入口文件开头加上
+```
+import '@babel/polyfill';
+```
+
+或HTML页面中加上`@babel/polyfill`的CDN资源引用。
