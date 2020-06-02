@@ -300,4 +300,4 @@ npm install @babel/polyfill
 import '@babel/polyfill';
 ```
 
-或HTML页面中加上`@babel/polyfill`的CDN资源引用。
+或在HTML页面中加上`@babel/polyfill`的CDN资源引用。
