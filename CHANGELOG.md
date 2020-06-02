@@ -6,6 +6,11 @@
 <font color=red><strong>删除</strong></font>
 
 
+# 3.1.1
+> 2020.06.02  
+1. <font color=red>修复</font> 打包时把node crypto module也打包进了文件中
+
+
 # 3.1.0
 > 2020.06.02  
 1. <font color=blue>增强</font> 将`lodash`引用从ajax基础包里移除, 减少基础包大小。加解密及签名扩展仍保持该依赖。
