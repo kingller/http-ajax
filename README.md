@@ -290,7 +290,6 @@ boolean
 兼容各主流浏览器。兼容IE需引入`@babel/polyfill`。  
 
 安装
-
 ```
 npm install @babel/polyfill
 ```

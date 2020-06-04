@@ -15,7 +15,7 @@ export function catchAjaxError({
     callback: IAjax.ICatchError;
     type?: 'uncaught' | 'log';
 }): void {
-    const errorMsg = e.stack || e.message;
+    const errorMsg = e ? e.stack || e.message : '';
     const remark = `ajax: ${method} ${url} params: ${JSON.stringify(params)}`;
     console && console.error(`${errorMsg} ${remark}`);
     callback({

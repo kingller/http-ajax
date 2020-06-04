@@ -6,6 +6,11 @@
 <font color=red><strong>删除</strong></font>
 
 
+# 3.1.2
+> 2020.06.04  
+1. <font color=red>修复</font> 编译时警告`Module not found: Error: Can't resolve 'null'`
+
+
 # 3.1.1
 > 2020.06.02  
 1. <font color=red>修复</font> 打包时把node crypto module也打包进了文件中
