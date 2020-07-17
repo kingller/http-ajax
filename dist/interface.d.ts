@@ -132,7 +132,7 @@ export interface IStringifyParamsOptions extends IOptions {
 export interface IConfigOptions {
     /**
      * Get请求是否添加随机字符串阻止缓存
-     * @default true
+     * @default false
      */
     noCache?: boolean;
     /**

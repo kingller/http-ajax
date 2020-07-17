@@ -6,6 +6,10 @@
 <font color=red><strong>删除</strong></font>
 
 
+# Next
+1. <font color=orange>修改</font> `noCache`默认值改为false，阻止IE缓存改为添加请求头`Cache-Control:no-cache`,`Pragma:no-cache`，并且`noCache`参数将会在下个版本`4.0.0`废弃。
+
+
 # 3.1.2
 > 2020.06.04  
 1. <font color=red>修复</font> 编译时警告`Module not found: Error: Can't resolve 'null'`

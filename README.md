@@ -41,11 +41,6 @@ const { beforeSend, processData } = ajax;
 
 ajax.config({
     /**
-     * Get请求是否添加随机字符串阻止缓存
-     * @default true
-     */
-    noCache: true,
-    /**
      * url前缀
      * @default '/api'
      */

@@ -14,7 +14,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -23,6 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var v4_1 = __importDefault(require("uuid/v4"));
+var browser_which_1 = __importDefault(require("browser-which"));
 var promise_1 = require("./utils/promise");
 var form_1 = require("./utils/form");
 var catch_1 = require("./utils/catch");
@@ -49,7 +50,7 @@ var AjaxBase = /** @class */ (function () {
     function AjaxBase() {
         var _this = this;
         this._config = {
-            noCache: true,
+            noCache: false,
             statusField: 'result',
         };
         this.getConfig = function () {
@@ -132,11 +133,13 @@ var AjaxBase = /** @class */ (function () {
                 var paramsKeys = Object.keys(params).sort();
                 for (var i = 0; i < paramsKeys.length; i++) {
                     var key = paramsKeys[i];
+                    /* eslint-disable @typescript-eslint/indent */
                     var value = params[key] === null || params[key] === undefined
                         ? ''
                         : params[key] instanceof Array
                             ? params[key].join(',')
                             : params[key];
+                    /* eslint-enable @typescript-eslint/indent */
                     if (!options || options.encodeValue !== false) {
                         value = encodeURIComponent(value);
                     }
@@ -153,6 +156,9 @@ var AjaxBase = /** @class */ (function () {
         /** 配置 */
         this.config = function (options) {
             if (options === void 0) { options = {}; }
+            if (typeof options.noCache !== 'undefined') {
+                console.warn('http-ajax: `noCache` will be deprecated in next version `4.0.0`');
+            }
             for (var key in options) {
                 var value = options[key];
                 if (key === 'prefix' ||
@@ -239,7 +245,11 @@ var AjaxBase = /** @class */ (function () {
         }
         return params;
     };
-    AjaxBase.prototype.sendRequest = function (props, url, params, loading, resolve, reject, onSessionExpired, options, cancelExecutor
+    AjaxBase.prototype.sendRequest = function (
+    /* eslint-disable @typescript-eslint/indent */
+    props, 
+    /* eslint-enable @typescript-eslint/indent */
+    url, params, loading, resolve, reject, onSessionExpired, options, cancelExecutor
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) {
         var _this = this;
@@ -391,11 +401,13 @@ var AjaxBase = /** @class */ (function () {
             }
             xhr.setRequestHeader('X-Request-Id', v4_1.default());
             var isContentTypeExist = false;
+            var isCacheControlExist = false;
             if (options.headers) {
                 for (var _i = 0, _a = Object.keys(options.headers); _i < _a.length; _i++) {
                     var k = _a[_i];
                     var v = options.headers[k];
-                    if (k.toLowerCase() === 'content-type') {
+                    var lowerCaseKey = k.toLowerCase();
+                    if (lowerCaseKey === 'content-type') {
                         isContentTypeExist = true;
                         // 支持不设置Content-Type
                         if (v) {
@@ -403,12 +415,19 @@ var AjaxBase = /** @class */ (function () {
                         }
                     }
                     else {
+                        if (lowerCaseKey === 'cache-control') {
+                            isCacheControlExist = true;
+                        }
                         xhr.setRequestHeader(k, v);
                     }
                 }
             }
             if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+            }
+            if (!isCacheControlExist && browser_which_1.default.ie) {
+                xhr.setRequestHeader('Cache-Control', 'no-cache');
+                xhr.setRequestHeader('Pragma', 'no-cache');
             }
             if (options.onProgress) {
                 xhr.upload.onprogress = options.onProgress;

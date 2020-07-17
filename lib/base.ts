@@ -1,5 +1,6 @@
 'use strict';
 import uuid from 'uuid/v4';
+import browser from 'browser-which';
 import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
@@ -35,7 +36,7 @@ interface IConfigItem {
 
 class AjaxBase {
     public _config: IConfigItem = {
-        noCache: true,
+        noCache: false,
         statusField: 'result',
     };
 
@@ -201,12 +202,14 @@ class AjaxBase {
             const paramsKeys = Object.keys(params).sort();
             for (let i = 0; i < paramsKeys.length; i++) {
                 const key = paramsKeys[i];
+                /* eslint-disable @typescript-eslint/indent */
                 let value =
                     params[key] === null || params[key] === undefined
                         ? ''
                         : params[key] instanceof Array
                         ? params[key].join(',')
                         : params[key];
+                /* eslint-enable @typescript-eslint/indent */
                 if (!options || options.encodeValue !== false) {
                     value = encodeURIComponent(value);
                 }
@@ -267,6 +270,7 @@ class AjaxBase {
         cancelExecutor: Ajax.ICancelExecutor;
         /** 请求session过期回调 */
         onSessionExpired?: Ajax.IOnSessionExpired;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }): Promise<any>;
 
     /**
@@ -291,9 +295,11 @@ class AjaxBase {
         options: Ajax.IOptions,
         /** 取消请求方法 */
         cancelExecutor: Ajax.ICancelExecutor
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<any>;
 
     public sendRequest<T>(
+        /* eslint-disable @typescript-eslint/indent */
         props:
             | Ajax.IMethod
             | {
@@ -316,6 +322,7 @@ class AjaxBase {
                   /** 请求session过期回调 */
                   onSessionExpired?: Ajax.IOnSessionExpired;
               },
+        /* eslint-enable @typescript-eslint/indent */
         url?: string,
         params?: Ajax.IParams | undefined,
         loading?: boolean,
@@ -472,22 +479,31 @@ class AjaxBase {
                 }
                 xhr.setRequestHeader('X-Request-Id', uuid());
                 let isContentTypeExist = false;
+                let isCacheControlExist = false;
                 if (options.headers) {
                     for (const k of Object.keys(options.headers)) {
                         const v = options.headers[k];
-                        if (k.toLowerCase() === 'content-type') {
+                        const lowerCaseKey = k.toLowerCase();
+                        if (lowerCaseKey === 'content-type') {
                             isContentTypeExist = true;
                             // 支持不设置Content-Type
                             if (v) {
                                 xhr.setRequestHeader(k, v);
                             }
                         } else {
+                            if (lowerCaseKey === 'cache-control') {
+                                isCacheControlExist = true;
+                            }
                             xhr.setRequestHeader(k, v);
                         }
                     }
                 }
                 if (!isContentTypeExist && !isFormData(params) && (!options || options.encrypt !== 'all')) {
                     xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+                }
+                if (!isCacheControlExist && browser.ie) {
+                    xhr.setRequestHeader('Cache-Control', 'no-cache');
+                    xhr.setRequestHeader('Pragma', 'no-cache');
                 }
 
                 if (options.onProgress) {
@@ -696,6 +712,9 @@ class AjaxBase {
             catchError?: (props: Ajax.ICatchErrorOptions) => void;
         } = {}
     ): void => {
+        if (typeof options.noCache !== 'undefined') {
+            console.warn('http-ajax: `noCache` will be deprecated in next version `4.0.0`');
+        }
         for (const key in options) {
             const value = options[key];
             if (

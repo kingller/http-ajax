@@ -166,7 +166,7 @@ export interface IOnError<T = any> {
 
 export interface ICatchErrorOptions {
     /** 错误消息 */
-    errorMsg: string; 
+    errorMsg: string;
     /** 错误代码 */
     errorCode?: string | number;
     /** 类型 */
@@ -185,7 +185,7 @@ export interface IStringifyParamsOptions extends IOptions {
 export interface IConfigOptions {
     /**
      * Get请求是否添加随机字符串阻止缓存
-     * @default true
+     * @default false
      */
     noCache?: boolean;
     /**
@@ -217,20 +217,18 @@ export interface IConfigOptions {
     /**
      * 请求发送前
      */
-    beforeSend?: (props: {
-        method: IMethod;
-        url: string;
-        params: IParams;
-        options: IOptions;
-    }) => IRequestResult | void;
+    beforeSend?: (props: { method: IMethod; url: string; params: IParams; options: IOptions }) => IRequestResult | void;
     /**
      * 数据处理
      */
-    processData?: (params: IParams, props: {
-        method: IMethod;
-        url: string;
-        options: IOptions;
-    }) => IParams;
+    processData?: (
+        params: IParams,
+        props: {
+            method: IMethod;
+            url: string;
+            options: IOptions;
+        }
+    ) => IParams;
     /** 捕获错误 */
     catchError?: (props: ICatchErrorOptions) => void;
 }
@@ -250,7 +248,10 @@ export interface IAjax {
     prefix: string;
     $loading: string;
     beforeSend: (props: { method: IMethod; url: string; params: IParams; options: IOptions }) => IRequestResult | void;
-    processData: (params: IParams, props: { method: IMethod; url: string; options: IOptions; reject?: IReject; }) => IParams;
+    processData: (
+        params: IParams,
+        props: { method: IMethod; url: string; options: IOptions; reject?: IReject }
+    ) => IParams;
     processResponse: (response: IResult, props: IProcessResponseOptions) => IResult;
     readonly stringifyParams: (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -270,27 +271,35 @@ export interface IAjax {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
     /** 捕获错误 */
-    catchError: (props: { errorMsg: string; errorCode?: string | number; type?: 'uncaught' | 'log'; remark?: string; }) => void;
+    catchError: (props: {
+        errorMsg: string;
+        errorCode?: string | number;
+        type?: 'uncaught' | 'log';
+        remark?: string;
+    }) => void;
+    // prettier-ignore
     sendRequest: <T>(
-        method: IMethod | {
+        method:
+        | IMethod
+        | {
             /** method */
-            method: IMethod,
+            method: IMethod;
             /** url */
-            url: string,
+            url: string;
             /** 请求参数 */
-            params?: IParams | undefined,
+            params?: IParams | undefined;
             /** 是否显示loading */
-            loading: boolean,
+            loading: boolean;
             /** resolve */
-            resolve: IResolve<T>,
+            resolve: IResolve<T>;
             /** reject */
-            reject: IReject,
+            reject: IReject;
             /** options */
-            options?: IOptions,
+            options?: IOptions;
             /** 取消请求方法 */
-            cancelExecutor: ICancelExecutor
+            cancelExecutor: ICancelExecutor;
             /** 请求session过期回调 */
-            onSessionExpired?: IOnSessionExpired,
+            onSessionExpired?: IOnSessionExpired;
         },
         url?: string,
         params?: IParams | undefined,
