@@ -26,4 +26,6 @@ var ajax_1 = __importDefault(require("./ajax"));
 exports.Ajax = __importStar(require("./interface"));
 var base_1 = require("./base");
 Object.defineProperty(exports, "AjaxBase", { enumerable: true, get: function () { return base_1.default; } });
+var form_1 = require("./utils/form");
+Object.defineProperty(exports, "isFormData", { enumerable: true, get: function () { return form_1.isFormData; } });
 exports.default = ajax_1.default;
