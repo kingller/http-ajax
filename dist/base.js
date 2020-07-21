@@ -59,43 +59,43 @@ var AjaxBase = /** @class */ (function () {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.get = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['get'], url, params, false, options);
+            return _this.request(Ajax.METHODS['get'], url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.post = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['post'], url, params, false, options);
+            return _this.request(Ajax.METHODS['post'], url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.put = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['put'], url, params, false, options);
+            return _this.request(Ajax.METHODS['put'], url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.del = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['del'], url, params, false, options);
+            return _this.request(Ajax.METHODS['del'], url, params, options, false);
         };
         this.loadable = {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             get: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['get'], url, params, true, options);
+                return _this.request(Ajax.METHODS['get'], url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             post: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['post'], url, params, true, options);
+                return _this.request(Ajax.METHODS['post'], url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             put: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['put'], url, params, true, options);
+                return _this.request(Ajax.METHODS['put'], url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             del: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['del'], url, params, true, options);
+                return _this.request(Ajax.METHODS['del'], url, params, options, true);
             },
         };
         this.prefix = '/api';
@@ -466,7 +466,7 @@ var AjaxBase = /** @class */ (function () {
         });
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    AjaxBase.prototype.request = function (method, url, params, loading, options) {
+    AjaxBase.prototype.request = function (method, url, params, options, loading) {
         var _this = this;
         var cancel;
         var promise;

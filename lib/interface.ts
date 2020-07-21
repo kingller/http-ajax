@@ -277,6 +277,14 @@ export interface IAjax {
         type?: 'uncaught' | 'log';
         remark?: string;
     }) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    request<T = any>(
+        method: IMethod,
+        url: string,
+        params: IParams | undefined,
+        options?: IOptions,
+        loading?: boolean
+    ): IRequestResult<T>;
     // prettier-ignore
     sendRequest: <T>(
         method:

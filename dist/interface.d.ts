@@ -227,6 +227,7 @@ export interface IAjax {
         type?: 'uncaught' | 'log';
         remark?: string;
     }) => void;
+    request<T = any>(method: IMethod, url: string, params: IParams | undefined, options?: IOptions, loading?: boolean): IRequestResult<T>;
     sendRequest: <T>(method: IMethod | {
         /** method */
         method: IMethod;

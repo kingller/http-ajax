@@ -50,7 +50,7 @@ class AjaxBase {
         options?: Ajax.IOptions
     ): Ajax.IRequestResult<T> => {
         // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-        return this.request<T>(Ajax.METHODS['get'], url, params, false, options);
+        return this.request<T>(Ajax.METHODS['get'], url, params, options, false);
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public readonly post = <T = any>(
@@ -59,7 +59,7 @@ class AjaxBase {
         options?: Ajax.IOptions
     ): Ajax.IRequestResult<T> => {
         // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-        return this.request<T>(Ajax.METHODS['post'], url, params, false, options);
+        return this.request<T>(Ajax.METHODS['post'], url, params, options, false);
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public readonly put = <T = any>(
@@ -68,7 +68,7 @@ class AjaxBase {
         options?: Ajax.IOptions
     ): Ajax.IRequestResult<T> => {
         // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-        return this.request<T>(Ajax.METHODS['put'], url, params, false, options);
+        return this.request<T>(Ajax.METHODS['put'], url, params, options, false);
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public readonly del = <T = any>(
@@ -77,29 +77,29 @@ class AjaxBase {
         options?: Ajax.IOptions
     ): Ajax.IRequestResult<T> => {
         // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-        return this.request<T>(Ajax.METHODS['del'], url, params, false, options);
+        return this.request<T>(Ajax.METHODS['del'], url, params, options, false);
     };
 
     public readonly loadable = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         get: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions): Ajax.IRequestResult<T> => {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return this.request<T>(Ajax.METHODS['get'], url, params, true, options);
+            return this.request<T>(Ajax.METHODS['get'], url, params, options, true);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         post: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions): Ajax.IRequestResult<T> => {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return this.request<T>(Ajax.METHODS['post'], url, params, true, options);
+            return this.request<T>(Ajax.METHODS['post'], url, params, options, true);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         put: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions): Ajax.IRequestResult<T> => {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return this.request<T>(Ajax.METHODS['put'], url, params, true, options);
+            return this.request<T>(Ajax.METHODS['put'], url, params, options, true);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         del: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions): Ajax.IRequestResult<T> => {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return this.request<T>(Ajax.METHODS['del'], url, params, true, options);
+            return this.request<T>(Ajax.METHODS['del'], url, params, options, true);
         },
     };
 
@@ -559,12 +559,12 @@ class AjaxBase {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private request<T = any>(
+    public request<T = any>(
         method: Ajax.IMethod,
         url: string,
         params: Ajax.IParams | undefined,
-        loading: boolean,
-        options?: Ajax.IOptions
+        options?: Ajax.IOptions,
+        loading?: boolean
     ): Ajax.IRequestResult<T> {
         let cancel;
         let promise: Ajax.IRequestResult<T>;
