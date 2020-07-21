@@ -16,6 +16,7 @@
 2. <font color=orange>修改</font> `processResponse`在http状态码`204`时也执行。
 3. <font color=orange>修改</font> 加解密扩展的`processErrorResponse`改为先执行原`processErrorResponse`
 4. <font color=green>新增</font> 导出`isFormData`方法，用来判断是否`FormData`
+5. <font color=green>新增</font> 导出`promisify`方法，用来将值转换为`Promise`
 
 
 # 3.1.2

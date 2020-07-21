@@ -28,4 +28,6 @@ var base_1 = require("./base");
 Object.defineProperty(exports, "AjaxBase", { enumerable: true, get: function () { return base_1.default; } });
 var form_1 = require("./utils/form");
 Object.defineProperty(exports, "isFormData", { enumerable: true, get: function () { return form_1.isFormData; } });
+var promise_1 = require("./utils/promise");
+Object.defineProperty(exports, "promisify", { enumerable: true, get: function () { return promise_1.promisify; } });
 exports.default = ajax_1.default;
