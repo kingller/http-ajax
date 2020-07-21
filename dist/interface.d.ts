@@ -206,7 +206,7 @@ export interface IAjax {
         options: IOptions;
         reject?: IReject;
     }) => IParams;
-    processResponse: (response: IResult, props: IProcessResponseOptions) => IResult;
+    processResponse: (response: IResult | null, props: IProcessResponseOptions) => IResult;
     readonly stringifyParams: (params: {
         [name: string]: any;
     } | string, method: IMethod, options?: IStringifyParamsOptions) => string;

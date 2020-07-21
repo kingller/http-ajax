@@ -116,7 +116,10 @@ class AjaxBase {
         return params;
     };
 
-    public processResponse = function (response: Ajax.IResult, props: Ajax.IProcessResponseOptions): Ajax.IResult {
+    public processResponse = function (
+        response: Ajax.IResult | null,
+        props: Ajax.IProcessResponseOptions
+    ): Ajax.IResult {
         return response;
     };
 
@@ -456,6 +459,14 @@ class AjaxBase {
                         });
                         ajaxThis.onSuccess<T>(xhr, { response: res, options, resolve, reject });
                     } else if (this.status === 204) {
+                        ajaxThis.processResponse(null, {
+                            xhr,
+                            method,
+                            url,
+                            params: _opts.params,
+                            options,
+                            reject,
+                        });
                         resolve(null);
                     } else {
                         // @ts-ignore

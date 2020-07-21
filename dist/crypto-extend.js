@@ -309,6 +309,9 @@ function cryptoExtend() {
         };
         this.processResponse = function (response, props) {
             response = processResponse(response, props);
+            if (response === null) {
+                return response;
+            }
             try {
                 var options = props.options;
                 var decrypt = (options && options.decrypt) || undefined;

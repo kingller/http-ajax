@@ -330,8 +330,11 @@ function cryptoExtend(): () => void {
             return params;
         };
 
-        (this as IAjax).processResponse = (response: IResult, props: IProcessResponseOptions): IResult => {
+        (this as IAjax).processResponse = (response: IResult | null, props: IProcessResponseOptions): IResult => {
             response = processResponse(response, props);
+            if (response === null) {
+                return response;
+            }
             try {
                 const { options } = props;
                 let decrypt: IEncryptFields = (options && options.decrypt) || undefined;

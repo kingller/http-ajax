@@ -252,7 +252,7 @@ export interface IAjax {
         params: IParams,
         props: { method: IMethod; url: string; options: IOptions; reject?: IReject }
     ) => IParams;
-    processResponse: (response: IResult, props: IProcessResponseOptions) => IResult;
+    processResponse: (response: IResult | null, props: IProcessResponseOptions) => IResult;
     readonly stringifyParams: (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         params: { [name: string]: any } | string,

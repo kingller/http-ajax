@@ -377,6 +377,14 @@ var AjaxBase = /** @class */ (function () {
                     ajaxThis.onSuccess(xhr, { response: res, options: options, resolve: resolve, reject: reject });
                 }
                 else if (this.status === 204) {
+                    ajaxThis.processResponse(null, {
+                        xhr: xhr,
+                        method: method,
+                        url: url,
+                        params: _opts.params,
+                        options: options,
+                        reject: reject,
+                    });
                     resolve(null);
                 }
                 else {
