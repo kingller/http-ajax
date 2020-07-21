@@ -388,17 +388,18 @@ function cryptoExtend() {
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.processErrorResponse = function (xhr, _opts) {
-            if (xhr.status === 470 && _this.onCryptoExpired) {
-                // 加密密钥过期
-                _this.onCryptoExpired({
-                    errorCode: xhr.status,
-                    errorMsg: xhr.statusText,
-                }, _opts);
-                return Promise.reject('status 470: secret key expired');
-            }
-            else {
-                return processErrorResponse(xhr, _opts);
-            }
+            var errorResponse = processErrorResponse(xhr, _opts);
+            return promise_1.promisify(errorResponse).then(function () {
+                if (xhr.status === 470 && _this.onCryptoExpired) {
+                    // 加密密钥过期
+                    _this.onCryptoExpired({
+                        errorCode: xhr.status,
+                        errorMsg: xhr.statusText,
+                    }, _opts);
+                    return Promise.reject('status 470: secret key expired');
+                }
+                return Promise.resolve();
+            });
         };
     };
 }

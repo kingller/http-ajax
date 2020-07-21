@@ -14,6 +14,7 @@
 > 2020.07.21  
 1. <font color=orange>修改</font> `noCache`默认值改为false，阻止IE缓存改为添加请求头`Cache-Control:no-cache`,`Pragma:no-cache`，并且`noCache`参数将会在下个版本`4.0.0`废弃。
 2. <font color=orange>修改</font> `processResponse`在http状态码`204`时也执行。
+3. <font color=orange>修改</font> 加解密扩展的`processErrorResponse`改为先执行原`processErrorResponse`
 
 
 # 3.1.2

@@ -429,19 +429,21 @@ function cryptoExtend(): () => void {
             xhr: XMLHttpRequest,
             _opts: IRequestOptions
         ): void | Promise<void> => {
-            if (xhr.status === 470 && this.onCryptoExpired) {
-                // 加密密钥过期
-                (this as IAjax).onCryptoExpired<T>(
-                    {
-                        errorCode: xhr.status,
-                        errorMsg: xhr.statusText,
-                    },
-                    _opts
-                );
-                return Promise.reject('status 470: secret key expired');
-            } else {
-                return processErrorResponse(xhr, _opts);
-            }
+            const errorResponse = processErrorResponse<T>(xhr, _opts);
+            return promisify(errorResponse).then(() => {
+                if (xhr.status === 470 && this.onCryptoExpired) {
+                    // 加密密钥过期
+                    (this as IAjax).onCryptoExpired<T>(
+                        {
+                            errorCode: xhr.status,
+                            errorMsg: xhr.statusText,
+                        },
+                        _opts
+                    );
+                    return Promise.reject('status 470: secret key expired');
+                }
+                return Promise.resolve();
+            });
         };
     };
 }
