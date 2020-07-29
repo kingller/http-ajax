@@ -7,7 +7,7 @@
 
 
 # Next
-
+1. <font color=red>修复</font> 数据分段传输回调`onData`未匹配内容含有回车情况
 
 
 # 3.2.0

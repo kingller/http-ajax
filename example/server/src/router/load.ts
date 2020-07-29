@@ -1,5 +1,7 @@
-import { get } from 'koa-router-decors';
+import { get, post } from 'koa-router-decors';
 import utils from '../utils/index';
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 export default class Load {
     @get('/load')
@@ -36,5 +38,16 @@ export default class Load {
                 refreshToken: Buffer.from(utils.uuid()).toString('base64'),
             },
         };
+    }
+
+    @post('/bigpipe/ajax')
+    public async bigPipeByAjax(ctx) {
+        ctx.res.writeHead(200, { 'Content-Type': 'text/html' });
+        for (let i = 0; i < 10; i++) {
+            await sleep(1000);
+            const chunk = `<chunk>${i}</chunk>`;
+            ctx.res.write(chunk);
+        }
+        ctx.res.end();
     }
 }

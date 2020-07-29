@@ -403,7 +403,7 @@ class AjaxBase {
                         if (this.readyState === 3 || this.readyState === 4) {
                             // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
                             if (this.response) {
-                                let chunks: string[] = this.response.match(/<chunk>(.*?)<\/chunk>/g);
+                                let chunks: string[] = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
                                 if (!chunks) {
                                     console && console.error(`${method} ${url} Incorrect response`);
                                     return;
