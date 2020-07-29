@@ -61,7 +61,7 @@ var HttpAjax = /** @class */ (function (_super) {
     HttpAjax.prototype.onSuccess = function (xhr, _a) {
         var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject;
         var statusField = this._config.statusField;
-        if (response[statusField]) {
+        if (response && response[statusField]) {
             if (response.confirmMsg) {
                 delete response[statusField];
                 resolve(response);
@@ -73,7 +73,7 @@ var HttpAjax = /** @class */ (function (_super) {
                 resolve(response.data);
             }
         }
-        else if (response[statusField] === false) {
+        else if (response && response[statusField] === false) {
             reject(response);
             if (options && options.autoPopupErrorMsg === false) {
                 return;

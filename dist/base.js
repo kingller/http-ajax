@@ -353,7 +353,7 @@ var AjaxBase = /** @class */ (function () {
                 }
                 if (this.status === 200 || this.status === 201) {
                     var res = void 0;
-                    if (options.json === false) {
+                    if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
                         var statusField = ajaxThis._config.statusField;
                         res = (_a = {},
                             _a[statusField] = true,
@@ -361,7 +361,14 @@ var AjaxBase = /** @class */ (function () {
                             _a);
                     }
                     else {
-                        res = JSON.parse(this.response || this.responseText || '{}');
+                        // IE9下responseType为json时，response的值为undefined，返回值需去responseText取
+                        // 其它浏览器responseType为json时，取response
+                        if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
+                            res = this.response;
+                        }
+                        else {
+                            res = JSON.parse(this.response || this.responseText || '{}');
+                        }
                     }
                     if (options.cache) {
                         ajaxThis._cache[url] = res;

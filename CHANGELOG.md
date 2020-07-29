@@ -7,7 +7,7 @@
 
 
 # Next
-
+1. <font color=orange>修改</font> 请求`responseType`有值时，不再调用`JSON.parse`处理返回值
 
 
 # 3.2.1

@@ -16,7 +16,7 @@ export class HttpAjax extends AjaxBase {
         }: { response: Ajax.IResult; options: Ajax.IOptions; resolve: Ajax.IResolve<T>; reject: Ajax.IReject }
     ): void {
         const { statusField } = this._config;
-        if (response[statusField]) {
+        if (response && response[statusField]) {
             if (response.confirmMsg) {
                 delete response[statusField];
                 resolve(response as T);
@@ -26,7 +26,7 @@ export class HttpAjax extends AjaxBase {
                 }
                 resolve(response.data as T);
             }
-        } else if (response[statusField] === false) {
+        } else if (response && response[statusField] === false) {
             reject(response);
             if (options && options.autoPopupErrorMsg === false) {
                 return;

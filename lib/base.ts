@@ -437,14 +437,20 @@ class AjaxBase {
 
                     if (this.status === 200 || this.status === 201) {
                         let res: Ajax.IResult;
-                        if (options.json === false) {
+                        if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
                             const { statusField } = ajaxThis._config;
                             res = {
                                 [statusField]: true,
                                 data: this.response || this.responseText,
                             };
                         } else {
-                            res = JSON.parse(this.response || this.responseText || '{}');
+                            // IE9下responseType为json时，response的值为undefined，返回值需去responseText取
+                            // 其它浏览器responseType为json时，取response
+                            if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
+                                res = this.response;
+                            } else {
+                                res = JSON.parse(this.response || this.responseText || '{}');
+                            }
                         }
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
@@ -727,7 +733,7 @@ class AjaxBase {
             console.warn('http-ajax: `noCache` will be deprecated in next version `4.0.0`');
         }
         for (const key in options) {
-            const value = options[key];
+            const value = options[key as keyof typeof options];
             if (
                 key === 'prefix' ||
                 key === 'onSuccess' ||

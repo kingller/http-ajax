@@ -30,7 +30,7 @@ ajax.config({
         // 处理成功回调
         // 下面是默认处理代码
         const { statusField } = ajax.getConfig();
-        if (response[statusField]) {
+        if (response && response[statusField]) {
             if (response.confirmMsg) {
                 delete response[statusField];
                 resolve(response as T);
@@ -40,7 +40,7 @@ ajax.config({
                 }
                 resolve(response.data as T);
             }
-        } else if (response[statusField] === false) {
+        } else if (response && response[statusField] === false) {
             reject(response);
             if (options && options.autoPopupErrorMsg === false) {
                 return;
