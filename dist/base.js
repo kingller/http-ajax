@@ -299,7 +299,9 @@ var AjaxBase = /** @class */ (function () {
             }
             params = _this.getProcessedParams(method, url, params, options, reject);
             if (method === Ajax.METHODS.get) {
-                url = url + "?" + params;
+                if (params) {
+                    url = url + "?" + params;
+                }
                 params = undefined;
             }
             if (options.cache && _this._cache[url] !== undefined) {
@@ -410,11 +412,15 @@ var AjaxBase = /** @class */ (function () {
             if (options.responseType) {
                 xhr.responseType = options.responseType;
             }
-            var token = window.localStorage.getItem('token') || '';
-            if (token) {
-                xhr.setRequestHeader('token', token);
+            if (!options.headers || typeof options.headers['token'] === 'undefined') {
+                var token = window.localStorage.getItem('token') || '';
+                if (token) {
+                    xhr.setRequestHeader('token', token);
+                }
             }
-            xhr.setRequestHeader('X-Request-Id', v4_1.default());
+            if (!options.headers || typeof options.headers['X-Request-Id'] === 'undefined') {
+                xhr.setRequestHeader('X-Request-Id', v4_1.default());
+            }
             var isContentTypeExist = false;
             var isCacheControlExist = false;
             if (options.headers) {
@@ -432,6 +438,13 @@ var AjaxBase = /** @class */ (function () {
                     else {
                         if (lowerCaseKey === 'cache-control') {
                             isCacheControlExist = true;
+                        }
+                        else {
+                            if (k === 'X-Request-Id' || k === 'token') {
+                                if (!v) {
+                                    continue;
+                                }
+                            }
                         }
                         xhr.setRequestHeader(k, v);
                     }
@@ -508,7 +521,7 @@ var AjaxBase = /** @class */ (function () {
         var method = Ajax.METHODS.get;
         var _options = Object.assign({}, options, { cache: true });
         params = this.getProcessedParams(method, url, params, _options);
-        return url + "?" + params;
+        return params ? url + "?" + params : url;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.getCache = function (url, params, options) {

@@ -91,9 +91,11 @@ var HttpAjax = /** @class */ (function (_super) {
             errorCode: xhr.status,
             errorMsg: xhr.statusText,
         };
-        this.catchError(Object.assign({
+        this.catchError({
             remark: "ajax: " + _opts.method + " " + _opts.url + " params: " + JSON.stringify(_opts.params),
-        }, error));
+            errorCode: error.errorCode,
+            errorMsg: error.errorMsg,
+        });
         if (xhr.status === 401 || xhr.status === 406) {
             this.onSessionExpired(error, _opts);
         }

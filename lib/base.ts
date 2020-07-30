@@ -383,7 +383,9 @@ class AjaxBase {
                 }
                 params = this.getProcessedParams(method, url, params, options, reject);
                 if (method === Ajax.METHODS.get) {
-                    url = `${url}?${params}`;
+                    if (params) {
+                        url = `${url}?${params}`;
+                    }
                     params = undefined;
                 }
                 if (options.cache && this._cache[url] !== undefined) {
@@ -490,11 +492,15 @@ class AjaxBase {
                 if (options.responseType) {
                     xhr.responseType = options.responseType;
                 }
-                const token = window.localStorage.getItem('token') || '';
-                if (token) {
-                    xhr.setRequestHeader('token', token);
+                if (!options.headers || typeof options.headers['token'] === 'undefined') {
+                    const token = window.localStorage.getItem('token') || '';
+                    if (token) {
+                        xhr.setRequestHeader('token', token);
+                    }
                 }
-                xhr.setRequestHeader('X-Request-Id', uuid());
+                if (!options.headers || typeof options.headers['X-Request-Id'] === 'undefined') {
+                    xhr.setRequestHeader('X-Request-Id', uuid());
+                }
                 let isContentTypeExist = false;
                 let isCacheControlExist = false;
                 if (options.headers) {
@@ -510,6 +516,12 @@ class AjaxBase {
                         } else {
                             if (lowerCaseKey === 'cache-control') {
                                 isCacheControlExist = true;
+                            } else {
+                                if (k === 'X-Request-Id' || k === 'token') {
+                                    if (!v) {
+                                        continue;
+                                    }
+                                }
                             }
                             xhr.setRequestHeader(k, v);
                         }
@@ -621,7 +633,7 @@ class AjaxBase {
         const method = Ajax.METHODS.get;
         const _options = Object.assign({}, options, { cache: true });
         params = this.getProcessedParams(method, url, params, _options);
-        return `${url}?${params}`;
+        return params ? `${url}?${params}` : url;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
