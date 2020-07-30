@@ -7,7 +7,13 @@
 
 
 # Next
+
+
+
+# 3.3.0
+> 2020.07.30  
 1. <font color=orange>修改</font> `responseType`有值时，不再调用`JSON.parse`处理返回值
+2. <font color=orange>修改</font> 参数`options`的`headers`属性`X-Request-Id`和`token`传递空值时，不再将其设至Request Header
 
 
 # 3.2.1
