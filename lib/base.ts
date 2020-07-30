@@ -457,6 +457,9 @@ class AjaxBase {
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
                         }
+                        if (options && options.responseHeader) {
+                            res.responseHeader = xhr.getResponseHeader(options.responseHeader);
+                        }
                         res = ajaxThis.processResponse(res, {
                             xhr,
                             method,
