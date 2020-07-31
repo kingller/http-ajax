@@ -48,7 +48,7 @@ export interface IOptions extends IOptionsBase {
     /** 自定义选项，用来传递值自定义处理逻辑 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     /** 获取指定响应头 */
-    responseHeader?: string;
+    responseHeaders?: Array<string>;
     [name: string]: any;
 }
 

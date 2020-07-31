@@ -17,7 +17,7 @@ export class HttpAjax extends AjaxBase {
     ): void {
         const { statusField } = this._config;
         if (response && response[statusField]) {
-            if (response.confirmMsg || response.responseHeader) {
+            if (response.confirmMsg || response.responseHeaders) {
                 delete response[statusField];
                 resolve(response as T);
             } else {

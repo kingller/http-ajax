@@ -457,8 +457,11 @@ class AjaxBase {
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
                         }
-                        if (options && options.responseHeader) {
-                            res.responseHeader = decodeURIComponent(xhr.getResponseHeader(options.responseHeader));
+                        if (options && options.responseHeaders && options.responseHeaders.length > 0) {
+                            res.responseHeaders = {};
+                            for (const header of options.responseHeaders) {
+                                res.responseHeaders[header] = decodeURIComponent(xhr.getResponseHeader(header));
+                            }
                         }
                         res = ajaxThis.processResponse(res, {
                             xhr,
