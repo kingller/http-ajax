@@ -47,8 +47,8 @@ export interface IOptions extends IOptionsBase {
     onProgress?: (e?: ProgressEvent) => void;
     /** 自定义选项，用来传递值自定义处理逻辑 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    /** 获取指定响应头 */
-    responseHeaders?: Array<string>;
+    /** 自定义响应体 */
+    transformResponse?: (response: IResult, responseHeaders?: any) => IResult;
     [name: string]: any;
 }
 
