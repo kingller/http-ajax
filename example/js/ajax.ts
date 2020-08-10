@@ -1,8 +1,26 @@
 import ajax, { Ajax } from 'http-ajax';
 import cryptoExtend from 'http-ajax/dist/crypto-extend';
 import signatureExtend from 'http-ajax/dist/signature-extend';
+import { parseHeaders } from 'http-ajax/dist/utils/parseHeaders';
 
 let refreshTokenPromise: Promise<any> = null;
+
+function transformResponse({
+    response,
+    options,
+    xhr,
+}: {
+    response: Ajax.IResult;
+    options?: Ajax.IOptions;
+    xhr?: XMLHttpRequest;
+}): Ajax.IResult {
+    if (options && options.transformResponse) {
+        let responseHeaders = xhr ? parseHeaders(xhr.getAllResponseHeaders()) : undefined;
+        return options.transformResponse(response, responseHeaders);
+    } else {
+        return response;
+    }
+}
 
 ajax.config({
     /**
@@ -33,11 +51,13 @@ ajax.config({
         if (response && response[statusField]) {
             if (response.confirmMsg) {
                 delete response[statusField];
+                response = transformResponse({ response, options, xhr });
                 resolve(response as T);
             } else {
                 if (response.warnMsg) {
                     window.$feedback(response.warnMsg, 'warning');
                 }
+                response = transformResponse({ response: response.data, options, xhr });
                 resolve(response.data as T);
             }
         } else if (response && response[statusField] === false) {
@@ -47,6 +67,7 @@ ajax.config({
             }
             window.$feedback(response.errorMsg);
         } else {
+            response = transformResponse({ response, options, xhr });
             resolve(response as T);
         }
     },

@@ -4,7 +4,6 @@ import browser from 'browser-which';
 import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
-import { parseHeaders } from "./utils/parseHeaders";
 import { ILoading } from './interface';
 import * as Ajax from './interface';
 
@@ -457,10 +456,6 @@ class AjaxBase {
                         }
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
-                        }
-                        if (options && options.transformResponse) {
-                            let responseHeaders = parseHeaders(xhr.getAllResponseHeaders());
-                            res = options.transformResponse(res, responseHeaders);
                         }
                         res = ajaxThis.processResponse(res, {
                             xhr,

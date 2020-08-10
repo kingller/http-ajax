@@ -1,5 +1,6 @@
 import React from 'react';
-import ajax from '../../../../dist/ajax.js';
+import { Ajax } from 'http-ajax';
+import ajax from 'ajax';
 import Button from '../../../components/button';
 import jsonFormat from 'json-format';
 import Textarea from '../../../components/textarea';
@@ -17,8 +18,11 @@ export default class Code extends React.PureComponent {
                 userName: 'severTime',
             },
             {
-                transformResponse: (response, responseHeaders) => {
-                    response = { ...response, responseHeaders };
+                transformResponse: (response: Ajax.IResult, responseHeaders: { [name: string]: any }) => {
+                    response = {
+                        data: response,
+                        responseHeaders,
+                    };
                     return response;
                 },
             }
