@@ -455,9 +455,6 @@ class AjaxBase {
                                 res = JSON.parse(this.response || this.responseText || '{}');
                             }
                         }
-                        if (options.cache) {
-                            ajaxThis._cache[url] = res;
-                        }
                         res = ajaxThis.processResponse(res, {
                             xhr,
                             method,
@@ -467,6 +464,9 @@ class AjaxBase {
                             reject,
                         });
                         res = transformData({ response: res, options, xhr, statusField });
+                        if (options.cache) {
+                            ajaxThis._cache[url] = res;
+                        }
                         ajaxThis.onSuccess<T>(xhr, { response: res, options, resolve, reject });
                     } else if (this.status === 204) {
                         ajaxThis.processResponse(null, {

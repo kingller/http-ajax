@@ -373,9 +373,6 @@ var AjaxBase = /** @class */ (function () {
                             res = JSON.parse(this.response || this.responseText || '{}');
                         }
                     }
-                    if (options.cache) {
-                        ajaxThis._cache[url] = res;
-                    }
                     res = ajaxThis.processResponse(res, {
                         xhr: xhr,
                         method: method,
@@ -385,6 +382,9 @@ var AjaxBase = /** @class */ (function () {
                         reject: reject,
                     });
                     res = transform_data_1.transformData({ response: res, options: options, xhr: xhr, statusField: statusField });
+                    if (options.cache) {
+                        ajaxThis._cache[url] = res;
+                    }
                     ajaxThis.onSuccess(xhr, { response: res, options: options, resolve: resolve, reject: reject });
                 }
                 else if (this.status === 204) {

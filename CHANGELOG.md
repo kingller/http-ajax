@@ -22,6 +22,7 @@
         headers?: { [name: string]: any }
     ) => any;
 ```
+2. <font color=red>修复</font> 启用数据缓存及加解密的，改为解密后缓存
 
 
 # 3.3.0
