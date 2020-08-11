@@ -4,6 +4,7 @@ import browser from 'browser-which';
 import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
+import { transformData } from './utils/transform-data';
 import { ILoading } from './interface';
 import * as Ajax from './interface';
 
@@ -439,8 +440,8 @@ class AjaxBase {
 
                     if (this.status === 200 || this.status === 201) {
                         let res: Ajax.IResult;
+                        const { statusField } = ajaxThis._config;
                         if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
-                            const { statusField } = ajaxThis._config;
                             res = {
                                 [statusField]: true,
                                 data: this.response || this.responseText,
@@ -465,6 +466,7 @@ class AjaxBase {
                             options,
                             reject,
                         });
+                        res = transformData({ response: res, options, xhr, statusField });
                         ajaxThis.onSuccess<T>(xhr, { response: res, options, resolve, reject });
                     } else if (this.status === 204) {
                         ajaxThis.processResponse(null, {

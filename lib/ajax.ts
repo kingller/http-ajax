@@ -1,26 +1,8 @@
 import * as Ajax from './interface';
 import AjaxBase from './base';
-import { parseHeaders } from './utils/parseHeaders';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 window.$feedback = window.$feedback || function (): void {};
-
-function transformResponse({
-    response,
-    options,
-    xhr,
-}: {
-    response: Ajax.IResult;
-    options?: Ajax.IOptions;
-    xhr?: XMLHttpRequest;
-}): Ajax.IResult {
-    if (options && options.transformResponse) {
-        let responseHeaders = xhr ? parseHeaders(xhr.getAllResponseHeaders()) : undefined;
-        return options.transformResponse(response, responseHeaders);
-    } else {
-        return response;
-    }
-}
 
 export class HttpAjax extends AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,26 +16,25 @@ export class HttpAjax extends AjaxBase {
         }: { response: Ajax.IResult; options: Ajax.IOptions; resolve: Ajax.IResolve<T>; reject: Ajax.IReject }
     ): void {
         const { statusField } = this._config;
-        if (response && response[statusField]) {
-            if (response.confirmMsg) {
-                delete response[statusField];
-                response = transformResponse({ response, options, xhr });
-                resolve(response as T);
-            } else {
-                if (response.warnMsg) {
-                    window.$feedback(response.warnMsg, 'warning');
+        if (response && typeof response === 'object' && typeof response[statusField] !== 'undefined') {
+            if (response[statusField]) {
+                if (response.confirmMsg) {
+                    delete response[statusField];
+                    resolve(response as T);
+                } else {
+                    if (response.warnMsg) {
+                        window.$feedback(response.warnMsg, 'warning');
+                    }
+                    resolve(response.data as T);
                 }
-                response.data = transformResponse({ response: response.data, options, xhr });
-                resolve(response.data as T);
+            } else {
+                reject(response);
+                if (options && options.autoPopupErrorMsg === false) {
+                    return;
+                }
+                window.$feedback(response.errorMsg);
             }
-        } else if (response && response[statusField] === false) {
-            reject(response);
-            if (options && options.autoPopupErrorMsg === false) {
-                return;
-            }
-            window.$feedback(response.errorMsg);
         } else {
-            response = transformResponse({ response, options, xhr });
             resolve(response as T);
         }
     }

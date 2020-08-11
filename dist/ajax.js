@@ -61,24 +61,26 @@ var HttpAjax = /** @class */ (function (_super) {
     HttpAjax.prototype.onSuccess = function (xhr, _a) {
         var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject;
         var statusField = this._config.statusField;
-        if (response && response[statusField]) {
-            if (response.confirmMsg) {
-                delete response[statusField];
-                resolve(response);
+        if (response && typeof response === 'object' && typeof response[statusField] !== 'undefined') {
+            if (response[statusField]) {
+                if (response.confirmMsg) {
+                    delete response[statusField];
+                    resolve(response);
+                }
+                else {
+                    if (response.warnMsg) {
+                        window.$feedback(response.warnMsg, 'warning');
+                    }
+                    resolve(response.data);
+                }
             }
             else {
-                if (response.warnMsg) {
-                    window.$feedback(response.warnMsg, 'warning');
+                reject(response);
+                if (options && options.autoPopupErrorMsg === false) {
+                    return;
                 }
-                resolve(response.data);
+                window.$feedback(response.errorMsg);
             }
-        }
-        else if (response && response[statusField] === false) {
-            reject(response);
-            if (options && options.autoPopupErrorMsg === false) {
-                return;
-            }
-            window.$feedback(response.errorMsg);
         }
         else {
             resolve(response);

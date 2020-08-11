@@ -1,26 +1,8 @@
 import ajax, { Ajax } from 'http-ajax';
 import cryptoExtend from 'http-ajax/dist/crypto-extend';
 import signatureExtend from 'http-ajax/dist/signature-extend';
-import { parseHeaders } from 'http-ajax/dist/utils/parseHeaders';
 
 let refreshTokenPromise: Promise<any> = null;
-
-function transformResponse({
-    response,
-    options,
-    xhr,
-}: {
-    response: Ajax.IResult;
-    options?: Ajax.IOptions;
-    xhr?: XMLHttpRequest;
-}): Ajax.IResult {
-    if (options && options.transformResponse) {
-        let responseHeaders = xhr ? parseHeaders(xhr.getAllResponseHeaders()) : undefined;
-        return options.transformResponse(response, responseHeaders);
-    } else {
-        return response;
-    }
-}
 
 ajax.config({
     /**
@@ -28,49 +10,6 @@ ajax.config({
      * @default '/api'
      */
     prefix: '/api',
-    /**
-     * 成功回调
-     */
-    onSuccess: <T = any>(
-        xhr: XMLHttpRequest,
-        {
-            response,
-            options,
-            resolve,
-            reject,
-        }: {
-            response: Ajax.IResult;
-            options: Ajax.IOptions;
-            resolve: Ajax.IResolve<T>;
-            reject: Ajax.IReject;
-        }
-    ): void => {
-        // 处理成功回调
-        // 下面是默认处理代码
-        const { statusField } = ajax.getConfig();
-        if (response && response[statusField]) {
-            if (response.confirmMsg) {
-                delete response[statusField];
-                response = transformResponse({ response, options, xhr });
-                resolve(response as T);
-            } else {
-                if (response.warnMsg) {
-                    window.$feedback(response.warnMsg, 'warning');
-                }
-                response = transformResponse({ response: response.data, options, xhr });
-                resolve(response.data as T);
-            }
-        } else if (response && response[statusField] === false) {
-            reject(response);
-            if (options && options.autoPopupErrorMsg === false) {
-                return;
-            }
-            window.$feedback(response.errorMsg);
-        } else {
-            response = transformResponse({ response, options, xhr });
-            resolve(response as T);
-        }
-    },
     /**
      * 失败回调
      */

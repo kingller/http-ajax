@@ -39,6 +39,14 @@ export interface IOptions extends IOptionsBase {
     onData?: (data: any) => void;
     /** 上传文件进度 */
     onProgress?: (e?: ProgressEvent) => void;
+    /** 自定义响应数据 */
+    transformData?: (
+    /** 数据 */
+    data: any, 
+    /** 响应头 */
+    headers?: {
+        [name: string]: any;
+    }) => any;
     /** 自定义选项，用来传递值自定义处理逻辑 */
     [name: string]: any;
 }

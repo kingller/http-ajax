@@ -70,22 +70,24 @@ ajax.config({
         // 处理成功回调
         // 下面是默认处理代码
         const { statusField } = ajax.getConfig();
-        if (response && response[statusField]) {
-            if (response.confirmMsg) {
-                delete response[statusField];
-                resolve(response as T);
-            } else {
-                if (response.warnMsg) {
-                    window.$feedback(response.warnMsg, 'warning');
+        if (response && typeof response === 'object' && typeof response[statusField] !== 'undefined') {
+            if (response[statusField]) {
+                if (response.confirmMsg) {
+                    delete response[statusField];
+                    resolve(response as T);
+                } else {
+                    if (response.warnMsg) {
+                        window.$feedback(response.warnMsg, 'warning');
+                    }
+                    resolve(response.data as T);
                 }
-                resolve(response.data as T);
+            } else {
+                reject(response);
+                if (options && options.autoPopupErrorMsg === false) {
+                    return;
+                }
+                window.$feedback(response.errorMsg);
             }
-        } else if (response && response[statusField] === false) {
-            reject(response);
-            if (options && options.autoPopupErrorMsg === false) {
-                return;
-            }
-            window.$feedback(response.errorMsg);
         } else {
             resolve(response as T);
         }
@@ -279,6 +281,17 @@ boolean
 #### encrypt
 'all' | string[]  
 加密字段
+
+### transformData
+自定义响应数据  
+```
+(
+    /** 数据 */
+    data: any,
+    /** 响应头 */
+    headers?: { [name: string]: any }
+) => any;
+```
 
 
 ## 兼容性

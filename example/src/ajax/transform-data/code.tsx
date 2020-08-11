@@ -11,19 +11,22 @@ export default class Code extends React.PureComponent {
     };
 
     severTime = (): void => {
-        ajax.get<Object>(
+        ajax.get<{
+            data: string;
+            headers: { [name: string]: any };
+        }>(
             '/pdr/ajax/send',
             {
                 userId: 1,
                 userName: 'severTime',
             },
             {
-                transformResponse: (response: Ajax.IResult, responseHeaders: { [name: string]: any }) => {
-                    response = {
-                        data: response,
-                        responseHeaders,
+                transformData: (data: string, headers: { [name: string]: any }) => {
+                    const responseData = {
+                        data,
+                        headers,
                     };
-                    return response;
+                    return responseData;
                 },
             }
         ).then((response): void => {

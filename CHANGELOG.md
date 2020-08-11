@@ -10,6 +10,20 @@
 
 
 
+# 3.4.0
+> 2020.08.11  
+1. <font color=blue>增强</font> 参数`options`添加`transformData`，自定义响应数据
+```
+    /** 自定义响应数据 */
+    transformData?: (
+        /** 数据 */
+        data: any,
+        /** 响应头 */
+        headers?: { [name: string]: any }
+    ) => any;
+```
+
+
 # 3.3.0
 > 2020.07.30  
 1. <font color=orange>修改</font> 参数`options`的`responseType`有值时，不再调用`JSON.parse`处理返回值
