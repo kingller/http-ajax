@@ -7,14 +7,14 @@ export default class Person {
     public async getData(ctx) {
         ctx.body = {
             result: true,
-            data: `${moment().format('YYYY-MM-DD hh:mm:ss')}`,
+            data: `${moment().format('YYYY-MM-DD HH:mm:ss')}`,
         };
     }
     @get('/pdr/ajax/cache')
     public async getTestData(ctx) {
         ctx.body = {
             result: true,
-            data: `${moment().format('YYYY-MM-DD hh:mm:ss')}`,
+            data: `${moment().format('YYYY-MM-DD HH:mm:ss')}`,
         };
     }
 
