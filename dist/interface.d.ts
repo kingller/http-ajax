@@ -40,7 +40,7 @@ export interface IOptions extends IOptionsBase {
     /** 上传文件进度 */
     onProgress?: (e?: ProgressEvent) => void;
     /** 自定义响应数据 */
-    transformData?: (
+    transformResponse?: (
     /** 数据 */
     data: any, 
     /** 响应头 */

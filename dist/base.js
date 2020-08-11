@@ -27,7 +27,7 @@ var browser_which_1 = __importDefault(require("browser-which"));
 var promise_1 = require("./utils/promise");
 var form_1 = require("./utils/form");
 var catch_1 = require("./utils/catch");
-var transform_data_1 = require("./utils/transform-data");
+var transform_response_1 = require("./utils/transform-response");
 var Ajax = __importStar(require("./interface"));
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message, code, request, response) {
@@ -381,7 +381,7 @@ var AjaxBase = /** @class */ (function () {
                         options: options,
                         reject: reject,
                     });
-                    res = transform_data_1.transformData({ response: res, options: options, xhr: xhr, statusField: statusField });
+                    res = transform_response_1.transformResponse({ response: res, options: options, xhr: xhr, statusField: statusField });
                     if (options.cache) {
                         ajaxThis._cache[url] = res;
                     }

@@ -7,7 +7,7 @@ import Crypto from './crypto/box';
 import Signature from './signature/box';
 import ErrorRequest from './error/box';
 import BigPipe from './bigpipe/box';
-import TransformData from './transform-data/box';
+import TransformResponse from './transform-response/box';
 import './index.css';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -39,7 +39,7 @@ export default class Ajax extends React.PureComponent {
                             <Signature />
                             <ErrorRequest />
                             <BigPipe />
-                            <TransformData />
+                            <TransformResponse />
                         </div>
                     </Page>
                     <PropsTable title="Options" of={optionsDoc} />

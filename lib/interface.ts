@@ -46,7 +46,7 @@ export interface IOptions extends IOptionsBase {
     /** 上传文件进度 */
     onProgress?: (e?: ProgressEvent) => void;
     /** 自定义响应数据 */
-    transformData?: (
+    transformResponse?: (
         /** 数据 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data: any,

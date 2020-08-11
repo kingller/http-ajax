@@ -282,7 +282,7 @@ boolean
 'all' | string[]  
 加密字段
 
-### transformData
+### transformResponse
 自定义响应数据  
 ```
 (

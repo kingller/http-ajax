@@ -1,5 +1,4 @@
 import React from 'react';
-import { Ajax } from 'http-ajax';
 import ajax from 'ajax';
 import Button from '../../../components/button';
 import jsonFormat from 'json-format';
@@ -21,7 +20,7 @@ export default class Code extends React.PureComponent {
                 userName: 'severTime',
             },
             {
-                transformData: (data: string, headers: { [name: string]: any }) => {
+                transformResponse: (data: string, headers: { [name: string]: any }) => {
                     const responseData = {
                         data,
                         headers,

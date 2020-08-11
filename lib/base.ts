@@ -4,7 +4,7 @@ import browser from 'browser-which';
 import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
-import { transformData } from './utils/transform-data';
+import { transformResponse } from './utils/transform-response';
 import { ILoading } from './interface';
 import * as Ajax from './interface';
 
@@ -463,7 +463,7 @@ class AjaxBase {
                             options,
                             reject,
                         });
-                        res = transformData({ response: res, options, xhr, statusField });
+                        res = transformResponse({ response: res, options, xhr, statusField });
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
                         }
