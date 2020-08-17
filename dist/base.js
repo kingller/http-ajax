@@ -28,6 +28,7 @@ var promise_1 = require("./utils/promise");
 var form_1 = require("./utils/form");
 var catch_1 = require("./utils/catch");
 var transform_response_1 = require("./utils/transform-response");
+var url_1 = require("./utils/url");
 var Ajax = __importStar(require("./interface"));
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message, code, request, response) {
@@ -409,7 +410,7 @@ var AjaxBase = /** @class */ (function () {
                     });
                 }
             };
-            xhr.open(method, "" + (typeof options.prefix === 'string' ? options.prefix : ajaxThis.prefix) + url);
+            xhr.open(method, url_1.addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
             //xhr.responseType = 'json';
             if (options.responseType) {
                 xhr.responseType = options.responseType;

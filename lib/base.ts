@@ -5,6 +5,7 @@ import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
 import { transformResponse } from './utils/transform-response';
+import { addPrefixToUrl } from './utils/url';
 import { ILoading } from './interface';
 import * as Ajax from './interface';
 
@@ -489,7 +490,7 @@ class AjaxBase {
                         });
                     }
                 };
-                xhr.open(method, `${typeof options.prefix === 'string' ? options.prefix : ajaxThis.prefix}${url}`);
+                xhr.open(method, addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
                 //xhr.responseType = 'json';
                 if (options.responseType) {
                     xhr.responseType = options.responseType;
