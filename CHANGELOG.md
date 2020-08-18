@@ -13,7 +13,7 @@
 # 3.5.0
 > 2020.08.18  
 1. <font color=blue>增强</font> `url`以`http://`或`https://`开头的不再自动添加`prefix`
-2. <font color=blue>增强</font> `url`支持包含参数，示例`example/:params`
+2. <font color=blue>增强</font> `url`支持包含参数，示例`example/:params`，`:params`代表参数（以 : 开头）
 
 
 # 3.4.0
