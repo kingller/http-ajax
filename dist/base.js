@@ -237,15 +237,24 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.removeCacheCancel = function (token) {
         this._cacheCancel[token] && delete this._cacheCancel[token];
     };
-    AjaxBase.prototype.getProcessedParams = function (method, url, params, options, reject) {
+    AjaxBase.prototype.getProcessedParams = function (method, url, params, options, reject
+    /* eslint-disable @typescript-eslint/indent */
+    ) {
         if (options === void 0) { options = {}; }
+        /* eslint-enable @typescript-eslint/indent */
         if (options.processData !== false) {
             params = this.processData(params, { method: method, url: url, options: options, reject: reject });
+            var processedValue = url_1.processParamsInUrl(url, params);
+            url = processedValue.url;
+            params = processedValue.params;
             if (!form_1.isFormData(params)) {
                 params = this.stringifyParams(params, method, options);
             }
         }
-        return params;
+        return {
+            url: url,
+            params: params,
+        };
     };
     AjaxBase.prototype.sendRequest = function (
     /* eslint-disable @typescript-eslint/indent */
@@ -299,7 +308,9 @@ var AjaxBase = /** @class */ (function () {
             if (options.onData) {
                 options.json = false;
             }
-            params = _this.getProcessedParams(method, url, params, options, reject);
+            var processedValue = _this.getProcessedParams(method, url, params, options, reject);
+            url = processedValue.url;
+            params = processedValue.params;
             if (method === Ajax.METHODS.get) {
                 if (params) {
                     url = url + "?" + params;
@@ -523,7 +534,9 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.getCacheKey = function (url, params, options) {
         var method = Ajax.METHODS.get;
         var _options = Object.assign({}, options, { cache: true });
-        params = this.getProcessedParams(method, url, params, _options);
+        var processedValue = this.getProcessedParams(method, url, params, _options);
+        url = processedValue.url;
+        params = processedValue.params;
         return params ? url + "?" + params : url;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

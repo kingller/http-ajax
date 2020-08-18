@@ -33,3 +33,11 @@
 .example-ajax-crypto .pdr-btn {
     margin-right: 15px;
 }
+
+.example-ajax-url-params button {
+    margin-bottom: 10px;
+}
+
+.example-ajax-url-params .pdr-textarea:not(:last-child) {
+    margin-bottom: 25px;
+}

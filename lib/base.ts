@@ -5,7 +5,7 @@ import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
 import { transformResponse } from './utils/transform-response';
-import { addPrefixToUrl } from './utils/url';
+import { addPrefixToUrl, processParamsInUrl } from './utils/url';
 import { ILoading } from './interface';
 import * as Ajax from './interface';
 
@@ -240,14 +240,25 @@ class AjaxBase {
         params: Ajax.IParams | undefined,
         options: Ajax.IOptions = {},
         reject?: Ajax.IReject
-    ): Ajax.IParams | undefined {
+        /* eslint-disable @typescript-eslint/indent */
+    ): {
+        url: string;
+        params: Ajax.IParams | undefined;
+    } {
+        /* eslint-enable @typescript-eslint/indent */
         if (options.processData !== false) {
             params = this.processData(params, { method, url, options, reject });
+            const processedValue = processParamsInUrl(url, params);
+            url = processedValue.url;
+            params = processedValue.params;
             if (!isFormData(params)) {
                 params = this.stringifyParams(params, method, options);
             }
         }
-        return params;
+        return {
+            url,
+            params,
+        };
     }
 
     /**
@@ -383,7 +394,9 @@ class AjaxBase {
                 if (options.onData) {
                     options.json = false;
                 }
-                params = this.getProcessedParams(method, url, params, options, reject);
+                const processedValue = this.getProcessedParams(method, url, params, options, reject);
+                url = processedValue.url;
+                params = processedValue.params;
                 if (method === Ajax.METHODS.get) {
                     if (params) {
                         url = `${url}?${params}`;
@@ -635,7 +648,9 @@ class AjaxBase {
     private getCacheKey(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): string {
         const method = Ajax.METHODS.get;
         const _options = Object.assign({}, options, { cache: true });
-        params = this.getProcessedParams(method, url, params, _options);
+        const processedValue = this.getProcessedParams(method, url, params, _options);
+        url = processedValue.url;
+        params = processedValue.params;
         return params ? `${url}?${params}` : url;
     }
 

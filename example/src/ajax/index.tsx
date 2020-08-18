@@ -8,6 +8,7 @@ import Signature from './signature/box';
 import ErrorRequest from './error/box';
 import BigPipe from './bigpipe/box';
 import TransformResponse from './transform-response/box';
+import UrlParams from './url-params/box';
 import './index.css';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -40,6 +41,7 @@ export default class Ajax extends React.PureComponent {
                             <ErrorRequest />
                             <BigPipe />
                             <TransformResponse />
+                            <UrlParams />
                         </div>
                     </Page>
                     <PropsTable title="Options" of={optionsDoc} />
