@@ -17,7 +17,8 @@ export default class Box extends React.PureComponent {
                             示例： <code>example/:params</code>
                         </li>
                         <li>
-                            <code>:params</code> 代表参数，参数名为 <code>params</code> ，将会从传入的ajax参数中获取
+                            <code>:params</code> 代表参数（以 <code>:</code> 开头），参数名为 <code>params</code>{' '}
+                            ，将会从传入的ajax参数中获取
                         </li>
                     </ul>
                 </div>
