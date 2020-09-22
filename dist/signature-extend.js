@@ -20,11 +20,11 @@ function signatureExtend() {
         var processData = this.processData;
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码
-        var appNonceField = ['app', 'non' + "ce"].join('-');
+        var appNonceField = ['app', ['non', 'ce'].join('')].join('-');
         // timestamp 时间
-        var timestampField = 'time' + "sta" + 'mp';
+        var timestampField = ['time', 'sta', 'mp'].join('');
         // sign 签名
-        var signField = 'si' + "gn";
+        var signField = ['si', 'gn'].join('');
         // 校验该扩展是否已添加过
         if (this._signatureExtendAdded) {
             console && console.error('`signatureExtend` can only be added to ajax once!');

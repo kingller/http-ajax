@@ -17,11 +17,11 @@ function signatureExtend(): () => void {
 
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码
-        const appNonceField = ['app', `${'non'}ce`].join('-');
+        const appNonceField = ['app', ['non', 'ce'].join('')].join('-');
         // timestamp 时间
-        const timestampField = `${'time'}sta${'mp'}`;
+        const timestampField = ['time', 'sta', 'mp'].join('');
         // sign 签名
-        const signField = `${'si'}gn`;
+        const signField = ['si', 'gn'].join('');
 
         // 校验该扩展是否已添加过
         if (this._signatureExtendAdded) {

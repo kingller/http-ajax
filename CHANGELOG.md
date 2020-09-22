@@ -10,6 +10,11 @@
 
 
 
+# 3.5.2
+> 2020.09.22  
+1. <font color=red>修复</font> 签名参数名混淆
+
+
 # 3.5.1
 > 2020.09.22  
 1. <font color=red>修复</font> Refused to get unsafe header "encrypt"
