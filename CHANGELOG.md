@@ -10,6 +10,11 @@
 
 
 
+# 3.5.1
+> 2020.09.22  
+1. <font color=red>修复</font> Refused to get unsafe header "encrypt"
+
+
 # 3.5.0
 > 2020.08.18  
 1. <font color=blue>增强</font> `url`以`http://`或`https://`开头的不再自动添加`prefix`

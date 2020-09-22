@@ -317,7 +317,11 @@ function cryptoExtend() {
                 var decrypt = (options && options.decrypt) || undefined;
                 if (!decrypt) {
                     var xhr = props.xhr;
-                    var encryptResHeader = xhr.getResponseHeader('encrypt');
+                    var encryptResHeader = '';
+                    // Fixed `Refused to get unsafe header "encrypt"`
+                    if (xhr.getAllResponseHeaders().indexOf('encrypt') >= 0) {
+                        encryptResHeader = xhr.getResponseHeader('encrypt');
+                    }
                     if (encryptResHeader) {
                         decrypt = JSON.parse(encryptResHeader);
                     }

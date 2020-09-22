@@ -340,7 +340,11 @@ function cryptoExtend(): () => void {
                 let decrypt: IEncryptFields = (options && options.decrypt) || undefined;
                 if (!decrypt) {
                     const { xhr } = props;
-                    const encryptResHeader = xhr.getResponseHeader('encrypt');
+                    let encryptResHeader = '';
+                    // Fixed `Refused to get unsafe header "encrypt"`
+                    if (xhr.getAllResponseHeaders().indexOf('encrypt') >= 0) {
+                        encryptResHeader = xhr.getResponseHeader('encrypt');
+                    }
                     if (encryptResHeader) {
                         decrypt = JSON.parse(encryptResHeader);
                     }
