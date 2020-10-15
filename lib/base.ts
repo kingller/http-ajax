@@ -514,11 +514,9 @@ class AjaxBase {
                         xhr.setRequestHeader('token', token);
                     }
                 }
-                if (!options.headers || typeof options.headers['X-Correlation-ID'] === 'undefined') {
-                    xhr.setRequestHeader('X-Correlation-ID', uuid());
-                }
                 let isContentTypeExist = false;
                 let isCacheControlExist = false;
+                let isXCorrelationIDExist = false;
                 if (options.headers) {
                     for (const k of Object.keys(options.headers)) {
                         const v = options.headers[k];
@@ -533,7 +531,10 @@ class AjaxBase {
                             if (lowerCaseKey === 'cache-control') {
                                 isCacheControlExist = true;
                             } else {
-                                if (k === 'X-Correlation-ID' || k === 'token') {
+                                if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
+                                    if (lowerCaseKey === 'x-correlation-id') {
+                                        isXCorrelationIDExist = true;
+                                    }
                                     if (!v) {
                                         continue;
                                     }
@@ -542,6 +543,9 @@ class AjaxBase {
                             xhr.setRequestHeader(k, v);
                         }
                     }
+                }
+                if (!isXCorrelationIDExist) {
+                    xhr.setRequestHeader('X-Correlation-ID', uuid());
                 }
                 if (!isContentTypeExist && !isFormData(params) && (!options || options.encrypt !== 'all')) {
                     xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');

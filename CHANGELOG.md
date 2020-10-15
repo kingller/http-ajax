@@ -10,6 +10,11 @@
 
 
 
+# 3.6.1
+> 2020.10.15  
+1. <font color=red>修复</font> 判断链路追踪字段`X-Correlation-ID`改为忽略大小写
+
+
 # 3.6.0
 > 2020.10.15  
 1. <font color=orange>修改</font> 链路追踪字段`X-Request-Id`改为`X-Correlation-ID`

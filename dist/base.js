@@ -432,11 +432,9 @@ var AjaxBase = /** @class */ (function () {
                     xhr.setRequestHeader('token', token);
                 }
             }
-            if (!options.headers || typeof options.headers['X-Correlation-ID'] === 'undefined') {
-                xhr.setRequestHeader('X-Correlation-ID', v4_1.default());
-            }
             var isContentTypeExist = false;
             var isCacheControlExist = false;
+            var isXCorrelationIDExist = false;
             if (options.headers) {
                 for (var _i = 0, _a = Object.keys(options.headers); _i < _a.length; _i++) {
                     var k = _a[_i];
@@ -454,7 +452,10 @@ var AjaxBase = /** @class */ (function () {
                             isCacheControlExist = true;
                         }
                         else {
-                            if (k === 'X-Correlation-ID' || k === 'token') {
+                            if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
+                                if (lowerCaseKey === 'x-correlation-id') {
+                                    isXCorrelationIDExist = true;
+                                }
                                 if (!v) {
                                     continue;
                                 }
@@ -463,6 +464,9 @@ var AjaxBase = /** @class */ (function () {
                         xhr.setRequestHeader(k, v);
                     }
                 }
+            }
+            if (!isXCorrelationIDExist) {
+                xhr.setRequestHeader('X-Correlation-ID', v4_1.default());
             }
             if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
