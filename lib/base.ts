@@ -514,8 +514,8 @@ class AjaxBase {
                         xhr.setRequestHeader('token', token);
                     }
                 }
-                if (!options.headers || typeof options.headers['X-Request-Id'] === 'undefined') {
-                    xhr.setRequestHeader('X-Request-Id', uuid());
+                if (!options.headers || typeof options.headers['X-Correlation-ID'] === 'undefined') {
+                    xhr.setRequestHeader('X-Correlation-ID', uuid());
                 }
                 let isContentTypeExist = false;
                 let isCacheControlExist = false;
@@ -533,7 +533,7 @@ class AjaxBase {
                             if (lowerCaseKey === 'cache-control') {
                                 isCacheControlExist = true;
                             } else {
-                                if (k === 'X-Request-Id' || k === 'token') {
+                                if (k === 'X-Correlation-ID' || k === 'token') {
                                     if (!v) {
                                         continue;
                                     }

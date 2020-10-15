@@ -432,8 +432,8 @@ var AjaxBase = /** @class */ (function () {
                     xhr.setRequestHeader('token', token);
                 }
             }
-            if (!options.headers || typeof options.headers['X-Request-Id'] === 'undefined') {
-                xhr.setRequestHeader('X-Request-Id', v4_1.default());
+            if (!options.headers || typeof options.headers['X-Correlation-ID'] === 'undefined') {
+                xhr.setRequestHeader('X-Correlation-ID', v4_1.default());
             }
             var isContentTypeExist = false;
             var isCacheControlExist = false;
@@ -454,7 +454,7 @@ var AjaxBase = /** @class */ (function () {
                             isCacheControlExist = true;
                         }
                         else {
-                            if (k === 'X-Request-Id' || k === 'token') {
+                            if (k === 'X-Correlation-ID' || k === 'token') {
                                 if (!v) {
                                     continue;
                                 }

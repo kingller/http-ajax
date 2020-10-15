@@ -10,6 +10,11 @@
 
 
 
+# 3.6.0
+> 2020.10.15  
+1. <font color=orange>修改</font> 链路追踪字段`X-Request-Id`改为`X-Correlation-ID`
+
+
 # 3.5.2
 > 2020.09.22  
 1. <font color=red>修复</font> 签名参数名混淆
