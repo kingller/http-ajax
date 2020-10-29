@@ -403,7 +403,9 @@ function cryptoExtend(): () => void {
             error?: { errorCode: number; errorMsg: string },
             _opts?: IRequestOptions
         ): void => {
-            clearCrypto();
+            if (!publicKeyPromise && !secretKeyPromise) {
+                clearCrypto();
+            }
             // 解密需去响应头获取encrypt字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成AES密钥并传输给服务端
             createSecretKey.apply(this).then(
                 () => {
