@@ -34,10 +34,9 @@ function signatureExtend() {
         var signData = function (_a) {
             var _b;
             var params = _a.params, method = _a.method, options = _a.options;
-            var signatureStr = _this.stringifyParams(params, method, { cache: true, encodeValue: false });
-            if (!signatureStr) {
-                return;
-            }
+            var signatureStr = form_1.isFormData(params)
+                ? ''
+                : _this.stringifyParams(params, method, { cache: true, encodeValue: false });
             var timestamp = new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
             var appNonce = v4_1.default();
             lodash_1.default.merge(options, {
@@ -51,10 +50,8 @@ function signatureExtend() {
         this.processData = function (params, props) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             params = processData(params, props);
-            if (params && !form_1.isFormData(params)) {
-                var method = props.method, options = props.options;
-                signData({ params: params, method: method, options: options });
-            }
+            var method = props.method, options = props.options;
+            signData({ params: params, method: method, options: options });
             return params;
         };
     };

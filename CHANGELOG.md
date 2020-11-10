@@ -7,6 +7,7 @@
 
 
 # Next
+1. <font color=orange>修改</font> 在参数为`FormData`或空时也进行签名，以支持阻止重放
 
 
 # 3.6.2

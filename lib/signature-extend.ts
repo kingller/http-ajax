@@ -40,10 +40,9 @@ function signatureExtend(): () => void {
             method: IMethod;
             options: IOptions;
         }): void => {
-            const signatureStr = (this as IAjax).stringifyParams(params, method, { cache: true, encodeValue: false });
-            if (!signatureStr) {
-                return;
-            }
+            const signatureStr = isFormData(params)
+                ? ''
+                : (this as IAjax).stringifyParams(params, method, { cache: true, encodeValue: false });
 
             const timestamp = new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
             const appNonce = uuid();
@@ -62,10 +61,8 @@ function signatureExtend(): () => void {
         (this as IAjax).processData = (params: IParams, props: IAjaxProcessDataOptions): IParams => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             params = processData(params, props) as { [name: string]: any };
-            if (params && !isFormData(params)) {
-                const { method, options } = props;
-                signData({ params, method, options });
-            }
+            const { method, options } = props;
+            signData({ params, method, options });
             return params;
         };
     };

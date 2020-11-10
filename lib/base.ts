@@ -200,7 +200,8 @@ class AjaxBase {
         //对于非GET请求，直接序列化该参数对象
         //requestBody为undefined时，将其转为空字符串，避免IE下出现错误：invalid JSON, only supports object and array
         //requestBody为null时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
-        if (method !== Ajax.METHODS.get) return (params !== null && JSON.stringify(params)) || '';
+        if (method !== Ajax.METHODS.get)
+            return (typeof params !== 'undefined' && params !== null && JSON.stringify(params)) || '';
         //对于GET请求，将参数拼成key1=val1&key2=val2的格式
         const array = [];
         if (params && typeof params === 'object') {
