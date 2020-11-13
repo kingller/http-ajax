@@ -8,6 +8,7 @@
 
 # Next
 1. <font color=orange>修改</font> 在参数为`FormData`或空时也进行签名，以支持阻止重放
+2. <font color=red>修复</font> 签名时间戳`timestamp`计算世界时时修复为减去时区（原来的逻辑错误再次加上了时区）
 
 
 # 3.6.2

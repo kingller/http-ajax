@@ -44,7 +44,7 @@ function signatureExtend(): () => void {
                 ? ''
                 : (this as IAjax).stringifyParams(params, method, { cache: true, encodeValue: false });
 
-            const timestamp = new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
+            const timestamp = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000;
             const appNonce = uuid();
 
             _.merge(options, {
