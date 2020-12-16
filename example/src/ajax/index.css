@@ -1,13 +1,23 @@
+.ajax-loading button {
+    margin-right: 10px;
+}
+
 .ajax-loading .ajax-cancel {
     position: relative;
     margin-bottom: 15px;
 }
 
-.ajax-loading button {
-    margin-right: 10px;
+.ajax-loading .ajax-cancel .cancel {
+    position: absolute;
+    z-index: 60000;
 }
 
 .ajax-loading .ajax-token-cancel {
+    position: relative;
+    height: 32px;
+}
+
+.ajax-loading .ajax-token-cancel-content {
     position: absolute;
     z-index: 60000;
 }
