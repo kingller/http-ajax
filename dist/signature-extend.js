@@ -17,7 +17,7 @@ var form_1 = require("./utils/form");
 function signatureExtend() {
     return function signature() {
         var _this = this;
-        var processData = this.processData;
+        var processDataAfter = this.processDataAfter;
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码
         var appNonceField = ['app', ['non', 'ce'].join('')].join('-');
@@ -33,8 +33,8 @@ function signatureExtend() {
         this._signatureExtendAdded = true;
         var signData = function (_a) {
             var _b;
-            var params = _a.params, method = _a.method, options = _a.options;
-            var signatureStr = form_1.isFormData(params)
+            var params = _a.params, method = _a.method, options = _a.options, processData = _a.processData;
+            var signatureStr = form_1.isFormData(params) || processData === false
                 ? ''
                 : _this.stringifyParams(params, method, { cache: true, encodeValue: false });
             var timestamp = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000;
@@ -47,11 +47,11 @@ function signatureExtend() {
                     _b),
             });
         };
-        this.processData = function (params, props) {
+        this.processDataAfter = function (params, props) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processData(params, props);
-            var method = props.method, options = props.options;
-            signData({ params: params, method: method, options: options });
+            params = processDataAfter(params, props);
+            var method = props.method, options = props.options, processData = props.processData;
+            signData({ params: params, method: method, options: options, processData: processData });
             return params;
         };
     };

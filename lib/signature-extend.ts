@@ -2,7 +2,7 @@ import _ from 'lodash';
 import Crypto from 'client-crypto';
 import uuid from 'uuid/v4';
 import { isFormData } from './utils/form';
-import { IAjax, IAjaxProcessDataOptions, IParams, IMethod, IOptions } from './interface';
+import { IAjax, IAjaxProcessDataAfterOptions, IParams, IMethod, IOptions } from './interface';
 
 /**
  * 签名扩展。
@@ -13,7 +13,7 @@ import { IAjax, IAjaxProcessDataOptions, IParams, IMethod, IOptions } from './in
  */
 function signatureExtend(): () => void {
     return function signature(): void {
-        const { processData } = this as IAjax;
+        const { processDataAfter } = this as IAjax;
 
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码
@@ -35,14 +35,17 @@ function signatureExtend(): () => void {
             params,
             method,
             options,
+            processData,
         }: {
             params: IParams;
             method: IMethod;
             options: IOptions;
+            processData?: boolean;
         }): void => {
-            const signatureStr = isFormData(params)
-                ? ''
-                : (this as IAjax).stringifyParams(params, method, { cache: true, encodeValue: false });
+            const signatureStr =
+                isFormData(params) || processData === false
+                    ? ''
+                    : (this as IAjax).stringifyParams(params, method, { cache: true, encodeValue: false });
 
             const timestamp = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000;
             const appNonce = uuid();
@@ -58,11 +61,11 @@ function signatureExtend(): () => void {
             });
         };
 
-        (this as IAjax).processData = (params: IParams, props: IAjaxProcessDataOptions): IParams => {
+        (this as IAjax).processDataAfter = (params: IParams, props: IAjaxProcessDataAfterOptions): IParams => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processData(params, props) as { [name: string]: any };
-            const { method, options } = props;
-            signData({ params, method, options });
+            params = processDataAfter(params, props) as { [name: string]: any };
+            const { method, options, processData } = props;
+            signData({ params, method, options, processData });
             return params;
         };
     };

@@ -118,6 +118,11 @@ class AjaxBase {
         return params;
     };
 
+    /** 去除URL中:params格式参数后数据处理 */
+    public processDataAfter = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataAfterOptions): Ajax.IParams {
+        return params;
+    };
+
     public processResponse = function (
         response: Ajax.IResult | null,
         props: Ajax.IProcessResponseOptions
@@ -249,9 +254,12 @@ class AjaxBase {
         /* eslint-enable @typescript-eslint/indent */
         if (options.processData !== false) {
             params = this.processData(params, { method, url, options, reject });
-            const processedValue = processParamsInUrl(url, params);
-            url = processedValue.url;
-            params = processedValue.params;
+        }
+        const processedValue = processParamsInUrl(url, params);
+        url = processedValue.url;
+        params = processedValue.params;
+        params = this.processDataAfter(params, { method, url, options, reject, processData: options.processData });
+        if (options.processData !== false) {
             if (!isFormData(params)) {
                 params = this.stringifyParams(params, method, options);
             }

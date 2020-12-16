@@ -31,15 +31,22 @@ params
     /* eslint-enable @typescript-eslint/indent */
     params = __assign({}, params);
     var modules = url.split('/');
+    var hasParamRemoved = false;
     var urlModules = modules.map(function (m) {
         if (m && /^:\w/.test(m)) {
             var paramName = m.match(/^:(.*)$/)[1];
             var value = encodeURIComponent(params[paramName]);
             delete params[paramName];
+            hasParamRemoved = true;
             return value;
         }
         return m;
     });
+    if (hasParamRemoved) {
+        if (Object.keys(params).length === 0) {
+            params = null;
+        }
+    }
     return {
         url: urlModules.join('/'),
         params: params,

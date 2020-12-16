@@ -109,6 +109,10 @@ var AjaxBase = /** @class */ (function () {
         this.processData = function (params, props) {
             return params;
         };
+        /** 去除URL中:params格式参数后数据处理 */
+        this.processDataAfter = function (params, props) {
+            return params;
+        };
         this.processResponse = function (response, props) {
             return response;
         };
@@ -244,9 +248,12 @@ var AjaxBase = /** @class */ (function () {
         /* eslint-enable @typescript-eslint/indent */
         if (options.processData !== false) {
             params = this.processData(params, { method: method, url: url, options: options, reject: reject });
-            var processedValue = url_1.processParamsInUrl(url, params);
-            url = processedValue.url;
-            params = processedValue.params;
+        }
+        var processedValue = url_1.processParamsInUrl(url, params);
+        url = processedValue.url;
+        params = processedValue.params;
+        params = this.processDataAfter(params, { method: method, url: url, options: options, reject: reject, processData: options.processData });
+        if (options.processData !== false) {
             if (!form_1.isFormData(params)) {
                 params = this.stringifyParams(params, method, options);
             }

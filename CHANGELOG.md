@@ -10,6 +10,11 @@
 
 
 
+# 4.0.1
+> 2020.12.16  
+1. <font color=red>修复</font> 签名时未去除`url`中`:params`格式参数
+
+
 # 4.0.0
 > 2020.11.13  
 1. <font color=orange>修改</font> 在参数为`FormData`或空时也进行签名，以支持阻止重放

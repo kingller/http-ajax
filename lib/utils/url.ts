@@ -23,15 +23,22 @@ function fillParamsInUrl(
     /* eslint-enable @typescript-eslint/indent */
     params = { ...params };
     const modules = url.split('/');
+    let hasParamRemoved = false;
     const urlModules = modules.map(function (m) {
         if (m && /^:\w/.test(m)) {
             const paramName = m.match(/^:(.*)$/)[1];
             const value = encodeURIComponent(params[paramName]);
             delete params[paramName];
+            hasParamRemoved = true;
             return value;
         }
         return m;
     });
+    if (hasParamRemoved) {
+        if (Object.keys(params).length === 0) {
+            params = null;
+        }
+    }
     return {
         url: urlModules.join('/'),
         params,
