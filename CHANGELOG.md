@@ -10,6 +10,11 @@
 
 
 
+# 4.0.2
+> 2020.12.22  
+1. <font color=red>修复</font> `ajax`的`clone`方法没有成功克隆签名扩展
+
+
 # 4.0.1
 > 2020.12.16  
 1. <font color=red>修复</font> 签名时未去除`url`中`:params`格式参数

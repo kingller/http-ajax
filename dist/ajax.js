@@ -32,8 +32,10 @@ var HttpAjax = /** @class */ (function (_super) {
             var cloneFields = [
                 'prefix',
                 '$loading',
+                'request',
                 'beforeSend',
                 'processData',
+                'processDataAfter',
                 'processResponse',
                 'processErrorResponse',
                 'onSuccess',
@@ -44,6 +46,8 @@ var HttpAjax = /** @class */ (function (_super) {
                 'catchError',
                 'clear',
                 '_config',
+                '_cryptoExtendAdded',
+                '_signatureExtendAdded',
             ];
             for (var _i = 0, cloneFields_1 = cloneFields; _i < cloneFields_1.length; _i++) {
                 var field = cloneFields_1[_i];

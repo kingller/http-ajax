@@ -289,7 +289,10 @@ export interface IAjax {
     /** 配置 */
     config: (options?: IConfigOptions) => void;
     Ajax: () => IAjax;
+    /** 克隆 */
     clone: () => IAjax;
+    /** 扩展 */
+    extend: (pluginFunc: () => void) => void;
 }
 export interface ICryptoExtend {
     (): () => void;

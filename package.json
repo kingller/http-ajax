@@ -1,6 +1,6 @@
 {
     "name": "http-ajax",
-    "version": "4.0.1",
+    "version": "4.0.2",
     "description": "Promise based HTTP client for the browser",
     "keywords": [
         "ajax",

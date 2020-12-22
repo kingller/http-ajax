@@ -69,8 +69,10 @@ export class HttpAjax extends AjaxBase {
         const cloneFields = [
             'prefix',
             '$loading',
+            'request',
             'beforeSend',
             'processData',
+            'processDataAfter',
             'processResponse',
             'processErrorResponse',
             'onSuccess',
@@ -81,6 +83,8 @@ export class HttpAjax extends AjaxBase {
             'catchError',
             'clear',
             '_config',
+            '_cryptoExtendAdded',
+            '_signatureExtendAdded',
         ];
         for (const field of cloneFields) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
