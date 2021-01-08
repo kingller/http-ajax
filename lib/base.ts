@@ -386,7 +386,7 @@ class AjaxBase {
             });
         //启用加载效果
         let loadingComponent: ILoading = null;
-        if (loading && this.getLoading(options) && !(options.cache && this._cache[url] !== undefined)) {
+        if (loading && this.getLoading(options)) {
             loadingComponent = this.getLoading(options);
             loadingComponent.start();
         }
@@ -397,6 +397,7 @@ class AjaxBase {
             .then((): void => {
                 if (_cancel) {
                     reject(createError('Request aborted', Ajax.CODE.CANCEL));
+                    loadingComponent && loadingComponent.finish();
                     return;
                 }
 
@@ -413,6 +414,7 @@ class AjaxBase {
                     params = undefined;
                 }
                 if (options.cache && this._cache[url] !== undefined) {
+                    loadingComponent && loadingComponent.finish();
                     this.onSuccess<T>(undefined, {
                         response: this._cache[url],
                         options,
