@@ -340,7 +340,11 @@ function cryptoExtend(): () => void {
                 let decrypt: IEncryptFields = (options && options.decrypt) || undefined;
                 if (!decrypt) {
                     const { xhr } = props;
-                    const encryptResHeader = xhr.getResponseHeader('encrypt');
+                    let encryptResHeader = '';
+                    // Fixed `Refused to get unsafe header "encrypt"`
+                    if (xhr.getAllResponseHeaders().indexOf('encrypt') >= 0) {
+                        encryptResHeader = xhr.getResponseHeader('encrypt');
+                    }
                     if (encryptResHeader) {
                         decrypt = JSON.parse(encryptResHeader);
                     }
@@ -399,7 +403,9 @@ function cryptoExtend(): () => void {
             error?: { errorCode: number; errorMsg: string },
             _opts?: IRequestOptions
         ): void => {
-            clearCrypto();
+            if (!publicKeyPromise && !secretKeyPromise) {
+                clearCrypto();
+            }
             // 解密需去响应头获取encrypt字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成AES密钥并传输给服务端
             createSecretKey.apply(this).then(
                 () => {

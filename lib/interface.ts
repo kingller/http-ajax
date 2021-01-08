@@ -100,6 +100,11 @@ export interface IAjaxProcessDataOptions {
     reject?: IReject;
 }
 
+export interface IAjaxProcessDataAfterOptions extends IAjaxProcessDataOptions {
+    /** 为false时不格式化请求参数 */
+    processData?: boolean;
+}
+
 export interface IProcessResponseOptions extends IAjaxArgsOptions {
     xhr: XMLHttpRequest;
     reject: IReject;
@@ -262,6 +267,10 @@ export interface IAjax {
         params: IParams,
         props: { method: IMethod; url: string; options: IOptions; reject?: IReject }
     ) => IParams;
+    processDataAfter: (
+        params: IParams,
+        props: { method: IMethod; url: string; options: IOptions; reject?: IReject; processData?: boolean }
+    ) => IParams;
     processResponse: (response: IResult | null, props: IProcessResponseOptions) => IResult;
     readonly stringifyParams: (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -349,7 +358,10 @@ export interface IAjax {
     /** 配置 */
     config: (options?: IConfigOptions) => void;
     Ajax: () => IAjax;
+    /** 克隆 */
     clone: () => IAjax;
+    /** 扩展 */
+    extend: (pluginFunc: () => void) => void;
 }
 
 // ----- Crypto start ------- //

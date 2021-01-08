@@ -28,6 +28,7 @@ var promise_1 = require("./utils/promise");
 var form_1 = require("./utils/form");
 var catch_1 = require("./utils/catch");
 var transform_response_1 = require("./utils/transform-response");
+var url_1 = require("./utils/url");
 var Ajax = __importStar(require("./interface"));
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message, code, request, response) {
@@ -108,6 +109,10 @@ var AjaxBase = /** @class */ (function () {
         this.processData = function (params, props) {
             return params;
         };
+        /** 去除URL中:params格式参数后数据处理 */
+        this.processDataAfter = function (params, props) {
+            return params;
+        };
         this.processResponse = function (response, props) {
             return response;
         };
@@ -127,7 +132,7 @@ var AjaxBase = /** @class */ (function () {
             //requestBody为undefined时，将其转为空字符串，避免IE下出现错误：invalid JSON, only supports object and array
             //requestBody为null时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
             if (method !== Ajax.METHODS.get)
-                return (params !== null && JSON.stringify(params)) || '';
+                return (typeof params !== 'undefined' && params !== null && JSON.stringify(params)) || '';
             //对于GET请求，将参数拼成key1=val1&key2=val2的格式
             var array = [];
             if (params && typeof params === 'object') {
@@ -236,15 +241,27 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.removeCacheCancel = function (token) {
         this._cacheCancel[token] && delete this._cacheCancel[token];
     };
-    AjaxBase.prototype.getProcessedParams = function (method, url, params, options, reject) {
+    AjaxBase.prototype.getProcessedParams = function (method, url, params, options, reject
+    /* eslint-disable @typescript-eslint/indent */
+    ) {
         if (options === void 0) { options = {}; }
+        /* eslint-enable @typescript-eslint/indent */
         if (options.processData !== false) {
             params = this.processData(params, { method: method, url: url, options: options, reject: reject });
+        }
+        var processedValue = url_1.processParamsInUrl(url, params);
+        url = processedValue.url;
+        params = processedValue.params;
+        params = this.processDataAfter(params, { method: method, url: url, options: options, reject: reject, processData: options.processData });
+        if (options.processData !== false) {
             if (!form_1.isFormData(params)) {
                 params = this.stringifyParams(params, method, options);
             }
         }
-        return params;
+        return {
+            url: url,
+            params: params,
+        };
     };
     AjaxBase.prototype.sendRequest = function (
     /* eslint-disable @typescript-eslint/indent */
@@ -298,7 +315,9 @@ var AjaxBase = /** @class */ (function () {
             if (options.onData) {
                 options.json = false;
             }
-            params = _this.getProcessedParams(method, url, params, options, reject);
+            var processedValue = _this.getProcessedParams(method, url, params, options, reject);
+            url = processedValue.url;
+            params = processedValue.params;
             if (method === Ajax.METHODS.get) {
                 if (params) {
                     url = url + "?" + params;
@@ -409,7 +428,7 @@ var AjaxBase = /** @class */ (function () {
                     });
                 }
             };
-            xhr.open(method, "" + (typeof options.prefix === 'string' ? options.prefix : ajaxThis.prefix) + url);
+            xhr.open(method, url_1.addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
             //xhr.responseType = 'json';
             if (options.responseType) {
                 xhr.responseType = options.responseType;
@@ -420,11 +439,9 @@ var AjaxBase = /** @class */ (function () {
                     xhr.setRequestHeader('token', token);
                 }
             }
-            if (!options.headers || typeof options.headers['X-Request-Id'] === 'undefined') {
-                xhr.setRequestHeader('X-Request-Id', v4_1.default());
-            }
             var isContentTypeExist = false;
             var isCacheControlExist = false;
+            var isXCorrelationIDExist = false;
             if (options.headers) {
                 for (var _i = 0, _a = Object.keys(options.headers); _i < _a.length; _i++) {
                     var k = _a[_i];
@@ -442,7 +459,10 @@ var AjaxBase = /** @class */ (function () {
                             isCacheControlExist = true;
                         }
                         else {
-                            if (k === 'X-Request-Id' || k === 'token') {
+                            if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
+                                if (lowerCaseKey === 'x-correlation-id') {
+                                    isXCorrelationIDExist = true;
+                                }
                                 if (!v) {
                                     continue;
                                 }
@@ -451,6 +471,9 @@ var AjaxBase = /** @class */ (function () {
                         xhr.setRequestHeader(k, v);
                     }
                 }
+            }
+            if (!isXCorrelationIDExist) {
+                xhr.setRequestHeader('X-Correlation-ID', v4_1.default());
             }
             if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
@@ -522,7 +545,9 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.getCacheKey = function (url, params, options) {
         var method = Ajax.METHODS.get;
         var _options = Object.assign({}, options, { cache: true });
-        params = this.getProcessedParams(method, url, params, _options);
+        var processedValue = this.getProcessedParams(method, url, params, _options);
+        url = processedValue.url;
+        params = processedValue.params;
         return params ? url + "?" + params : url;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

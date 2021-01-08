@@ -5,6 +5,7 @@ import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
 import { transformResponse } from './utils/transform-response';
+import { addPrefixToUrl, processParamsInUrl } from './utils/url';
 import { ILoading } from './interface';
 import * as Ajax from './interface';
 
@@ -117,6 +118,11 @@ class AjaxBase {
         return params;
     };
 
+    /** 去除URL中:params格式参数后数据处理 */
+    public processDataAfter = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataAfterOptions): Ajax.IParams {
+        return params;
+    };
+
     public processResponse = function (
         response: Ajax.IResult | null,
         props: Ajax.IProcessResponseOptions
@@ -199,7 +205,8 @@ class AjaxBase {
         //对于非GET请求，直接序列化该参数对象
         //requestBody为undefined时，将其转为空字符串，避免IE下出现错误：invalid JSON, only supports object and array
         //requestBody为null时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
-        if (method !== Ajax.METHODS.get) return (params !== null && JSON.stringify(params)) || '';
+        if (method !== Ajax.METHODS.get)
+            return (typeof params !== 'undefined' && params !== null && JSON.stringify(params)) || '';
         //对于GET请求，将参数拼成key1=val1&key2=val2的格式
         const array = [];
         if (params && typeof params === 'object') {
@@ -239,14 +246,28 @@ class AjaxBase {
         params: Ajax.IParams | undefined,
         options: Ajax.IOptions = {},
         reject?: Ajax.IReject
-    ): Ajax.IParams | undefined {
+        /* eslint-disable @typescript-eslint/indent */
+    ): {
+        url: string;
+        params: Ajax.IParams | undefined;
+    } {
+        /* eslint-enable @typescript-eslint/indent */
         if (options.processData !== false) {
             params = this.processData(params, { method, url, options, reject });
+        }
+        const processedValue = processParamsInUrl(url, params);
+        url = processedValue.url;
+        params = processedValue.params;
+        params = this.processDataAfter(params, { method, url, options, reject, processData: options.processData });
+        if (options.processData !== false) {
             if (!isFormData(params)) {
                 params = this.stringifyParams(params, method, options);
             }
         }
-        return params;
+        return {
+            url,
+            params,
+        };
     }
 
     /**
@@ -384,7 +405,9 @@ class AjaxBase {
                 if (options.onData) {
                     options.json = false;
                 }
-                params = this.getProcessedParams(method, url, params, options, reject);
+                const processedValue = this.getProcessedParams(method, url, params, options, reject);
+                url = processedValue.url;
+                params = processedValue.params;
                 if (method === Ajax.METHODS.get) {
                     if (params) {
                         url = `${url}?${params}`;
@@ -491,7 +514,7 @@ class AjaxBase {
                         });
                     }
                 };
-                xhr.open(method, `${typeof options.prefix === 'string' ? options.prefix : ajaxThis.prefix}${url}`);
+                xhr.open(method, addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
                 //xhr.responseType = 'json';
                 if (options.responseType) {
                     xhr.responseType = options.responseType;
@@ -502,11 +525,9 @@ class AjaxBase {
                         xhr.setRequestHeader('token', token);
                     }
                 }
-                if (!options.headers || typeof options.headers['X-Request-Id'] === 'undefined') {
-                    xhr.setRequestHeader('X-Request-Id', uuid());
-                }
                 let isContentTypeExist = false;
                 let isCacheControlExist = false;
+                let isXCorrelationIDExist = false;
                 if (options.headers) {
                     for (const k of Object.keys(options.headers)) {
                         const v = options.headers[k];
@@ -521,7 +542,10 @@ class AjaxBase {
                             if (lowerCaseKey === 'cache-control') {
                                 isCacheControlExist = true;
                             } else {
-                                if (k === 'X-Request-Id' || k === 'token') {
+                                if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
+                                    if (lowerCaseKey === 'x-correlation-id') {
+                                        isXCorrelationIDExist = true;
+                                    }
                                     if (!v) {
                                         continue;
                                     }
@@ -530,6 +554,9 @@ class AjaxBase {
                             xhr.setRequestHeader(k, v);
                         }
                     }
+                }
+                if (!isXCorrelationIDExist) {
+                    xhr.setRequestHeader('X-Correlation-ID', uuid());
                 }
                 if (!isContentTypeExist && !isFormData(params) && (!options || options.encrypt !== 'all')) {
                     xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
@@ -636,7 +663,9 @@ class AjaxBase {
     private getCacheKey(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): string {
         const method = Ajax.METHODS.get;
         const _options = Object.assign({}, options, { cache: true });
-        params = this.getProcessedParams(method, url, params, _options);
+        const processedValue = this.getProcessedParams(method, url, params, _options);
+        url = processedValue.url;
+        params = processedValue.params;
         return params ? `${url}?${params}` : url;
     }
 

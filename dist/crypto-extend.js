@@ -317,7 +317,11 @@ function cryptoExtend() {
                 var decrypt = (options && options.decrypt) || undefined;
                 if (!decrypt) {
                     var xhr = props.xhr;
-                    var encryptResHeader = xhr.getResponseHeader('encrypt');
+                    var encryptResHeader = '';
+                    // Fixed `Refused to get unsafe header "encrypt"`
+                    if (xhr.getAllResponseHeaders().indexOf('encrypt') >= 0) {
+                        encryptResHeader = xhr.getResponseHeader('encrypt');
+                    }
                     if (encryptResHeader) {
                         decrypt = JSON.parse(encryptResHeader);
                     }
@@ -374,7 +378,9 @@ function cryptoExtend() {
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.onCryptoExpired = function (error, _opts) {
-            clearCrypto();
+            if (!publicKeyPromise && !secretKeyPromise) {
+                clearCrypto();
+            }
             // 解密需去响应头获取encrypt字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成AES密钥并传输给服务端
             createSecretKey.apply(_this).then(function () {
                 var method = _opts.method, url = _opts.url, params = _opts.params, loading = _opts.loading, resolve = _opts.resolve, reject = _opts.reject, options = _opts.options, cancelExecutor = _opts.cancelExecutor;

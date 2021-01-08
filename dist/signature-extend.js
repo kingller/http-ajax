@@ -17,28 +17,27 @@ var form_1 = require("./utils/form");
 function signatureExtend() {
     return function signature() {
         var _this = this;
-        var processData = this.processData;
+        var processDataAfter = this.processDataAfter;
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码
-        var appNonceField = ['app', 'non' + "ce"].join('-');
+        var appNonceField = ['app', ['non', 'ce'].join('')].join('-');
         // timestamp 时间
-        var timestampField = 'time' + "sta" + 'mp';
+        var timestampField = ['time', 'sta', 'mp'].join('');
         // sign 签名
-        var signField = 'si' + "gn";
+        var signField = ['si', 'gn'].join('');
         // 校验该扩展是否已添加过
         if (this._signatureExtendAdded) {
-            console && console.error('`signatureExtend` can only be added to ajax once!');
+            console && console.error('Error: `signatureExtend` can only be added to ajax once!');
         }
         // 添加标志符用来校验该扩展是否已添加
         this._signatureExtendAdded = true;
         var signData = function (_a) {
             var _b;
-            var params = _a.params, method = _a.method, options = _a.options;
-            var signatureStr = _this.stringifyParams(params, method, { cache: true, encodeValue: false });
-            if (!signatureStr) {
-                return;
-            }
-            var timestamp = new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000;
+            var params = _a.params, method = _a.method, options = _a.options, processData = _a.processData;
+            var signatureStr = form_1.isFormData(params) || processData === false
+                ? ''
+                : _this.stringifyParams(params, method, { cache: true, encodeValue: false });
+            var timestamp = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000;
             var appNonce = v4_1.default();
             lodash_1.default.merge(options, {
                 headers: (_b = {},
@@ -48,13 +47,11 @@ function signatureExtend() {
                     _b),
             });
         };
-        this.processData = function (params, props) {
+        this.processDataAfter = function (params, props) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processData(params, props);
-            if (params && !form_1.isFormData(params)) {
-                var method = props.method, options = props.options;
-                signData({ params: params, method: method, options: options });
-            }
+            params = processDataAfter(params, props);
+            var method = props.method, options = props.options, processData = props.processData;
+            signData({ params: params, method: method, options: options, processData: processData });
             return params;
         };
     };

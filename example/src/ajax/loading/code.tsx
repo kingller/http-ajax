@@ -63,12 +63,14 @@ export default class Code extends React.PureComponent {
                     </Button>
                 </div>
                 <div className="ajax-token-cancel">
-                    <Button type="primary" onClick={this.onStart2}>
-                        加载
-                    </Button>
-                    <Button className="cancel" onClick={this.onCancel2}>
-                        取消
-                    </Button>
+                    <div className="ajax-token-cancel-content">
+                        <Button type="primary" onClick={this.onStart2}>
+                            加载
+                        </Button>
+                        <Button className="cancel" onClick={this.onCancel2}>
+                            取消
+                        </Button>
+                    </div>
                 </div>
             </div>
         );

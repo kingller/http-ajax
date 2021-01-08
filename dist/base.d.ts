@@ -23,6 +23,8 @@ declare class AjaxBase {
     beforeSend: (props: Ajax.IAjaxArgsOptions) => Ajax.IRequestResult | void;
     /** 数据处理 */
     processData: (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions) => Ajax.IParams;
+    /** 去除URL中:params格式参数后数据处理 */
+    processDataAfter: (params: Ajax.IParams, props: Ajax.IAjaxProcessDataAfterOptions) => Ajax.IParams;
     processResponse: (response: Ajax.IResult | null, props: Ajax.IProcessResponseOptions) => Ajax.IResult;
     /** 私有变量，请勿使用 */
     private _cache;

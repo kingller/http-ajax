@@ -10,6 +10,53 @@
 
 
 
+# 4.0.2
+> 2020.12.22  
+1. <font color=red>修复</font> `ajax`的`clone`方法没有成功克隆签名扩展
+
+
+# 4.0.1
+> 2020.12.16  
+1. <font color=red>修复</font> 签名时未去除`url`中`:params`格式参数
+
+
+# 4.0.0
+> 2020.11.13  
+1. <font color=orange>修改</font> 在参数为`FormData`或空时也进行签名，以支持阻止重放
+2. <font color=red>修复</font> 签名时间戳`timestamp`计算世界时时修复为减去时区（原来逻辑错误再次加上了时区）
+
+
+# 3.6.2
+> 2020.10.29  
+1. <font color=red>修复</font> 加解密请求同时发送多个并返回状态470（密钥过期）时，重新获取秘钥请求发送了多个，改为发送一个
+
+
+# 3.6.1
+> 2020.10.15  
+1. <font color=red>修复</font> 判断链路追踪字段`X-Correlation-ID`改为忽略大小写
+
+
+# 3.6.0
+> 2020.10.15  
+1. <font color=orange>修改</font> 链路追踪字段`X-Request-Id`改为`X-Correlation-ID`
+
+
+# 3.5.2
+> 2020.09.22  
+1. <font color=red>修复</font> 签名参数名混淆
+
+
+# 3.5.1
+> 2020.09.22  
+1. <font color=red>修复</font> Refused to get unsafe header "encrypt"
+
+
+# 3.5.0
+> 2020.08.18  
+1. <font color=blue>增强</font> `url`以`http://`或`https://`开头的不再自动添加`prefix`
+2. <font color=blue>增强</font> `url`支持包含参数，示例`example/:params`，`:params`代表参数（以 : 开头）
+
+
 # 3.4.0
 > 2020.08.11  
 1. <font color=blue>增强</font> 参数`options`添加`transformResponse`，自定义响应数据
