@@ -384,8 +384,6 @@ class AjaxBase {
             cancelExecutor(function (): void {
                 _cancel = true;
             });
-        const processedParams = this.getProcessedParams(method, url, params, options, reject);
-        const processedUrl = processedParams ? `${url}?${processedParams}` : url;
         //启用加载效果
         let loadingComponent: ILoading = null;
         if (loading && this.getLoading(options)) {
