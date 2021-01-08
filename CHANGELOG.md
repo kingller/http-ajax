@@ -10,6 +10,11 @@
 
 
 
+# 4.0.3
+> 2021.01.08  
+1. <font color=red>修复</font> `ajax`使用缓存且设置了loadable时，第二次取cache会显示loading，且loading不会消失
+
+
 # 4.0.2
 > 2020.12.22  
 1. <font color=red>修复</font> `ajax`的`clone`方法没有成功克隆签名扩展

@@ -300,7 +300,7 @@ var AjaxBase = /** @class */ (function () {
             });
         //启用加载效果
         var loadingComponent = null;
-        if (loading && this.getLoading(options) && !(options.cache && this._cache[url] !== undefined)) {
+        if (loading && this.getLoading(options)) {
             loadingComponent = this.getLoading(options);
             loadingComponent.start();
         }
@@ -310,6 +310,7 @@ var AjaxBase = /** @class */ (function () {
             .then(function () {
             if (_cancel) {
                 reject(createError('Request aborted', Ajax.CODE.CANCEL));
+                loadingComponent && loadingComponent.finish();
                 return;
             }
             if (options.onData) {
@@ -325,6 +326,7 @@ var AjaxBase = /** @class */ (function () {
                 params = undefined;
             }
             if (options.cache && _this._cache[url] !== undefined) {
+                loadingComponent && loadingComponent.finish();
                 _this.onSuccess(undefined, {
                     response: _this._cache[url],
                     options: options,
