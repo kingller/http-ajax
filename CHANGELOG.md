@@ -10,6 +10,11 @@
 
 
 
+# 4.0.4
+> 2021.03.03  
+1. <font color=red><strong>删除</strong></font> 移除`jsencrypt`中`YUI`版本说明
+
+
 # 4.0.3
 > 2021.01.08  
 1. <font color=red>修复</font> `ajax`使用缓存且设置了loadable时，第二次取cache会显示loading，且loading不会消失
