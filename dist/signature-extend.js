@@ -37,7 +37,7 @@ function signatureExtend() {
             var signatureStr = form_1.isFormData(params) || processData === false
                 ? ''
                 : _this.stringifyParams(params, method, { cache: true, encodeValue: false });
-            var timestamp = new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000;
+            var timestamp = new Date().getTime();
             var appNonce = v4_1.default();
             lodash_1.default.merge(options, {
                 headers: (_b = {},
