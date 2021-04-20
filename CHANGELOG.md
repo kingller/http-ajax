@@ -10,6 +10,11 @@
 
 
 
+# 5.0.0
+> 2021.04.20  
+1. <font color=red>修复</font> 请求签名时时间戳错误的加上了时区，现在把时区移除，使用世界时
+
+
 # 4.0.4
 > 2021.03.03  
 1. <font color=red><strong>删除</strong></font> 移除`jsencrypt`中`YUI`版本说明
