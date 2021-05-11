@@ -63,7 +63,7 @@
         "less-loader": "5.0.0",
         "less-plugin-autoprefix": "2.0.0",
         "line-height": "^0.3.1",
-        "lodash": "4.17.19",
+        "lodash": "4.17.21",
         "metadata-ts-loader": "^1.1.0",
         "mini-css-extract-plugin": "0.8.0",
         "mobx": "4.15.4",
