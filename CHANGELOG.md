@@ -10,6 +10,11 @@
 
 
 
+# 5.0.1
+> 2021.05.13  
+1. <font color=red>修复</font> IE安全模式下获取`window.localStorage`报错，添加`try catch`捕获错误
+
+
 # 5.0.0
 > 2021.04.20  
 1. <font color=red>修复</font> 请求签名时时间戳错误的加上了时区，现在把时区移除，使用世界时

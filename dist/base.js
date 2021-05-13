@@ -436,7 +436,13 @@ var AjaxBase = /** @class */ (function () {
                 xhr.responseType = options.responseType;
             }
             if (!options.headers || typeof options.headers['token'] === 'undefined') {
-                var token = window.localStorage.getItem('token') || '';
+                var token = '';
+                try {
+                    token = window.localStorage.getItem('token') || '';
+                }
+                catch (e) {
+                    console && console.error('Failed to get token from localStorage');
+                }
                 if (token) {
                     xhr.setRequestHeader('token', token);
                 }
