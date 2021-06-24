@@ -1,7 +1,7 @@
 import * as Ajax from './interface';
 import AjaxBase from './base';
 export declare class HttpAjax extends AjaxBase {
-    onSuccess<T = any>(xhr: XMLHttpRequest, { response, options, resolve, reject, }: {
+    onSuccess<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { response, options, resolve, reject, }: {
         response: Ajax.IResult;
         options: Ajax.IOptions;
         resolve: Ajax.IResolve<T>;

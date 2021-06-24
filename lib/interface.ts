@@ -170,6 +170,7 @@ export interface IRequestOptions {
 export interface IOnSuccess<T = any> {
     (
         xhr: XMLHttpRequest | undefined,
+        _opts: IRequestOptions,
         props: { response: IResult; options: IOptions; resolve: IResolve<T>; reject: IReject }
     ): void;
 }
@@ -281,6 +282,7 @@ export interface IAjax {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: <T = any>(
         xhr: XMLHttpRequest | undefined,
+        _opts: IRequestOptions,
         props: { response: IResult; options: IOptions; resolve: IResolve<T>; reject: IReject }
     ) => void;
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */

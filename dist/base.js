@@ -193,7 +193,7 @@ var AjaxBase = /** @class */ (function () {
         };
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    AjaxBase.prototype.onSuccess = function (xhr, _a) {
+    AjaxBase.prototype.onSuccess = function (xhr, _opts, _a) {
         var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject;
         var statusField = this._config.statusField;
         if (response[statusField]) {
@@ -327,7 +327,7 @@ var AjaxBase = /** @class */ (function () {
             }
             if (options.cache && _this._cache[url] !== undefined) {
                 loadingComponent && loadingComponent.finish();
-                _this.onSuccess(undefined, {
+                _this.onSuccess(undefined, _opts, {
                     response: _this._cache[url],
                     options: options,
                     resolve: resolve,
@@ -406,7 +406,7 @@ var AjaxBase = /** @class */ (function () {
                     if (options.cache) {
                         ajaxThis._cache[url] = res;
                     }
-                    ajaxThis.onSuccess(xhr, { response: res, options: options, resolve: resolve, reject: reject });
+                    ajaxThis.onSuccess(xhr, _opts, { response: res, options: options, resolve: resolve, reject: reject });
                 }
                 else if (this.status === 204) {
                     ajaxThis.processResponse(null, {

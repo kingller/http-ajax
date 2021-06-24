@@ -30,7 +30,7 @@ declare class AjaxBase {
     private _cache;
     /** 私有变量，请勿使用 */
     private _cacheCancel;
-    onSuccess<T = any>(xhr: XMLHttpRequest, { response, options, resolve, reject, }: {
+    onSuccess<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { response, options, resolve, reject, }: {
         response: Ajax.IResult;
         options: Ajax.IOptions;
         resolve: Ajax.IResolve<T>;

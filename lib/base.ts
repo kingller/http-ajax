@@ -141,6 +141,7 @@ class AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public onSuccess<T = any>(
         xhr: XMLHttpRequest,
+        _opts: Ajax.IRequestOptions,
         {
             response,
             options,
@@ -415,7 +416,7 @@ class AjaxBase {
                 }
                 if (options.cache && this._cache[url] !== undefined) {
                     loadingComponent && loadingComponent.finish();
-                    this.onSuccess<T>(undefined, {
+                    this.onSuccess<T>(undefined, _opts, {
                         response: this._cache[url],
                         options,
                         resolve,
@@ -492,7 +493,7 @@ class AjaxBase {
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
                         }
-                        ajaxThis.onSuccess<T>(xhr, { response: res, options, resolve, reject });
+                        ajaxThis.onSuccess<T>(xhr, _opts, { response: res, options, resolve, reject });
                     } else if (this.status === 204) {
                         ajaxThis.processResponse(null, {
                             xhr,

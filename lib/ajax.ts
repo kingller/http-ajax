@@ -8,6 +8,7 @@ export class HttpAjax extends AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public onSuccess<T = any>(
         xhr: XMLHttpRequest,
+        _opts: Ajax.IRequestOptions,
         {
             response,
             options,

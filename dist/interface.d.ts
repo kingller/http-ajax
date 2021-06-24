@@ -116,7 +116,7 @@ export interface IRequestOptions {
     cancelExecutor: ICancelExecutor;
 }
 export interface IOnSuccess<T = any> {
-    (xhr: XMLHttpRequest | undefined, props: {
+    (xhr: XMLHttpRequest | undefined, _opts: IRequestOptions, props: {
         response: IResult;
         options: IOptions;
         resolve: IResolve<T>;
@@ -229,7 +229,7 @@ export interface IAjax {
     readonly stringifyParams: (params: {
         [name: string]: any;
     } | string, method: IMethod, options?: IStringifyParamsOptions) => string;
-    onSuccess: <T = any>(xhr: XMLHttpRequest | undefined, props: {
+    onSuccess: <T = any>(xhr: XMLHttpRequest | undefined, _opts: IRequestOptions, props: {
         response: IResult;
         options: IOptions;
         resolve: IResolve<T>;
