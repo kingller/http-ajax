@@ -272,13 +272,7 @@ class AjaxBase {
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public responseEnd<T = any>(
-        xhr: XMLHttpRequest,
-        _opts: Ajax.IRequestOptions,
-        { resolve, reject }: { resolve: Ajax.IResolve<T>; reject: Ajax.IReject }
-    ): void {
-        resolve();
-    }
+    public responseEnd<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void {}
 
     /**
      * 发送请求
@@ -437,7 +431,7 @@ class AjaxBase {
                 }
                 if (options.cache && this._cache[url] !== undefined) {
                     loadingComponent && loadingComponent.finish();
-                    this.responseEnd(undefined, _opts, { resolve, reject });
+                    this.responseEnd(undefined, _opts);
                     this.onSuccess<T>(undefined, _opts, {
                         response: this._cache[url],
                         options,
@@ -515,7 +509,7 @@ class AjaxBase {
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
                         }
-                        ajaxThis.responseEnd(xhr, _opts, { resolve, reject });
+                        ajaxThis.responseEnd(xhr, _opts);
                         ajaxThis.onSuccess<T>(xhr, _opts, { response: res, options, resolve, reject });
                     } else if (this.status === 204) {
                         ajaxThis.processResponse(null, {
@@ -526,10 +520,10 @@ class AjaxBase {
                             options,
                             reject,
                         });
-                        ajaxThis.responseEnd(xhr, _opts, { resolve, reject });
+                        ajaxThis.responseEnd(xhr, _opts);
                         resolve(null);
                     } else {
-                        ajaxThis.responseEnd(xhr, _opts, { resolve, reject });
+                        ajaxThis.responseEnd(xhr, _opts);
                         // @ts-ignore
                         if (this.aborted) {
                             return;
@@ -628,7 +622,7 @@ class AjaxBase {
                     });
             })
             .catch((e: Error): void => {
-                this.responseEnd(undefined, _opts, { resolve, reject });
+                this.responseEnd(undefined, _opts);
                 reject(e);
                 catchAjaxError({
                     e,
