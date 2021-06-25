@@ -291,7 +291,19 @@ var AjaxBase = /** @class */ (function () {
         if (!onSessionExpired) {
             onSessionExpired = this.onSessionExpired;
         }
-        var _opts = { method: method, url: url, params: params, loading: loading, resolve: resolve, reject: reject, onSessionExpired: onSessionExpired, options: options, cancelExecutor: cancelExecutor };
+        var _opts = {
+            method: method,
+            url: url,
+            params: params,
+            loading: loading,
+            resolve: resolve,
+            reject: reject,
+            onSessionExpired: onSessionExpired,
+            options: options,
+            cancelExecutor: cancelExecutor,
+            // 链路追踪ID
+            xCorrelationID: '',
+        };
         !options && (options = {});
         var _cancel = false;
         cancelExecutor &&
@@ -470,6 +482,7 @@ var AjaxBase = /** @class */ (function () {
                             if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
                                 if (lowerCaseKey === 'x-correlation-id') {
                                     isXCorrelationIDExist = true;
+                                    _opts.xCorrelationID = v;
                                 }
                                 if (!v) {
                                     continue;
@@ -481,7 +494,8 @@ var AjaxBase = /** @class */ (function () {
                 }
             }
             if (!isXCorrelationIDExist) {
-                xhr.setRequestHeader('X-Correlation-ID', v4_1.default());
+                _opts.xCorrelationID = v4_1.default();
+                xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
             }
             if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
@@ -515,6 +529,7 @@ var AjaxBase = /** @class */ (function () {
                 params: params,
                 callback: _this.catchError,
                 type: 'log',
+                xCorrelationID: _opts.xCorrelationID,
             });
         });
     };

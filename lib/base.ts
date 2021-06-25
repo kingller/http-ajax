@@ -378,7 +378,19 @@ class AjaxBase {
         if (!onSessionExpired) {
             onSessionExpired = this.onSessionExpired;
         }
-        const _opts = { method, url, params, loading, resolve, reject, onSessionExpired, options, cancelExecutor };
+        const _opts = {
+            method,
+            url,
+            params,
+            loading,
+            resolve,
+            reject,
+            onSessionExpired,
+            options,
+            cancelExecutor,
+            // 链路追踪ID
+            xCorrelationID: '',
+        };
         !options && (options = {});
         let _cancel = false;
         cancelExecutor &&
@@ -551,6 +563,7 @@ class AjaxBase {
                                 if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
                                     if (lowerCaseKey === 'x-correlation-id') {
                                         isXCorrelationIDExist = true;
+                                        _opts.xCorrelationID = v;
                                     }
                                     if (!v) {
                                         continue;
@@ -562,7 +575,8 @@ class AjaxBase {
                     }
                 }
                 if (!isXCorrelationIDExist) {
-                    xhr.setRequestHeader('X-Correlation-ID', uuid());
+                    _opts.xCorrelationID = uuid();
+                    xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
                 }
                 if (!isContentTypeExist && !isFormData(params) && (!options || options.encrypt !== 'all')) {
                     xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
@@ -609,6 +623,7 @@ class AjaxBase {
                     params,
                     callback: this.catchError,
                     type: 'log',
+                    xCorrelationID: _opts.xCorrelationID,
                 });
             });
     }

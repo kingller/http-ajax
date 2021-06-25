@@ -164,6 +164,8 @@ export interface IRequestOptions {
     onSessionExpired: IOnSessionExpired;
     options?: IOptions;
     cancelExecutor: ICancelExecutor;
+    // 链路追踪ID
+    xCorrelationID?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

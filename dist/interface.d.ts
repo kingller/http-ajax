@@ -114,6 +114,7 @@ export interface IRequestOptions {
     onSessionExpired: IOnSessionExpired;
     options?: IOptions;
     cancelExecutor: ICancelExecutor;
+    xCorrelationID?: string;
 }
 export interface IOnSuccess<T = any> {
     (xhr: XMLHttpRequest | undefined, _opts: IRequestOptions, props: {
