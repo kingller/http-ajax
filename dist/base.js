@@ -48,7 +48,6 @@ function createError(message, code, request, response) {
     };
     return error;
 }
-var _opts;
 var AjaxBase = /** @class */ (function () {
     function AjaxBase() {
         var _this = this;
@@ -62,43 +61,43 @@ var AjaxBase = /** @class */ (function () {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.get = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['get'], url, params, options, false, _opts);
+            return _this.request(Ajax.METHODS['get'], url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.post = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['post'], url, params, options, false, _opts);
+            return _this.request(Ajax.METHODS['post'], url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.put = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['put'], url, params, options, false, _opts);
+            return _this.request(Ajax.METHODS['put'], url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.del = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['del'], url, params, options, false, _opts);
+            return _this.request(Ajax.METHODS['del'], url, params, options, false);
         };
         this.loadable = {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             get: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['get'], url, params, options, true, _opts);
+                return _this.request(Ajax.METHODS['get'], url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             post: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['post'], url, params, options, true, _opts);
+                return _this.request(Ajax.METHODS['post'], url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             put: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['put'], url, params, options, true, _opts);
+                return _this.request(Ajax.METHODS['put'], url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             del: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['del'], url, params, options, true, _opts);
+                return _this.request(Ajax.METHODS['del'], url, params, options, true);
             },
         };
         this.prefix = '/api';
@@ -264,6 +263,10 @@ var AjaxBase = /** @class */ (function () {
             params: params,
         };
     };
+    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+    AjaxBase.prototype.responseEnd = function (xhr, _opts) {
+        return { xhr: xhr, _opts: _opts };
+    };
     AjaxBase.prototype.sendRequest = function (
     /* eslint-disable @typescript-eslint/indent */
     props, 
@@ -292,7 +295,7 @@ var AjaxBase = /** @class */ (function () {
         if (!onSessionExpired) {
             onSessionExpired = this.onSessionExpired;
         }
-        _opts = {
+        var _opts = {
             method: method,
             url: url,
             params: params,
@@ -340,6 +343,7 @@ var AjaxBase = /** @class */ (function () {
             }
             if (options.cache && _this._cache[url] !== undefined) {
                 loadingComponent && loadingComponent.finish();
+                _this.responseEnd(undefined, _opts);
                 _this.onSuccess(undefined, _opts, {
                     response: _this._cache[url],
                     options: options,
@@ -419,6 +423,7 @@ var AjaxBase = /** @class */ (function () {
                     if (options.cache) {
                         ajaxThis._cache[url] = res;
                     }
+                    ajaxThis.responseEnd(xhr, _opts);
                     ajaxThis.onSuccess(xhr, _opts, { response: res, options: options, resolve: resolve, reject: reject });
                 }
                 else if (this.status === 204) {
@@ -430,9 +435,11 @@ var AjaxBase = /** @class */ (function () {
                         options: options,
                         reject: reject,
                     });
+                    ajaxThis.responseEnd(xhr, _opts);
                     resolve(null);
                 }
                 else {
+                    ajaxThis.responseEnd(xhr, _opts);
                     // @ts-ignore
                     if (this.aborted) {
                         return;
@@ -522,6 +529,7 @@ var AjaxBase = /** @class */ (function () {
                 });
         })
             .catch(function (e) {
+            _this.responseEnd(undefined, _opts);
             reject(e);
             catch_1.catchAjaxError({
                 e: e,
@@ -535,7 +543,7 @@ var AjaxBase = /** @class */ (function () {
         });
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    AjaxBase.prototype.request = function (method, url, params, options, loading, _opts) {
+    AjaxBase.prototype.request = function (method, url, params, options, loading) {
         var _this = this;
         var cancel;
         var promise;

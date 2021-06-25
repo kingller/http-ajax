@@ -38,6 +38,7 @@ var HttpAjax = /** @class */ (function (_super) {
                 'processDataAfter',
                 'processResponse',
                 'processErrorResponse',
+                'responseEnd',
                 'onSuccess',
                 'onError',
                 'onSessionExpired',

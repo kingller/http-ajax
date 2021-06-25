@@ -51,6 +51,10 @@ declare class AjaxBase {
     /** 移除缓存的cancel请求 */
     private removeCacheCancel;
     private getProcessedParams;
+    responseEnd(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): {
+        xhr: XMLHttpRequest;
+        _opts: Ajax.IRequestOptions;
+    };
     /**
      * 发送请求
      */
@@ -99,7 +103,7 @@ declare class AjaxBase {
     options: Ajax.IOptions, 
     /** 取消请求方法 */
     cancelExecutor: Ajax.ICancelExecutor): Promise<any>;
-    request<T = any>(method: Ajax.IMethod, url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions, loading?: boolean, _opts?: Ajax.IRequestOptions): Ajax.IRequestResult<T>;
+    request<T = any>(method: Ajax.IMethod, url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions, loading?: boolean): Ajax.IRequestResult<T>;
     /** session过期回调 */
     onSessionExpired<T = any>(error?: {
         errorCode: number;
