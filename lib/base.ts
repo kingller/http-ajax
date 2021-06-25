@@ -35,7 +35,7 @@ interface IConfigItem {
     noCache: boolean;
     statusField?: string;
 }
-
+let _opts: Ajax.IRequestOptions;
 class AjaxBase {
     public _config: IConfigItem = {
         noCache: false,
@@ -52,7 +52,7 @@ class AjaxBase {
         options?: Ajax.IOptions
     ): Ajax.IRequestResult<T> => {
         // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-        return this.request<T>(Ajax.METHODS['get'], url, params, options, false);
+        return this.request<T>(Ajax.METHODS['get'], url, params, options, false, _opts);
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public readonly post = <T = any>(
@@ -61,7 +61,7 @@ class AjaxBase {
         options?: Ajax.IOptions
     ): Ajax.IRequestResult<T> => {
         // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-        return this.request<T>(Ajax.METHODS['post'], url, params, options, false);
+        return this.request<T>(Ajax.METHODS['post'], url, params, options, false, _opts);
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public readonly put = <T = any>(
@@ -70,7 +70,7 @@ class AjaxBase {
         options?: Ajax.IOptions
     ): Ajax.IRequestResult<T> => {
         // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-        return this.request<T>(Ajax.METHODS['put'], url, params, options, false);
+        return this.request<T>(Ajax.METHODS['put'], url, params, options, false, _opts);
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public readonly del = <T = any>(
@@ -79,29 +79,29 @@ class AjaxBase {
         options?: Ajax.IOptions
     ): Ajax.IRequestResult<T> => {
         // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-        return this.request<T>(Ajax.METHODS['del'], url, params, options, false);
+        return this.request<T>(Ajax.METHODS['del'], url, params, options, false, _opts);
     };
 
     public readonly loadable = {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         get: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions): Ajax.IRequestResult<T> => {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return this.request<T>(Ajax.METHODS['get'], url, params, options, true);
+            return this.request<T>(Ajax.METHODS['get'], url, params, options, true, _opts);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         post: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions): Ajax.IRequestResult<T> => {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return this.request<T>(Ajax.METHODS['post'], url, params, options, true);
+            return this.request<T>(Ajax.METHODS['post'], url, params, options, true, _opts);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         put: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions): Ajax.IRequestResult<T> => {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return this.request<T>(Ajax.METHODS['put'], url, params, options, true);
+            return this.request<T>(Ajax.METHODS['put'], url, params, options, true, _opts);
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         del: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions): Ajax.IRequestResult<T> => {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return this.request<T>(Ajax.METHODS['del'], url, params, options, true);
+            return this.request<T>(Ajax.METHODS['del'], url, params, options, true, _opts);
         },
     };
 
@@ -378,7 +378,7 @@ class AjaxBase {
         if (!onSessionExpired) {
             onSessionExpired = this.onSessionExpired;
         }
-        const _opts = {
+        _opts = {
             method,
             url,
             params,
@@ -634,7 +634,8 @@ class AjaxBase {
         url: string,
         params: Ajax.IParams | undefined,
         options?: Ajax.IOptions,
-        loading?: boolean
+        loading?: boolean,
+        _opts?: Ajax.IRequestOptions
     ): Ajax.IRequestResult<T> {
         let cancel;
         let promise: Ajax.IRequestResult<T>;
