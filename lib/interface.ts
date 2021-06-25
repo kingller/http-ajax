@@ -306,7 +306,8 @@ export interface IAjax {
         url: string,
         params: IParams | undefined,
         options?: IOptions,
-        loading?: boolean
+        loading?: boolean,
+        _opts?: IRequestOptions
     ): IRequestResult<T>;
     // prettier-ignore
     sendRequest: <T>(
