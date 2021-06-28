@@ -193,8 +193,8 @@ var AjaxBase = /** @class */ (function () {
         };
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    AjaxBase.prototype.onSuccess = function (xhr, _opts, _a) {
-        var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject;
+    AjaxBase.prototype.onSuccess = function (xhr, _a) {
+        var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject, _opts = _a._opts;
         var statusField = this._config.statusField;
         if (response[statusField]) {
             resolve(response.data);
@@ -265,7 +265,9 @@ var AjaxBase = /** @class */ (function () {
     };
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    AjaxBase.prototype.responseEnd = function (success, xhr, _opts) { };
+    AjaxBase.prototype.responseEnd = function (xhr, _opts, _a) {
+        var boolean = _a.success;
+    };
     AjaxBase.prototype.sendRequest = function (
     /* eslint-disable @typescript-eslint/indent */
     props, 
@@ -344,12 +346,13 @@ var AjaxBase = /** @class */ (function () {
             }
             if (options.cache && _this._cache[url] !== undefined) {
                 loadingComponent && loadingComponent.finish();
-                _this.responseEnd(true, undefined, _opts);
-                _this.onSuccess(undefined, _opts, {
+                _this.responseEnd(undefined, _opts, { success: true });
+                _this.onSuccess(undefined, {
                     response: _this._cache[url],
                     options: options,
                     resolve: resolve,
                     reject: reject,
+                    _opts: _opts,
                 });
                 return;
             }
@@ -424,8 +427,8 @@ var AjaxBase = /** @class */ (function () {
                     if (options.cache) {
                         ajaxThis._cache[url] = res;
                     }
-                    ajaxThis.responseEnd(true, xhr, _opts);
-                    ajaxThis.onSuccess(xhr, _opts, { response: res, options: options, resolve: resolve, reject: reject });
+                    ajaxThis.responseEnd(xhr, _opts, { success: true });
+                    ajaxThis.onSuccess(xhr, { response: res, options: options, resolve: resolve, reject: reject, _opts: _opts });
                 }
                 else if (this.status === 204) {
                     ajaxThis.processResponse(null, {
@@ -436,11 +439,11 @@ var AjaxBase = /** @class */ (function () {
                         options: options,
                         reject: reject,
                     });
-                    ajaxThis.responseEnd(true, xhr, _opts);
+                    ajaxThis.responseEnd(xhr, _opts, { success: true });
                     resolve(null);
                 }
                 else {
-                    ajaxThis.responseEnd(false, xhr, _opts);
+                    ajaxThis.responseEnd(xhr, _opts, { success: false });
                     // @ts-ignore
                     if (this.aborted) {
                         return;
@@ -530,7 +533,7 @@ var AjaxBase = /** @class */ (function () {
                 });
         })
             .catch(function (e) {
-            _this.responseEnd(false, undefined, _opts);
+            _this.responseEnd(undefined, _opts, { success: false });
             reject(e);
             catch_1.catchAjaxError({
                 e: e,

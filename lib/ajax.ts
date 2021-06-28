@@ -8,13 +8,19 @@ export class HttpAjax extends AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public onSuccess<T = any>(
         xhr: XMLHttpRequest,
-        _opts: Ajax.IRequestOptions,
         {
             response,
             options,
             resolve,
             reject,
-        }: { response: Ajax.IResult; options: Ajax.IOptions; resolve: Ajax.IResolve<T>; reject: Ajax.IReject }
+            _opts,
+        }: {
+            response: Ajax.IResult;
+            options: Ajax.IOptions;
+            resolve: Ajax.IResolve<T>;
+            reject: Ajax.IReject;
+            _opts: Ajax.IRequestOptions;
+        }
     ): void {
         const { statusField } = this._config;
         if (response && typeof response === 'object' && typeof response[statusField] !== 'undefined') {

@@ -1,11 +1,12 @@
 import * as Ajax from './interface';
 import AjaxBase from './base';
 export declare class HttpAjax extends AjaxBase {
-    onSuccess<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { response, options, resolve, reject, }: {
+    onSuccess<T = any>(xhr: XMLHttpRequest, { response, options, resolve, reject, _opts, }: {
         response: Ajax.IResult;
         options: Ajax.IOptions;
         resolve: Ajax.IResolve<T>;
         reject: Ajax.IReject;
+        _opts: Ajax.IRequestOptions;
     }): void;
     /** 添加默认AJAX错误处理程序 */
     onError<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void;

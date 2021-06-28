@@ -117,11 +117,12 @@ export interface IRequestOptions {
     xCorrelationID?: string;
 }
 export interface IOnSuccess<T = any> {
-    (xhr: XMLHttpRequest | undefined, _opts: IRequestOptions, props: {
+    (xhr: XMLHttpRequest | undefined, props: {
         response: IResult;
         options: IOptions;
         resolve: IResolve<T>;
         reject: IReject;
+        _opts: IRequestOptions;
     }): void;
 }
 export interface IOnError<T = any> {
@@ -230,11 +231,12 @@ export interface IAjax {
     readonly stringifyParams: (params: {
         [name: string]: any;
     } | string, method: IMethod, options?: IStringifyParamsOptions) => string;
-    onSuccess: <T = any>(xhr: XMLHttpRequest | undefined, _opts: IRequestOptions, props: {
+    onSuccess: <T = any>(xhr: XMLHttpRequest | undefined, props: {
         response: IResult;
         options: IOptions;
         resolve: IResolve<T>;
         reject: IReject;
+        _opts: IRequestOptions;
     }) => void;
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
     processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void | Promise<void>;

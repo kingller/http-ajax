@@ -30,11 +30,12 @@ declare class AjaxBase {
     private _cache;
     /** 私有变量，请勿使用 */
     private _cacheCancel;
-    onSuccess<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { response, options, resolve, reject, }: {
+    onSuccess<T = any>(xhr: XMLHttpRequest, { response, options, resolve, reject, _opts, }: {
         response: Ajax.IResult;
         options: Ajax.IOptions;
         resolve: Ajax.IResolve<T>;
         reject: Ajax.IReject;
+        _opts: Ajax.IRequestOptions;
     }): void;
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
     processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void>;
@@ -51,7 +52,9 @@ declare class AjaxBase {
     /** 移除缓存的cancel请求 */
     private removeCacheCancel;
     private getProcessedParams;
-    responseEnd<T = any>(success: boolean, xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void;
+    responseEnd<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { success: boolean }: {
+        success: any;
+    }): void;
     /**
      * 发送请求
      */

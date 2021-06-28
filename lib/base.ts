@@ -140,13 +140,19 @@ class AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public onSuccess<T = any>(
         xhr: XMLHttpRequest,
-        _opts: Ajax.IRequestOptions,
         {
             response,
             options,
             resolve,
             reject,
-        }: { response: Ajax.IResult; options: Ajax.IOptions; resolve: Ajax.IResolve<T>; reject: Ajax.IReject }
+            _opts,
+        }: {
+            response: Ajax.IResult;
+            options: Ajax.IOptions;
+            resolve: Ajax.IResolve<T>;
+            reject: Ajax.IReject;
+            _opts: Ajax.IRequestOptions;
+        }
     ): void {
         const { statusField } = this._config;
         if (response[statusField]) {
@@ -272,7 +278,7 @@ class AjaxBase {
 
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public responseEnd<T = any>(success: boolean, xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void {}
+    public responseEnd<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { success: boolean }): void {}
 
     /**
      * 发送请求
@@ -433,12 +439,13 @@ class AjaxBase {
                 }
                 if (options.cache && this._cache[url] !== undefined) {
                     loadingComponent && loadingComponent.finish();
-                    this.responseEnd(true, undefined, _opts);
-                    this.onSuccess<T>(undefined, _opts, {
+                    this.responseEnd(undefined, _opts, { success: true });
+                    this.onSuccess<T>(undefined, {
                         response: this._cache[url],
                         options,
                         resolve,
                         reject,
+                        _opts,
                     });
                     return;
                 }
@@ -511,8 +518,8 @@ class AjaxBase {
                         if (options.cache) {
                             ajaxThis._cache[url] = res;
                         }
-                        ajaxThis.responseEnd(true, xhr, _opts);
-                        ajaxThis.onSuccess<T>(xhr, _opts, { response: res, options, resolve, reject });
+                        ajaxThis.responseEnd(xhr, _opts, { success: true });
+                        ajaxThis.onSuccess<T>(xhr, { response: res, options, resolve, reject, _opts });
                     } else if (this.status === 204) {
                         ajaxThis.processResponse(null, {
                             xhr,
@@ -522,10 +529,10 @@ class AjaxBase {
                             options,
                             reject,
                         });
-                        ajaxThis.responseEnd(true, xhr, _opts);
+                        ajaxThis.responseEnd(xhr, _opts, { success: true });
                         resolve(null);
                     } else {
-                        ajaxThis.responseEnd(false, xhr, _opts);
+                        ajaxThis.responseEnd(xhr, _opts, { success: false });
                         // @ts-ignore
                         if (this.aborted) {
                             return;
@@ -624,7 +631,7 @@ class AjaxBase {
                     });
             })
             .catch((e: Error): void => {
-                this.responseEnd(false, undefined, _opts);
+                this.responseEnd(undefined, _opts, { success: false });
                 reject(e);
                 catchAjaxError({
                     e,

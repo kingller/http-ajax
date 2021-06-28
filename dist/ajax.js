@@ -63,8 +63,8 @@ var HttpAjax = /** @class */ (function (_super) {
         return _this;
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    HttpAjax.prototype.onSuccess = function (xhr, _opts, _a) {
-        var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject;
+    HttpAjax.prototype.onSuccess = function (xhr, _a) {
+        var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject, _opts = _a._opts;
         var statusField = this._config.statusField;
         if (response && typeof response === 'object' && typeof response[statusField] !== 'undefined') {
             if (response[statusField]) {
