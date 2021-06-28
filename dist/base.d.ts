@@ -51,10 +51,7 @@ declare class AjaxBase {
     /** 移除缓存的cancel请求 */
     private removeCacheCancel;
     private getProcessedParams;
-    responseEnd(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): {
-        xhr: XMLHttpRequest;
-        _opts: Ajax.IRequestOptions;
-    };
+    responseEnd<T = any>(success: boolean, xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void;
     /**
      * 发送请求
      */

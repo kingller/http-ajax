@@ -264,9 +264,8 @@ var AjaxBase = /** @class */ (function () {
         };
     };
     // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-    AjaxBase.prototype.responseEnd = function (xhr, _opts) {
-        return { xhr: xhr, _opts: _opts };
-    };
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    AjaxBase.prototype.responseEnd = function (success, xhr, _opts) { };
     AjaxBase.prototype.sendRequest = function (
     /* eslint-disable @typescript-eslint/indent */
     props, 
@@ -307,6 +306,8 @@ var AjaxBase = /** @class */ (function () {
             cancelExecutor: cancelExecutor,
             // 链路追踪ID
             xCorrelationID: '',
+            // 请求开始时间
+            startTime: new Date().getTime(),
         };
         !options && (options = {});
         var _cancel = false;
@@ -343,7 +344,7 @@ var AjaxBase = /** @class */ (function () {
             }
             if (options.cache && _this._cache[url] !== undefined) {
                 loadingComponent && loadingComponent.finish();
-                _this.responseEnd(undefined, _opts);
+                _this.responseEnd(true, undefined, _opts);
                 _this.onSuccess(undefined, _opts, {
                     response: _this._cache[url],
                     options: options,
@@ -423,7 +424,7 @@ var AjaxBase = /** @class */ (function () {
                     if (options.cache) {
                         ajaxThis._cache[url] = res;
                     }
-                    ajaxThis.responseEnd(xhr, _opts);
+                    ajaxThis.responseEnd(true, xhr, _opts);
                     ajaxThis.onSuccess(xhr, _opts, { response: res, options: options, resolve: resolve, reject: reject });
                 }
                 else if (this.status === 204) {
@@ -435,11 +436,11 @@ var AjaxBase = /** @class */ (function () {
                         options: options,
                         reject: reject,
                     });
-                    ajaxThis.responseEnd(xhr, _opts);
+                    ajaxThis.responseEnd(true, xhr, _opts);
                     resolve(null);
                 }
                 else {
-                    ajaxThis.responseEnd(xhr, _opts);
+                    ajaxThis.responseEnd(false, xhr, _opts);
                     // @ts-ignore
                     if (this.aborted) {
                         return;
@@ -529,7 +530,7 @@ var AjaxBase = /** @class */ (function () {
                 });
         })
             .catch(function (e) {
-            _this.responseEnd(undefined, _opts);
+            _this.responseEnd(false, undefined, _opts);
             reject(e);
             catch_1.catchAjaxError({
                 e: e,
