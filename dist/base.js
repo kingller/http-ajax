@@ -1,4 +1,15 @@
-'use strict';
+"use strict";
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
@@ -14,7 +25,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -61,43 +72,43 @@ var AjaxBase = /** @class */ (function () {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.get = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['get'], url, params, options, false);
+            return _this.request(Ajax.METHODS.get, url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.post = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['post'], url, params, options, false);
+            return _this.request(Ajax.METHODS.post, url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.put = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['put'], url, params, options, false);
+            return _this.request(Ajax.METHODS.put, url, params, options, false);
         };
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.del = function (url, params, options) {
             // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-            return _this.request(Ajax.METHODS['del'], url, params, options, false);
+            return _this.request(Ajax.METHODS.del, url, params, options, false);
         };
         this.loadable = {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             get: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['get'], url, params, options, true);
+                return _this.request(Ajax.METHODS.get, url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             post: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['post'], url, params, options, true);
+                return _this.request(Ajax.METHODS.post, url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             put: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['put'], url, params, options, true);
+                return _this.request(Ajax.METHODS.put, url, params, options, true);
             },
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             del: function (url, params, options) {
                 // eslint-disable-next-line  @typescript-eslint/no-use-before-define
-                return _this.request(Ajax.METHODS['del'], url, params, options, true);
+                return _this.request(Ajax.METHODS.del, url, params, options, true);
             },
         };
         this.prefix = '/api';
@@ -125,27 +136,29 @@ var AjaxBase = /** @class */ (function () {
         this.stringifyParams = function (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         params, method, options) {
-            //如果调用方已经将参数序列化成字符串，直接返回
+            // 如果调用方已经将参数序列化成字符串，直接返回
             if (typeof params === 'string')
                 return params;
-            //对于非GET请求，直接序列化该参数对象
-            //requestBody为undefined时，将其转为空字符串，避免IE下出现错误：invalid JSON, only supports object and array
-            //requestBody为null时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
+            // 对于非GET请求，直接序列化该参数对象
+            // requestBody为undefined时，将其转为空字符串，避免IE下出现错误：invalid JSON, only supports object and array
+            // requestBody为null时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
             if (method !== Ajax.METHODS.get)
                 return (typeof params !== 'undefined' && params !== null && JSON.stringify(params)) || '';
-            //对于GET请求，将参数拼成key1=val1&key2=val2的格式
+            // 对于GET请求，将参数拼成key1=val1&key2=val2的格式
             var array = [];
             if (params && typeof params === 'object') {
                 var paramsKeys = Object.keys(params).sort();
                 for (var i = 0; i < paramsKeys.length; i++) {
                     var key = paramsKeys[i];
-                    /* eslint-disable @typescript-eslint/indent */
-                    var value = params[key] === null || params[key] === undefined
-                        ? ''
-                        : params[key] instanceof Array
-                            ? params[key].join(',')
-                            : params[key];
-                    /* eslint-enable @typescript-eslint/indent */
+                    var value = '';
+                    if (typeof params[key] !== 'undefined' && params[key] !== null) {
+                        if (params[key] instanceof Array) {
+                            value = params[key].join(',');
+                        }
+                        else {
+                            value = params[key];
+                        }
+                    }
                     if (!options || options.encodeValue !== false) {
                         value = encodeURIComponent(value);
                     }
@@ -166,35 +179,38 @@ var AjaxBase = /** @class */ (function () {
                 console.warn('http-ajax: `noCache` will be deprecated in next version `4.0.0`');
             }
             for (var key in options) {
-                var value = options[key];
-                if (key === 'prefix' ||
-                    key === 'onSuccess' ||
-                    key === 'onError' ||
-                    key === 'onSessionExpired' ||
-                    key === 'getLoading' ||
-                    key === 'beforeSend' ||
-                    key === 'processData' ||
-                    key === 'catchError') {
-                    if (key === 'prefix') {
-                        if (typeof value === 'string') {
-                            _this.prefix = value;
+                if (Object.prototype.hasOwnProperty.call(options, key)) {
+                    var value = options[key];
+                    if (key === 'prefix' ||
+                        key === 'onSuccess' ||
+                        key === 'onError' ||
+                        key === 'onSessionExpired' ||
+                        key === 'getLoading' ||
+                        key === 'beforeSend' ||
+                        key === 'processData' ||
+                        key === 'responseEnd' ||
+                        key === 'catchError') {
+                        if (key === 'prefix') {
+                            if (typeof value === 'string') {
+                                _this.prefix = value;
+                            }
+                        }
+                        else {
+                            if (typeof value === 'function') {
+                                _this[key] = value;
+                            }
                         }
                     }
                     else {
-                        if (typeof value === 'function') {
-                            _this[key] = value;
-                        }
+                        _this._config[key] = value;
                     }
-                }
-                else {
-                    _this._config[key] = value;
                 }
             }
         };
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.onSuccess = function (xhr, _a) {
-        var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject, _opts = _a._opts;
+        var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject;
         var statusField = this._config.statusField;
         if (response[statusField]) {
             resolve(response.data);
@@ -239,7 +255,9 @@ var AjaxBase = /** @class */ (function () {
     };
     /** 移除缓存的cancel请求 */
     AjaxBase.prototype.removeCacheCancel = function (token) {
-        this._cacheCancel[token] && delete this._cacheCancel[token];
+        if (this._cacheCancel[token]) {
+            delete this._cacheCancel[token];
+        }
     };
     AjaxBase.prototype.getProcessedParams = function (method, url, params, options, reject
     /* eslint-disable @typescript-eslint/indent */
@@ -263,7 +281,6 @@ var AjaxBase = /** @class */ (function () {
             params: params,
         };
     };
-    // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     AjaxBase.prototype.responseEnd = function (xhr, _opts, _a) {
         var boolean = _a.success;
@@ -311,13 +328,16 @@ var AjaxBase = /** @class */ (function () {
             // 请求开始时间
             startTime: new Date().getTime(),
         };
-        !options && (options = {});
+        if (!options) {
+            options = {};
+        }
         var _cancel = false;
-        cancelExecutor &&
+        if (cancelExecutor) {
             cancelExecutor(function () {
                 _cancel = true;
             });
-        //启用加载效果
+        }
+        // 启用加载效果
         var loadingComponent = null;
         if (loading && this.getLoading(options)) {
             loadingComponent = this.getLoading(options);
@@ -329,7 +349,8 @@ var AjaxBase = /** @class */ (function () {
             .then(function () {
             if (_cancel) {
                 reject(createError('Request aborted', Ajax.CODE.CANCEL));
-                loadingComponent && loadingComponent.finish();
+                if (loadingComponent)
+                    loadingComponent.finish();
                 return;
             }
             if (options.onData) {
@@ -345,14 +366,17 @@ var AjaxBase = /** @class */ (function () {
                 params = undefined;
             }
             if (options.cache && _this._cache[url] !== undefined) {
-                loadingComponent && loadingComponent.finish();
+                if (loadingComponent)
+                    loadingComponent.finish();
                 _this.responseEnd(undefined, _opts, { success: true });
                 _this.onSuccess(undefined, {
                     response: _this._cache[url],
                     options: options,
                     resolve: resolve,
                     reject: reject,
-                    _opts: _opts,
+                    method: _opts.method,
+                    url: _opts.url,
+                    params: _opts.params,
                 });
                 return;
             }
@@ -368,6 +392,7 @@ var AjaxBase = /** @class */ (function () {
                         if (this.response) {
                             var chunks = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
                             if (!chunks) {
+                                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                                 console && console.error(method + " " + url + " Incorrect response");
                                 return;
                             }
@@ -388,12 +413,12 @@ var AjaxBase = /** @class */ (function () {
                 }
                 if (this.readyState !== 4)
                     return;
-                //关闭加载效果
+                // 关闭加载效果
                 if (loadingComponent) {
                     loadingComponent.finish();
                 }
                 if (options && options.cancelToken) {
-                    //请求完成，删除缓存的cancel
+                    // 请求完成，删除缓存的cancel
                     ajaxThis.removeCacheCancel(options.cancelToken);
                 }
                 if (this.status === 200 || this.status === 201) {
@@ -421,14 +446,25 @@ var AjaxBase = /** @class */ (function () {
                         url: url,
                         params: _opts.params,
                         options: options,
+                        resolve: resolve,
                         reject: reject,
+                        xCorrelationID: _opts.xCorrelationID,
                     });
                     res = transform_response_1.transformResponse({ response: res, options: options, xhr: xhr, statusField: statusField });
                     if (options.cache) {
                         ajaxThis._cache[url] = res;
                     }
                     ajaxThis.responseEnd(xhr, _opts, { success: true });
-                    ajaxThis.onSuccess(xhr, { response: res, options: options, resolve: resolve, reject: reject, _opts: _opts });
+                    ajaxThis.onSuccess(xhr, {
+                        response: res,
+                        method: _opts.method,
+                        url: _opts.url,
+                        params: _opts.params,
+                        options: options,
+                        resolve: resolve,
+                        reject: reject,
+                        xCorrelationID: _opts.xCorrelationID,
+                    });
                 }
                 else if (this.status === 204) {
                     ajaxThis.processResponse(null, {
@@ -437,7 +473,9 @@ var AjaxBase = /** @class */ (function () {
                         url: url,
                         params: _opts.params,
                         options: options,
+                        resolve: resolve,
                         reject: reject,
+                        xCorrelationID: _opts.xCorrelationID,
                     });
                     ajaxThis.responseEnd(xhr, _opts, { success: true });
                     resolve(null);
@@ -455,16 +493,17 @@ var AjaxBase = /** @class */ (function () {
                 }
             };
             xhr.open(method, url_1.addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
-            //xhr.responseType = 'json';
+            // xhr.responseType = 'json';
             if (options.responseType) {
                 xhr.responseType = options.responseType;
             }
-            if (!options.headers || typeof options.headers['token'] === 'undefined') {
+            if (!options.headers || typeof options.headers.token === 'undefined') {
                 var token = '';
                 try {
                     token = window.localStorage.getItem('token') || '';
                 }
                 catch (e) {
+                    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                     console && console.error('Failed to get token from localStorage');
                 }
                 if (token) {
@@ -521,7 +560,7 @@ var AjaxBase = /** @class */ (function () {
             }
             // prettier-ignore
             xhr.send(params);
-            cancelExecutor &&
+            if (cancelExecutor) {
                 cancelExecutor(function () {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
                         return;
@@ -531,6 +570,7 @@ var AjaxBase = /** @class */ (function () {
                     xhr.aborted = true;
                     xhr.abort();
                 });
+            }
         })
             .catch(function (e) {
             _this.responseEnd(undefined, _opts, { success: false });
@@ -543,6 +583,7 @@ var AjaxBase = /** @class */ (function () {
                 callback: _this.catchError,
                 type: 'log',
                 xCorrelationID: _opts.xCorrelationID,
+                options: options,
             });
         });
     };
@@ -554,7 +595,9 @@ var AjaxBase = /** @class */ (function () {
         var cancelExecutor = function (c) {
             // An executor function receives a cancel function as a parameter
             cancel = c;
-            promise && (promise.cancel = cancel);
+            if (promise) {
+                promise.cancel = cancel;
+            }
             // 如果是再次发送的请求， 前一请求缓存已从_cacheCancel清除，这里需要重新设置
             if (options && options.cancelToken && promise && !_this._cacheCancel[options.cancelToken]) {
                 _this._cacheCancel[options.cancelToken] = promise;
@@ -566,7 +609,7 @@ var AjaxBase = /** @class */ (function () {
         });
         promise.cancel = cancel;
         if (options && options.cancelToken) {
-            //传入cancelToken的话就缓存cancel, 用来取消请求
+            // 传入cancelToken的话就缓存cancel, 用来取消请求
             this.cancel(options.cancelToken);
             this._cacheCancel[options.cancelToken] = promise;
         }
@@ -580,7 +623,7 @@ var AjaxBase = /** @class */ (function () {
     };
     AjaxBase.prototype.getCacheKey = function (url, params, options) {
         var method = Ajax.METHODS.get;
-        var _options = Object.assign({}, options, { cache: true });
+        var _options = __assign(__assign({}, options), { cache: true });
         var processedValue = this.getProcessedParams(method, url, params, _options);
         url = processedValue.url;
         params = processedValue.params;

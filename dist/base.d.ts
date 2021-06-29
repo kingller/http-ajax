@@ -30,12 +30,18 @@ declare class AjaxBase {
     private _cache;
     /** 私有变量，请勿使用 */
     private _cacheCancel;
-    onSuccess<T = any>(xhr: XMLHttpRequest, { response, options, resolve, reject, _opts, }: {
+    onSuccess<T = any>(xhr: XMLHttpRequest, { response, options, resolve, reject, }: {
         response: Ajax.IResult;
         options: Ajax.IOptions;
         resolve: Ajax.IResolve<T>;
         reject: Ajax.IReject;
-        _opts: Ajax.IRequestOptions;
+        /** method */
+        method?: Ajax.IMethod;
+        /** url */
+        url?: string;
+        /** 请求参数 */
+        params?: Ajax.IParams | undefined;
+        xCorrelationID?: string;
     }): void;
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
     processErrorResponse<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | Promise<void>;
@@ -52,7 +58,7 @@ declare class AjaxBase {
     /** 移除缓存的cancel请求 */
     private removeCacheCancel;
     private getProcessedParams;
-    responseEnd<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { success: boolean }: {
+    responseEnd(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { success: boolean }: {
         success: any;
     }): void;
     /**
@@ -173,6 +179,10 @@ declare class AjaxBase {
             url: string;
             options: Ajax.IOptions;
         }) => Ajax.IParams;
+        /** 请求结束 */
+        responseEnd?: (xhr?: XMLHttpRequest, _opts?: Ajax.IRequestOptions, props?: {
+            success: boolean;
+        }) => void;
         /** 捕获错误 */
         catchError?: (props: Ajax.ICatchErrorOptions) => void;
     }) => void;

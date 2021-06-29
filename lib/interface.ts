@@ -1,3 +1,5 @@
+/* eslint-disable import/export */
+
 export enum CODE {
     CANCEL = 'ECONNABORTED',
 }
@@ -107,7 +109,9 @@ export interface IAjaxProcessDataAfterOptions extends IAjaxProcessDataOptions {
 
 export interface IProcessResponseOptions extends IAjaxArgsOptions {
     xhr: XMLHttpRequest;
+    resolve: IResolve;
     reject: IReject;
+    xCorrelationID: string;
 }
 
 // 返回结果
@@ -164,15 +168,30 @@ export interface IRequestOptions {
     onSessionExpired: IOnSessionExpired;
     options?: IOptions;
     cancelExecutor: ICancelExecutor;
-    // 链路追踪ID
+    /** 链路追踪ID */
     xCorrelationID?: string;
+    /** 请求开始时间 */
+    startTime?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface IOnSuccess<T = any> {
     (
         xhr: XMLHttpRequest | undefined,
-        props: { response: IResult; options: IOptions; resolve: IResolve<T>; reject: IReject; _opts: IRequestOptions }
+        props: {
+            response: IResult;
+            options: IOptions;
+            resolve: IResolve<T>;
+            reject: IReject;
+            /** method */
+            method?: IMethod;
+            /** url */
+            url?: string;
+            /** 请求参数 */
+            params?: IParams | undefined;
+            /** 链路追踪ID */
+            xCorrelationID?: string;
+        }
     ): void;
 }
 
@@ -190,6 +209,16 @@ export interface ICatchErrorOptions {
     type?: 'uncaught' | 'log';
     /** 备注 */
     remark?: string;
+    /** method */
+    method?: IMethod;
+    /** url */
+    url?: string;
+    /** 请求参数 */
+    params?: IParams | undefined;
+    options?: IOptions;
+    /** 链路追踪ID */
+    xCorrelationID?: string;
+    xhr?: XMLHttpRequest;
 }
 
 export type ICatchError = (props: ICatchErrorOptions) => void;
@@ -246,17 +275,19 @@ export interface IConfigOptions {
             options: IOptions;
         }
     ) => IParams;
+    /** 请求结束 */
+    responseEnd?: (xhr?: XMLHttpRequest, _opts?: IRequestOptions, props?: { success: boolean }) => void;
     /** 捕获错误 */
     catchError?: (props: ICatchErrorOptions) => void;
 }
 
 // Ajax
 export interface IAjax {
-    get: IRequest;
-    put: IRequest;
-    del: IRequest;
-    post: IRequest;
-    loadable: {
+    readonly get: IRequest;
+    readonly put: IRequest;
+    readonly del: IRequest;
+    readonly post: IRequest;
+    readonly loadable: {
         get: IRequest;
         put: IRequest;
         del: IRequest;
@@ -283,8 +314,23 @@ export interface IAjax {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: <T = any>(
         xhr: XMLHttpRequest | undefined,
-        props: { response: IResult; options: IOptions; resolve: IResolve<T>; reject: IReject; _opts: IRequestOptions }
+        props: {
+            response: IResult;
+            options: IOptions;
+            resolve: IResolve<T>;
+            reject: IReject;
+            /** method */
+            method?: IMethod;
+            /** url */
+            url?: string;
+            /** 请求参数 */
+            params?: IParams | undefined;
+            /** 链路追踪ID */
+            xCorrelationID?: string;
+        }
     ) => void;
+    /** 请求结束 */
+    responseEnd?: (xhr?: XMLHttpRequest, _opts?: IRequestOptions, props?: { success: boolean }) => void;
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void | Promise<void>;
@@ -293,10 +339,24 @@ export interface IAjax {
     onError: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
     /** 捕获错误 */
     catchError: (props: {
+        /** 错误消息 */
         errorMsg: string;
+        /** 错误代码 */
         errorCode?: string | number;
+        /** 类型 */
         type?: 'uncaught' | 'log';
+        /** 备注 */
         remark?: string;
+        /** method */
+        method?: IMethod;
+        /** url */
+        url?: string;
+        /** 请求参数 */
+        params?: IParams | undefined;
+        options?: IOptions;
+        /** 链路追踪ID */
+        xCorrelationID?: string;
+        xhr?: XMLHttpRequest;
     }) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     request<T = any>(
@@ -413,3 +473,5 @@ export interface ILoading {
 }
 
 // ----- loading end ------- //
+
+/* eslint-enable import/export */

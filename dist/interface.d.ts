@@ -77,7 +77,9 @@ export interface IAjaxProcessDataAfterOptions extends IAjaxProcessDataOptions {
 }
 export interface IProcessResponseOptions extends IAjaxArgsOptions {
     xhr: XMLHttpRequest;
+    resolve: IResolve;
     reject: IReject;
+    xCorrelationID: string;
 }
 export interface IResult {
     result?: boolean;
@@ -114,7 +116,10 @@ export interface IRequestOptions {
     onSessionExpired: IOnSessionExpired;
     options?: IOptions;
     cancelExecutor: ICancelExecutor;
+    /** 链路追踪ID */
     xCorrelationID?: string;
+    /** 请求开始时间 */
+    startTime?: number;
 }
 export interface IOnSuccess<T = any> {
     (xhr: XMLHttpRequest | undefined, props: {
@@ -122,7 +127,14 @@ export interface IOnSuccess<T = any> {
         options: IOptions;
         resolve: IResolve<T>;
         reject: IReject;
-        _opts: IRequestOptions;
+        /** method */
+        method?: IMethod;
+        /** url */
+        url?: string;
+        /** 请求参数 */
+        params?: IParams | undefined;
+        /** 链路追踪ID */
+        xCorrelationID?: string;
     }): void;
 }
 export interface IOnError<T = any> {
@@ -137,6 +149,16 @@ export interface ICatchErrorOptions {
     type?: 'uncaught' | 'log';
     /** 备注 */
     remark?: string;
+    /** method */
+    method?: IMethod;
+    /** url */
+    url?: string;
+    /** 请求参数 */
+    params?: IParams | undefined;
+    options?: IOptions;
+    /** 链路追踪ID */
+    xCorrelationID?: string;
+    xhr?: XMLHttpRequest;
 }
 export declare type ICatchError = (props: ICatchErrorOptions) => void;
 export interface IStringifyParamsOptions extends IOptions {
@@ -192,15 +214,19 @@ export interface IConfigOptions {
         url: string;
         options: IOptions;
     }) => IParams;
+    /** 请求结束 */
+    responseEnd?: (xhr?: XMLHttpRequest, _opts?: IRequestOptions, props?: {
+        success: boolean;
+    }) => void;
     /** 捕获错误 */
     catchError?: (props: ICatchErrorOptions) => void;
 }
 export interface IAjax {
-    get: IRequest;
-    put: IRequest;
-    del: IRequest;
-    post: IRequest;
-    loadable: {
+    readonly get: IRequest;
+    readonly put: IRequest;
+    readonly del: IRequest;
+    readonly post: IRequest;
+    readonly loadable: {
         get: IRequest;
         put: IRequest;
         del: IRequest;
@@ -236,7 +262,18 @@ export interface IAjax {
         options: IOptions;
         resolve: IResolve<T>;
         reject: IReject;
-        _opts: IRequestOptions;
+        /** method */
+        method?: IMethod;
+        /** url */
+        url?: string;
+        /** 请求参数 */
+        params?: IParams | undefined;
+        /** 链路追踪ID */
+        xCorrelationID?: string;
+    }) => void;
+    /** 请求结束 */
+    responseEnd?: (xhr?: XMLHttpRequest, _opts?: IRequestOptions, props?: {
+        success: boolean;
     }) => void;
     /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
     processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void | Promise<void>;
@@ -244,10 +281,24 @@ export interface IAjax {
     onError: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
     /** 捕获错误 */
     catchError: (props: {
+        /** 错误消息 */
         errorMsg: string;
+        /** 错误代码 */
         errorCode?: string | number;
+        /** 类型 */
         type?: 'uncaught' | 'log';
+        /** 备注 */
         remark?: string;
+        /** method */
+        method?: IMethod;
+        /** url */
+        url?: string;
+        /** 请求参数 */
+        params?: IParams | undefined;
+        options?: IOptions;
+        /** 链路追踪ID */
+        xCorrelationID?: string;
+        xhr?: XMLHttpRequest;
     }) => void;
     request<T = any>(method: IMethod, url: string, params: IParams | undefined, options?: IOptions, loading?: boolean): IRequestResult<T>;
     sendRequest: <T>(method: IMethod | {

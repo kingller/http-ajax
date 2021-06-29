@@ -10,4 +10,7 @@ module.exports = {
             "version": "16.0",
         },
     },
+    rules: {
+        'prefer-promise-reject-errors': 0,
+    },
 };

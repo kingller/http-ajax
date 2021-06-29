@@ -7,7 +7,9 @@ export function catchAjaxError({
     params,
     callback,
     type,
+    options,
     xCorrelationID,
+    xhr,
 }: {
     e: Error;
     method: IAjax.IMethod;
@@ -15,14 +17,19 @@ export function catchAjaxError({
     params?: IAjax.IParams;
     callback: IAjax.ICatchError;
     type?: 'uncaught' | 'log';
+    options?: IAjax.IOptions;
     xCorrelationID?: string;
+    xhr?: XMLHttpRequest;
 }): void {
     const errorMsg = e ? e.stack || e.message : '';
-    const remark = `ajax: ${method} ${url} params: ${JSON.stringify(params)}`;
-    console && console.error(`${errorMsg} ${remark}`);
     callback({
         errorMsg,
-        remark,
         type,
+        method,
+        url,
+        params,
+        options,
+        xCorrelationID,
+        xhr,
     });
 }

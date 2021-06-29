@@ -49,10 +49,12 @@ function cryptoExtend(): () => void {
 
         // 校验该扩展是否已添加过
         if (this._cryptoExtendAdded) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console && console.error('Error: `cryptoExtend` can only be added to ajax once!');
         } else {
             // 校验加密扩展必须在签名扩展前添加
             if (this._signatureExtendAdded) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 console && console.warn('Warning: `cryptoExtend` should be added to ajax before `signatureExtend`!');
             }
         }
@@ -108,6 +110,7 @@ function cryptoExtend(): () => void {
                         )
                         .then(function () {
                             if (!window.btoa) {
+                                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                                 console && console.error('`window.btoa` is undefined');
                             }
                             storage.setItem(STORAGE_KEY.SECRET_KEY, window.btoa(newSecretKey), 'session');
@@ -171,14 +174,16 @@ function cryptoExtend(): () => void {
                 if (!fieldName) {
                     continue;
                 }
+                // eslint-disable-next-line no-template-curly-in-string
                 if (fieldName === '${index}') {
                     if (!isArray(currentData)) {
                         break;
                     }
                 }
                 if (index === fieldPaths.length - 1) {
+                    // eslint-disable-next-line no-template-curly-in-string
                     if (fieldName === '${index}') {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-loop-func
                         (currentData as any[]).forEach((v, i) => {
                             if (typeof v !== 'undefined') {
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -195,6 +200,7 @@ function cryptoExtend(): () => void {
                     }
                     return;
                 }
+                // eslint-disable-next-line no-template-curly-in-string
                 if (fieldName === '${index}') {
                     const restFieldPaths = fieldPaths.slice(index + 1);
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -304,20 +310,19 @@ function cryptoExtend(): () => void {
                     params = cloneDeep(params);
                     if (options.encrypt === 'all') {
                         return Crypto.AES.encrypt(params);
-                    } else {
-                        if (!params || typeof params !== 'object') {
-                            return params;
-                        }
-                        if (Array.isArray(options.encrypt)) {
-                            options.encrypt.forEach((field) => {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                encryptDataField(params as { [name: string]: any }, field);
-                            });
-                        }
+                    }
+                    if (!params || typeof params !== 'object') {
+                        return params;
+                    }
+                    if (Array.isArray(options.encrypt)) {
+                        options.encrypt.forEach((field) => {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            encryptDataField(params as { [name: string]: any }, field);
+                        });
                     }
                 }
             } catch (e) {
-                reject && reject(e);
+                if (reject) reject(e);
                 catchAjaxError({
                     e,
                     method: props.method,
@@ -325,6 +330,7 @@ function cryptoExtend(): () => void {
                     params,
                     callback: (this as IAjax).catchError,
                     type: reject ? 'log' : 'uncaught',
+                    options,
                 });
             }
             return params;
@@ -335,8 +341,8 @@ function cryptoExtend(): () => void {
             if (response === null) {
                 return response;
             }
+            const { options } = props;
             try {
-                const { options } = props;
                 let decrypt: IEncryptFields = (options && options.decrypt) || undefined;
                 if (!decrypt) {
                     const { xhr } = props;
@@ -361,7 +367,7 @@ function cryptoExtend(): () => void {
                         }
                         if (decrypt === 'all') {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            data = Crypto.AES.decrypt((data as any) as string);
+                            data = Crypto.AES.decrypt(data as any as string);
                         } else {
                             if (!data || typeof data !== 'object') {
                                 return response;
@@ -388,6 +394,9 @@ function cryptoExtend(): () => void {
                     params: props.params,
                     callback: (this as IAjax).catchError,
                     type: 'log',
+                    options,
+                    xCorrelationID: props.xCorrelationID,
+                    xhr: props.xhr,
                 });
             }
             return response;

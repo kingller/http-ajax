@@ -1,4 +1,5 @@
 "use strict";
+/* eslint-disable import/export */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.METHODS = exports.CODE = void 0;
 var CODE;
@@ -13,3 +14,4 @@ var METHODS;
     METHODS["del"] = "DELETE";
 })(METHODS = exports.METHODS || (exports.METHODS = {}));
 // ----- loading end ------- //
+/* eslint-enable import/export */

@@ -3,10 +3,12 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -64,7 +66,7 @@ var HttpAjax = /** @class */ (function (_super) {
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     HttpAjax.prototype.onSuccess = function (xhr, _a) {
-        var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject, _opts = _a._opts;
+        var response = _a.response, options = _a.options, resolve = _a.resolve, reject = _a.reject;
         var statusField = this._config.statusField;
         if (response && typeof response === 'object' && typeof response[statusField] !== 'undefined') {
             if (response[statusField]) {
@@ -99,9 +101,15 @@ var HttpAjax = /** @class */ (function (_super) {
             errorMsg: xhr.statusText,
         };
         this.catchError({
-            remark: "ajax: " + _opts.method + " " + _opts.url + " params: " + JSON.stringify(_opts.params),
             errorCode: error.errorCode,
             errorMsg: error.errorMsg,
+            type: 'log',
+            method: _opts.method,
+            url: _opts.url,
+            params: _opts.params,
+            options: _opts.options,
+            xCorrelationID: _opts.xCorrelationID,
+            xhr: xhr,
         });
         if (xhr.status === 401 || xhr.status === 406) {
             this.onSessionExpired(error, _opts);
