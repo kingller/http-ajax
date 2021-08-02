@@ -17,6 +17,7 @@ var storage = {
             return value;
         }
         catch (e) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console &&
                 console.error("Failed to get " + key + " from " + (type === 'session' ? 'sessionStorage' : 'localStorage'));
             return undefined;
@@ -34,6 +35,7 @@ var storage = {
             }
         }
         catch (e) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console &&
                 console.error("Failed to set " + key + " into " + (type === 'session' ? 'sessionStorage' : 'localStorage'));
         }
@@ -46,6 +48,7 @@ var storage = {
             }
         }
         catch (e) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console &&
                 console.error("Failed to remove " + key + " into " + (type === 'session' ? 'sessionStorage' : 'localStorage'));
         }
@@ -56,6 +59,7 @@ var storage = {
             _storage.clear();
         }
         catch (e) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console && console.error("Failed to clear " + (type === 'session' ? 'sessionStorage' : 'localStorage'));
         }
     },

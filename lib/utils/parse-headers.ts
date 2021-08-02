@@ -38,7 +38,7 @@ export function parseHeaders(
             if (key === 'set-cookie') {
                 headerMap[key] = (headerMap[key] ? headerMap[key] : []).concat([val]);
             } else {
-                headerMap[key] = headerMap[key] ? headerMap[key] + ', ' + val : val;
+                headerMap[key] = headerMap[key] ? `${headerMap[key]}, ${val}` : val;
             }
         }
     });

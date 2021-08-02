@@ -13,13 +13,19 @@ export class HttpAjax extends AjaxBase {
             options,
             resolve,
             reject,
-            _opts,
         }: {
             response: Ajax.IResult;
             options: Ajax.IOptions;
             resolve: Ajax.IResolve<T>;
             reject: Ajax.IReject;
-            _opts: Ajax.IRequestOptions;
+            /** method */
+            method?: Ajax.IMethod;
+            /** url */
+            url?: string;
+            /** 请求参数 */
+            params?: Ajax.IParams | undefined;
+            /** 链路追踪ID */
+            xCorrelationID?: string;
         }
     ): void {
         const { statusField } = this._config;
@@ -54,9 +60,15 @@ export class HttpAjax extends AjaxBase {
             errorMsg: xhr.statusText,
         };
         this.catchError({
-            remark: `ajax: ${_opts.method} ${_opts.url} params: ${JSON.stringify(_opts.params)}`,
             errorCode: error.errorCode,
             errorMsg: error.errorMsg,
+            type: 'log',
+            method: _opts.method,
+            url: _opts.url,
+            params: _opts.params,
+            options: _opts.options,
+            xCorrelationID: _opts.xCorrelationID,
+            xhr,
         });
         if (xhr.status === 401 || xhr.status === 406) {
             this.onSessionExpired<T>(error, _opts);

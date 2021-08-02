@@ -25,6 +25,7 @@ function signatureExtend(): () => void {
 
         // 校验该扩展是否已添加过
         if (this._signatureExtendAdded) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console && console.error('Error: `signatureExtend` can only be added to ajax once!');
         }
 

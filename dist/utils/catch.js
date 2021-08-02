@@ -2,14 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.catchAjaxError = void 0;
 function catchAjaxError(_a) {
-    var e = _a.e, method = _a.method, url = _a.url, params = _a.params, callback = _a.callback, type = _a.type, xCorrelationID = _a.xCorrelationID;
+    var e = _a.e, method = _a.method, url = _a.url, params = _a.params, callback = _a.callback, type = _a.type, options = _a.options, xCorrelationID = _a.xCorrelationID, xhr = _a.xhr;
     var errorMsg = e ? e.stack || e.message : '';
-    var remark = "ajax: " + method + " " + url + " params: " + JSON.stringify(params);
-    console && console.error(errorMsg + " " + remark);
     callback({
         errorMsg: errorMsg,
-        remark: remark,
         type: type,
+        method: method,
+        url: url,
+        params: params,
+        options: options,
+        xCorrelationID: xCorrelationID,
+        xhr: xhr,
     });
 }
 exports.catchAjaxError = catchAjaxError;

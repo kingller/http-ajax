@@ -10,6 +10,12 @@
 
 
 
+# 5.1.0
+> 2021.06.29  
+1. <font color=blue>增强</font> 增加链路追踪ID传参`xCorrelationID`
+2. <font color=green>新增</font> `responseEnd`请求结束回调方法
+
+
 # 5.0.1
 > 2021.05.13  
 1. <font color=red>修复</font> IE安全模式下获取`window.localStorage`报错，添加`try catch`捕获错误
