@@ -20,6 +20,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpAjax = void 0;
 var base_1 = __importDefault(require("./base"));
+var response_data_1 = require("./utils/response-data");
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 window.$feedback = window.$feedback || function () { };
 var HttpAjax = /** @class */ (function (_super) {
@@ -90,7 +91,7 @@ var HttpAjax = /** @class */ (function (_super) {
             }
         }
         else {
-            resolve(response);
+            resolve(response_data_1.getResponseData({ response: response, statusField: statusField }));
         }
     };
     /** 添加默认AJAX错误处理程序 */

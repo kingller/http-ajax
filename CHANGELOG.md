@@ -10,6 +10,20 @@
 
 
 
+# 5.2.0
+> 2021.09.14  
+1. <font color=green>新增</font> 支持如下请求响应格式
+```
+{
+    code: 200,
+    reason: 'test',
+    message: '获取成功',
+    details: {},
+    apiVersion: '',
+}
+```
+
+
 # 5.1.0
 > 2021.06.29  
 1. <font color=blue>增强</font> 增加链路追踪ID传参`xCorrelationID`

@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.promisify = exports.isFormData = exports.AjaxBase = exports.Ajax = void 0;
+exports.getResponseData = exports.promisify = exports.isFormData = exports.AjaxBase = exports.Ajax = void 0;
 var ajax_1 = __importDefault(require("./ajax"));
 exports.Ajax = __importStar(require("./interface"));
 var base_1 = require("./base");
@@ -31,4 +31,6 @@ var form_1 = require("./utils/form");
 Object.defineProperty(exports, "isFormData", { enumerable: true, get: function () { return form_1.isFormData; } });
 var promise_1 = require("./utils/promise");
 Object.defineProperty(exports, "promisify", { enumerable: true, get: function () { return promise_1.promisify; } });
+var response_data_1 = require("./utils/response-data");
+Object.defineProperty(exports, "getResponseData", { enumerable: true, get: function () { return response_data_1.getResponseData; } });
 exports.default = ajax_1.default;

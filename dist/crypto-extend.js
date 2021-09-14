@@ -11,6 +11,7 @@ var clone_1 = require("./utils/clone");
 var array_1 = require("./utils/array");
 var promise_1 = require("./utils/promise");
 var catch_1 = require("./utils/catch");
+var response_data_1 = require("./utils/response-data");
 var publicKeyPromise = null;
 var secretKeyPromise = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -334,35 +335,22 @@ function cryptoExtend() {
                 }
                 if (decrypt) {
                     var statusField = _this._config.statusField;
-                    if (response[statusField] || typeof response[statusField] === 'undefined') {
-                        var data_1 = response;
-                        if (response[statusField]) {
-                            data_1 = response.data;
-                        }
-                        if (!data_1) {
+                    var data_1 = response_data_1.getResponseData({ response: response, statusField: statusField });
+                    if (decrypt === 'all') {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        data_1 = client_crypto_1.default.AES.decrypt(data_1);
+                    }
+                    else {
+                        if (!data_1 || typeof data_1 !== 'object') {
                             return response;
                         }
-                        if (decrypt === 'all') {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            data_1 = client_crypto_1.default.AES.decrypt(data_1);
-                        }
-                        else {
-                            if (!data_1 || typeof data_1 !== 'object') {
-                                return response;
-                            }
-                            if (Array.isArray(decrypt)) {
-                                decrypt.forEach(function (field) {
-                                    decryptDataField(data_1, field);
-                                });
-                            }
-                        }
-                        if (response[statusField]) {
-                            response.data = data_1;
-                        }
-                        else {
-                            response = data_1;
+                        if (Array.isArray(decrypt)) {
+                            decrypt.forEach(function (field) {
+                                decryptDataField(data_1, field);
+                            });
                         }
                     }
+                    response = response_data_1.setResponseData({ response: response, data: data_1, statusField: statusField });
                 }
             }
             catch (e) {

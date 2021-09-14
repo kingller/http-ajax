@@ -1,5 +1,6 @@
 import { IResult, IOptions } from '../interface';
 import { parseHeaders } from './parse-headers';
+import { getResponseData, setResponseData } from './response-data';
 
 export function transformResponse<T>({
     response,
@@ -14,11 +15,9 @@ export function transformResponse<T>({
 }): T {
     if (options && options.transformResponse) {
         const responseHeaders = xhr ? parseHeaders(xhr.getAllResponseHeaders()) : undefined;
-        if (response && typeof response === 'object' && typeof response[statusField] !== 'undefined') {
-            (response as IResult).data = options.transformResponse((response as IResult).data, responseHeaders);
-        } else {
-            response = options.transformResponse(response, responseHeaders);
-        }
+        let data = getResponseData({ response, statusField });
+        data = options.transformResponse(data, responseHeaders);
+        response = setResponseData({ response, data, statusField });
     }
     return response;
 }

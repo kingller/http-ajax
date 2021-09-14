@@ -637,15 +637,7 @@ class AjaxBase {
 
                 // prettier-ignore
                 xhr.send(
-                    params as
-                    | string
-                    | Document
-                    | Blob
-                    | ArrayBufferView
-                    | ArrayBuffer
-                    | FormData
-                    | URLSearchParams
-                    | ReadableStream<Uint8Array>
+                    params as Document | Blob | BufferSource | FormData | URLSearchParams | string | null
                 );
 
                 if (cancelExecutor) {

@@ -8,4 +8,6 @@ export { isFormData } from './utils/form';
 
 export { promisify } from './utils/promise';
 
+export { getResponseData } from './utils/response-data';
+
 export default ajax;
