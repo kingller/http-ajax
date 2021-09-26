@@ -6,6 +6,7 @@ import { cloneDeep } from './utils/clone';
 import { isArray } from './utils/array';
 import { promisify } from './utils/promise';
 import { catchAjaxError } from './utils/catch';
+import { getResponseData, setResponseData } from './utils/response-data';
 import {
     IAjax,
     IAjaxArgsOptions,
@@ -357,33 +358,23 @@ function cryptoExtend(): () => void {
                 }
                 if (decrypt) {
                     const { statusField } = this._config;
-                    if (response[statusField] || typeof response[statusField] === 'undefined') {
-                        let data = response;
-                        if (response[statusField]) {
-                            data = response.data;
-                        }
-                        if (!data) {
+                    let data = getResponseData({ response, statusField });
+
+                    if (decrypt === 'all') {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        data = Crypto.AES.decrypt((data as any) as string);
+                    } else {
+                        if (!data || typeof data !== 'object') {
                             return response;
                         }
-                        if (decrypt === 'all') {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            data = Crypto.AES.decrypt((data as any) as string);
-                        } else {
-                            if (!data || typeof data !== 'object') {
-                                return response;
-                            }
-                            if (Array.isArray(decrypt)) {
-                                decrypt.forEach((field) => {
-                                    decryptDataField(data, field);
-                                });
-                            }
-                        }
-                        if (response[statusField]) {
-                            response.data = data;
-                        } else {
-                            response = data;
+                        if (Array.isArray(decrypt)) {
+                            decrypt.forEach((field) => {
+                                decryptDataField(data, field);
+                            });
                         }
                     }
+
+                    response = setResponseData({ response, data, statusField });
                 }
             } catch (e) {
                 props.reject(e);

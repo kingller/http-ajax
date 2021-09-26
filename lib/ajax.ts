@@ -1,5 +1,6 @@
 import * as Ajax from './interface';
 import AjaxBase from './base';
+import { getResponseData } from './utils/response-data';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 window.$feedback = window.$feedback || function (): void {};
@@ -48,7 +49,9 @@ export class HttpAjax extends AjaxBase {
                 window.$feedback(response.errorMsg);
             }
         } else {
-            resolve(response as T);
+            resolve(
+                getResponseData<T>({ response, statusField })
+            );
         }
     }
 
