@@ -17,6 +17,7 @@ import {
     IRequestOptions,
     IProcessResponseOptions,
 } from './interface';
+import newCrypto from './utils/crypto';
 
 interface IPublicKeyResponse {
     publicKey: string;
@@ -95,8 +96,16 @@ function cryptoExtend(): () => void {
             return getPublicKey.apply(this).then((publicKeyResponse: IPublicKeyResponse) => {
                 // 生成AES秘钥
                 const newSecretKey = Crypto.AES.createKey();
+                const key = newCrypto.AES.createKey();
+                console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
                 // 使用RSA公钥加密秘钥
                 const encryptedSecretKey = Crypto.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
+                const newEncryptedSecretKey = newCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
+                console.log(
+                    '🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey',
+                    newEncryptedSecretKey
+                );
+
                 // 将加密后的秘钥传输给服务器端
                 secretKeyPromise = new Promise((resolve, reject) => {
                     (this as IAjax)

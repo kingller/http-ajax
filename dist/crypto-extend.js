@@ -12,6 +12,7 @@ var array_1 = require("./utils/array");
 var promise_1 = require("./utils/promise");
 var catch_1 = require("./utils/catch");
 var response_data_1 = require("./utils/response-data");
+var crypto_1 = __importDefault(require("./utils/crypto"));
 var publicKeyPromise = null;
 var secretKeyPromise = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,8 +78,12 @@ function cryptoExtend() {
             return getPublicKey.apply(this).then(function (publicKeyResponse) {
                 // 生成AES秘钥
                 var newSecretKey = client_crypto_1.default.AES.createKey();
+                var key = crypto_1.default.AES.createKey();
+                console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
                 // 使用RSA公钥加密秘钥
                 var encryptedSecretKey = client_crypto_1.default.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
+                var newEncryptedSecretKey = crypto_1.default.RSA.encrypt(key, publicKeyResponse.publicKey);
+                console.log('🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey', newEncryptedSecretKey);
                 // 将加密后的秘钥传输给服务器端
                 secretKeyPromise = new Promise(function (resolve, reject) {
                     _this
@@ -159,7 +164,7 @@ function cryptoExtend() {
                 if (index === fieldPaths.length - 1) {
                     // eslint-disable-next-line no-template-curly-in-string
                     if (fieldName === '${index}') {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-loop-func
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         currentData.forEach(function (v, i) {
                             if (typeof v !== 'undefined') {
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
