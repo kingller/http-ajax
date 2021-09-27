@@ -4,7 +4,7 @@ declare const crypto: {
     };
     AES: {
         createKey: () => Promise<CryptoKey>;
-        encrypt: (data: any, key?: any) => Promise<void>;
+        encrypt: (data: any, key?: any) => Promise<ArrayBuffer>;
     };
     str2ab: (str: string) => ArrayBuffer;
 };

@@ -93,14 +93,14 @@ function cryptoExtend(): () => void {
         }
 
         function sendSecretKeyRequest(): Promise<void> {
-            return getPublicKey.apply(this).then((publicKeyResponse: IPublicKeyResponse) => {
+            return getPublicKey.apply(this).then(async (publicKeyResponse: IPublicKeyResponse) => {
                 // 生成AES秘钥
                 const newSecretKey = Crypto.AES.createKey();
-                const key = newCrypto.AES.createKey();
+                const key = await newCrypto.AES.createKey();
                 console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
                 // 使用RSA公钥加密秘钥
                 const encryptedSecretKey = Crypto.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
-                const newEncryptedSecretKey = newCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
+                const newEncryptedSecretKey = await newCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
                 console.log(
                     '🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey',
                     newEncryptedSecretKey

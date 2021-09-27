@@ -87,8 +87,7 @@ var crypto = {
                             }, key, data)];
                     case 1:
                         ciphertext = _a.sent();
-                        console.log('🚀 ~ file: crypto.ts ~ line 49 ~ encrypt: ~ ciphertext', ciphertext);
-                        return [2 /*return*/];
+                        return [2 /*return*/, ciphertext];
                 }
             });
         }); },

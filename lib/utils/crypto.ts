@@ -46,6 +46,7 @@ const crypto = {
                 key,
                 data
             );
+            return ciphertext;
             console.log('🚀 ~ file: crypto.ts ~ line 49 ~ encrypt: ~ ciphertext', ciphertext);
         },
     },
