@@ -93,19 +93,18 @@ function cryptoExtend(): () => void {
         }
 
         function sendSecretKeyRequest(): Promise<void> {
-            return getPublicKey.apply(this).then(async (publicKeyResponse: IPublicKeyResponse) => {
-                // 生成AES秘钥
-                const key = await newCrypto.AES.createKey();
-                console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
-                // 使用RSA公钥加密秘钥
-                const newEncryptedSecretKey = await newCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
-                console.log(
-                    '🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey',
-                    newEncryptedSecretKey
-                );
-
+            return getPublicKey.apply(this).then((publicKeyResponse: IPublicKeyResponse) => {
                 // 将加密后的秘钥传输给服务器端
-                secretKeyPromise = new Promise((resolve, reject) => {
+                secretKeyPromise = new Promise(async (resolve, reject) => {
+                    // 生成AES秘钥
+                    const key = await newCrypto.AES.createKey();
+                    console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
+                    // 使用RSA公钥加密秘钥
+                    const newEncryptedSecretKey = await newCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
+                    console.log(
+                        '🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey',
+                        newEncryptedSecretKey
+                    );
                     (this as IAjax)
                         .post(
                             '/encryption/token',
@@ -116,7 +115,7 @@ function cryptoExtend(): () => void {
                                 },
                             }
                         )
-                        .then(async function () {
+                        .then(function () {
                             storage.setItem(STORAGE_KEY.SECRET_KEY, key, 'session');
                             storage.setItem(STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
                             waitingPublicKeyPromise.forEach(function (p) {

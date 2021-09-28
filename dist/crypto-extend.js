@@ -111,40 +111,34 @@ function cryptoExtend() {
         }
         function sendSecretKeyRequest() {
             var _this = this;
-            return getPublicKey.apply(this).then(function (publicKeyResponse) { return __awaiter(_this, void 0, void 0, function () {
-                var key, newEncryptedSecretKey;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, crypto_1.default.AES.createKey()];
-                        case 1:
-                            key = _a.sent();
-                            console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
-                            return [4 /*yield*/, crypto_1.default.RSA.encrypt(key, publicKeyResponse.publicKey)];
-                        case 2:
-                            newEncryptedSecretKey = _a.sent();
-                            console.log('🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey', newEncryptedSecretKey);
-                            // 将加密后的秘钥传输给服务器端
-                            secretKeyPromise = new Promise(function (resolve, reject) {
-                                _this
+            return getPublicKey.apply(this).then(function (publicKeyResponse) {
+                // 将加密后的秘钥传输给服务器端
+                secretKeyPromise = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+                    var key, newEncryptedSecretKey;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, crypto_1.default.AES.createKey()];
+                            case 1:
+                                key = _a.sent();
+                                console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
+                                return [4 /*yield*/, crypto_1.default.RSA.encrypt(key, publicKeyResponse.publicKey)];
+                            case 2:
+                                newEncryptedSecretKey = _a.sent();
+                                console.log('🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey', newEncryptedSecretKey);
+                                this
                                     .post('/encryption/token', { token: newEncryptedSecretKey }, {
                                     headers: {
                                         uuid: publicKeyResponse.uuid,
                                     },
                                 })
                                     .then(function () {
-                                    return __awaiter(this, void 0, void 0, function () {
-                                        return __generator(this, function (_a) {
-                                            storage_1.default.setItem(enums_1.STORAGE_KEY.SECRET_KEY, key, 'session');
-                                            storage_1.default.setItem(enums_1.STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
-                                            waitingPublicKeyPromise.forEach(function (p) {
-                                                p.resolve();
-                                            });
-                                            waitingPublicKeyPromise = [];
-                                            resolve();
-                                            return [2 /*return*/];
-                                        });
+                                    storage_1.default.setItem(enums_1.STORAGE_KEY.SECRET_KEY, key, 'session');
+                                    storage_1.default.setItem(enums_1.STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
+                                    waitingPublicKeyPromise.forEach(function (p) {
+                                        p.resolve();
                                     });
+                                    waitingPublicKeyPromise = [];
+                                    resolve();
                                 })
                                     .catch(function (e) {
                                     waitingPublicKeyPromise.forEach(function (p) {
@@ -153,11 +147,12 @@ function cryptoExtend() {
                                     waitingPublicKeyPromise = [];
                                     reject(e);
                                 });
-                            });
-                            return [2 /*return*/, secretKeyPromise];
-                    }
-                });
-            }); });
+                                return [2 /*return*/];
+                        }
+                    });
+                }); });
+                return secretKeyPromise;
+            });
         }
         function createSecretKey() {
             var _this = this;
