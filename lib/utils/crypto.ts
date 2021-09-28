@@ -73,17 +73,21 @@ const crypto = {
 
             return `${strIv}${strCiphertext}`;
         },
-        decrypt: async (ciphertext, key) => {
+        decrypt: async (ciphertext, rawKey) => {
             const strIv = ciphertext.slice(0, 12);
             const strCiphertext = ciphertext.slice(12);
             const iv = crypto.str2ab(strIv);
             const newCiphertext = crypto.str2ab(strCiphertext);
+            const secretKey = await window.crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
+                'encrypt',
+                'decrypt',
+            ]);
             const data = await window.crypto.subtle.decrypt(
                 {
                     name: 'AES-GCM',
                     iv: iv,
                 },
-                key,
+                secretKey,
                 newCiphertext
             );
             return data;

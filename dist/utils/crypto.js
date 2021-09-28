@@ -87,18 +87,23 @@ var crypto = {
                 }
             });
         }); },
-        encrypt: function (data, key) { return __awaiter(void 0, void 0, void 0, function () {
-            var iv, ciphertext, strIv, strCiphertext;
+        encrypt: function (data, rawKey) { return __awaiter(void 0, void 0, void 0, function () {
+            var iv, secretKey, ciphertext, strIv, strCiphertext;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         iv = window.crypto.getRandomValues(new Uint8Array(12));
-                        console.log('🚀 ~ file: crypto.ts ~ line 56 ~ encrypt: ~ iv', iv);
+                        return [4 /*yield*/, window.crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
+                                'encrypt',
+                                'decrypt',
+                            ])];
+                    case 1:
+                        secretKey = _a.sent();
                         return [4 /*yield*/, window.crypto.subtle.encrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
-                            }, key, data)];
-                    case 1:
+                            }, secretKey, data)];
+                    case 2:
                         ciphertext = _a.sent();
                         strIv = crypto.ab2str(iv);
                         strCiphertext = crypto.ab2str(ciphertext);
@@ -106,8 +111,8 @@ var crypto = {
                 }
             });
         }); },
-        decrypt: function (ciphertext, key) { return __awaiter(void 0, void 0, void 0, function () {
-            var strIv, strCiphertext, iv, newCiphertext, data;
+        decrypt: function (ciphertext, rawKey) { return __awaiter(void 0, void 0, void 0, function () {
+            var strIv, strCiphertext, iv, newCiphertext, secretKey, data;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -115,11 +120,17 @@ var crypto = {
                         strCiphertext = ciphertext.slice(12);
                         iv = crypto.str2ab(strIv);
                         newCiphertext = crypto.str2ab(strCiphertext);
+                        return [4 /*yield*/, window.crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
+                                'encrypt',
+                                'decrypt',
+                            ])];
+                    case 1:
+                        secretKey = _a.sent();
                         return [4 /*yield*/, window.crypto.subtle.decrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
-                            }, key, newCiphertext)];
-                    case 1:
+                            }, secretKey, newCiphertext)];
+                    case 2:
                         data = _a.sent();
                         return [2 /*return*/, data];
                 }
