@@ -6,8 +6,7 @@ const crypto = {
 
             const pemHeader = '-----BEGIN PUBLIC KEY-----';
             const pemFooter = '-----END PUBLIC KEY-----';
-            const pemContents = decodeURIComponent(pem).substring(pemHeader.length, pem.length - pemFooter.length);
-            const testPemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length - 1);
+            const pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length - 1);
             if (!window.atob) {
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 console && console.error('`window.atob` is undefined');

@@ -39,14 +39,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = {
     RSA: {
         encrypt: function (secretKey, pem) { return __awaiter(void 0, void 0, void 0, function () {
-            var pemHeader, pemFooter, pemContents, testPemContents, binaryDerString, binaryDer, publicKey, encryptedKey;
+            var pemHeader, pemFooter, pemContents, binaryDerString, binaryDer, publicKey, encryptedKey;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         pemHeader = '-----BEGIN PUBLIC KEY-----';
                         pemFooter = '-----END PUBLIC KEY-----';
-                        pemContents = decodeURIComponent(pem).substring(pemHeader.length, pem.length - pemFooter.length);
-                        testPemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length - 1);
+                        pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length - 1);
                         if (!window.atob) {
                             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                             console && console.error('`window.atob` is undefined');
