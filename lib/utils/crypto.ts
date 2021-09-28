@@ -54,15 +54,18 @@ const crypto = {
             return arrBufferSecretKey;
         },
 
-        encrypt: async (data, key) => {
+        encrypt: async (data, rawKey) => {
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
-            console.log('🚀 ~ file: crypto.ts ~ line 56 ~ encrypt: ~ iv', iv);
+            const secretKey = await window.crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
+                'encrypt',
+                'decrypt',
+            ]);
             const ciphertext = await window.crypto.subtle.encrypt(
                 {
                     name: 'AES-GCM',
                     iv,
                 },
-                key,
+                secretKey,
                 data
             );
             const strIv = crypto.ab2str(iv);
@@ -85,6 +88,7 @@ const crypto = {
             );
             return data;
         },
+
         exportCryptoKey: async (key) => {
             const exported = await window.crypto.subtle.exportKey('raw', key);
             const exportedKeyBuffer = new Uint8Array(exported);
