@@ -205,8 +205,9 @@ function cryptoExtend() {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         currentData.forEach(function (v, i) {
                             if (typeof v !== 'undefined') {
+                                var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                currentData[i] = encryptOrDecryptFuc(v);
+                                currentData[i] = encryptOrDecryptFuc(v, secretKey);
                             }
                         });
                     }
@@ -214,8 +215,9 @@ function cryptoExtend() {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         var value = currentData[fieldName];
                         if (typeof value !== 'undefined') {
+                            var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            currentData[fieldName] = encryptOrDecryptFuc(value);
+                            currentData[fieldName] = encryptOrDecryptFuc(value, secretKey);
                         }
                     }
                     return { value: void 0 };
@@ -248,7 +250,7 @@ function cryptoExtend() {
             if (!filed || !data) {
                 return;
             }
-            var encryptOrDecryptFuc = type === 'encrypt' ? client_crypto_1.default.AES.encrypt : client_crypto_1.default.AES.decrypt;
+            var encryptOrDecryptFuc = type === 'encrypt' ? crypto_1.default.AES.encrypt : crypto_1.default.AES.decrypt;
             if (/\$\{index\}(\.|$)/.test(filed)) {
                 // 需要遍历数组加密
                 var fieldPaths = filed.split('.');
@@ -257,7 +259,8 @@ function cryptoExtend() {
             else {
                 var value = lodash_1.default.get(data, filed);
                 if (typeof value !== 'undefined') {
-                    value = encryptOrDecryptFuc(value);
+                    var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                    value = encryptOrDecryptFuc(value, secretKey);
                     lodash_1.default.set(data, filed, value);
                 }
             }

@@ -1,3 +1,6 @@
+import _ from 'lodash';
+import { Ajax } from '..';
+
 const crypto = {
     RSA: {
         encrypt: async (secretKey, pem) => {
@@ -51,8 +54,9 @@ const crypto = {
             return arrBufferSecretKey;
         },
 
-        encrypt: async (data, key?) => {
+        encrypt: async (data, key) => {
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            console.log('🚀 ~ file: crypto.ts ~ line 56 ~ encrypt: ~ iv', iv);
             const ciphertext = await window.crypto.subtle.encrypt(
                 {
                     name: 'AES-GCM',
@@ -61,15 +65,30 @@ const crypto = {
                 key,
                 data
             );
-            console.log('🚀 ~ file: crypto.ts ~ line 49 ~ encrypt: ~ ciphertext', ciphertext);
+            const strIv = crypto.ab2str(iv);
+            const strCiphertext = crypto.ab2str(ciphertext);
 
-            return ciphertext;
+            return `${strIv}${strCiphertext}`;
+        },
+        decrypt: async (ciphertext, key) => {
+            const strIv = ciphertext.slice(0, 12);
+            const strCiphertext = ciphertext.slice(12);
+            const iv = crypto.str2ab(strIv);
+            const newCiphertext = crypto.str2ab(strCiphertext);
+            const data = await window.crypto.subtle.decrypt(
+                {
+                    name: 'AES-GCM',
+                    iv: iv,
+                },
+                key,
+                newCiphertext
+            );
+            return data;
         },
         exportCryptoKey: async (key) => {
             const exported = await window.crypto.subtle.exportKey('raw', key);
             const exportedKeyBuffer = new Uint8Array(exported);
             return exportedKeyBuffer;
-            // return window.atob(exportedKeyBuffer);
         },
     },
 

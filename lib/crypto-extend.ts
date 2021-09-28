@@ -167,7 +167,7 @@ function cryptoExtend(): () => void {
             data: { [name: string]: any } | any[],
             fieldPaths: string[],
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            encryptOrDecryptFuc: (data: any) => any
+            encryptOrDecryptFuc: (data: any, key) => any
         ): void {
             let currentData = data;
             for (let index = 0; index < fieldPaths.length; index++) {
@@ -190,16 +190,18 @@ function cryptoExtend(): () => void {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (currentData as any[]).forEach((v, i) => {
                             if (typeof v !== 'undefined') {
+                                const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                (currentData as any[])[i] = encryptOrDecryptFuc(v);
+                                (currentData as any[])[i] = encryptOrDecryptFuc(v, secretKey);
                             }
                         });
                     } else {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const value = (currentData as { [name: string]: any })[fieldName];
                         if (typeof value !== 'undefined') {
+                            const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            (currentData as { [name: string]: any })[fieldName] = encryptOrDecryptFuc(value);
+                            (currentData as { [name: string]: any })[fieldName] = encryptOrDecryptFuc(value, secretKey);
                         }
                     }
                     return;
@@ -228,7 +230,7 @@ function cryptoExtend(): () => void {
             if (!filed || !data) {
                 return;
             }
-            const encryptOrDecryptFuc = type === 'encrypt' ? Crypto.AES.encrypt : Crypto.AES.decrypt;
+            const encryptOrDecryptFuc = type === 'encrypt' ? newCrypto.AES.encrypt : newCrypto.AES.decrypt;
             if (/\$\{index\}(\.|$)/.test(filed)) {
                 // 需要遍历数组加密
                 const fieldPaths = filed.split('.');
@@ -236,7 +238,8 @@ function cryptoExtend(): () => void {
             } else {
                 let value = _.get(data, filed);
                 if (typeof value !== 'undefined') {
-                    value = encryptOrDecryptFuc(value);
+                    const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
+                    value = encryptOrDecryptFuc(value, secretKey);
                     _.set(data, filed, value);
                 }
             }
