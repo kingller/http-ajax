@@ -50,13 +50,14 @@ const crypto = {
                 ['encrypt', 'decrypt']
             );
             const arrBufferSecretKey = await crypto.AES.exportCryptoKey(key);
-
-            return arrBufferSecretKey;
+            const SecretKeyStr = crypto.ab2str(arrBufferSecretKey);
+            return SecretKeyStr;
         },
 
         encrypt: async (data, rawKey) => {
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
-            const secretKey = await window.crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
+            const arrBufferKey = crypto.str2ab(rawKey);
+            const secretKey = await window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                 'encrypt',
                 'decrypt',
             ]);

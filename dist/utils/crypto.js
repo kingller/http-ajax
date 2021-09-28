@@ -71,7 +71,7 @@ var crypto = {
     },
     AES: {
         createKey: function () { return __awaiter(void 0, void 0, void 0, function () {
-            var key, arrBufferSecretKey;
+            var key, arrBufferSecretKey, SecretKeyStr;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, window.crypto.subtle.generateKey({
@@ -83,17 +83,19 @@ var crypto = {
                         return [4 /*yield*/, crypto.AES.exportCryptoKey(key)];
                     case 2:
                         arrBufferSecretKey = _a.sent();
-                        return [2 /*return*/, arrBufferSecretKey];
+                        SecretKeyStr = crypto.ab2str(arrBufferSecretKey);
+                        return [2 /*return*/, SecretKeyStr];
                 }
             });
         }); },
         encrypt: function (data, rawKey) { return __awaiter(void 0, void 0, void 0, function () {
-            var iv, secretKey, enc, newData, ciphertext, strIv, strCiphertext;
+            var iv, arrBufferKey, secretKey, enc, newData, ciphertext, strIv, strCiphertext;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         iv = window.crypto.getRandomValues(new Uint8Array(12));
-                        return [4 /*yield*/, window.crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
+                        arrBufferKey = crypto.str2ab(rawKey);
+                        return [4 /*yield*/, window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                                 'encrypt',
                                 'decrypt',
                             ])];
