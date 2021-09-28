@@ -91,7 +91,20 @@ var crypto = {
                             }, key, data)];
                     case 1:
                         ciphertext = _a.sent();
+                        console.log('🚀 ~ file: crypto.ts ~ line 49 ~ encrypt: ~ ciphertext', ciphertext);
                         return [2 /*return*/, ciphertext];
+                }
+            });
+        }); },
+        exportCryptoKey: function (key) { return __awaiter(void 0, void 0, void 0, function () {
+            var exported, exportedKeyBuffer;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, window.crypto.subtle.exportKey('raw', key)];
+                    case 1:
+                        exported = _a.sent();
+                        exportedKeyBuffer = new Uint8Array(exported);
+                        return [2 /*return*/, exportedKeyBuffer];
                 }
             });
         }); },
@@ -103,6 +116,9 @@ var crypto = {
             bufView[i] = str.charCodeAt(i);
         }
         return buf;
+    },
+    ab2str: function (buf) {
+        return String.fromCharCode.apply(null, new Uint8Array(buf));
     },
 };
 exports.default = crypto;

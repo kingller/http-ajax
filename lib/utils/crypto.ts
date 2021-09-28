@@ -50,8 +50,15 @@ const crypto = {
                 key,
                 data
             );
-            return ciphertext;
             console.log('🚀 ~ file: crypto.ts ~ line 49 ~ encrypt: ~ ciphertext', ciphertext);
+
+            return ciphertext;
+        },
+        exportCryptoKey: async (key) => {
+            const exported = await window.crypto.subtle.exportKey('raw', key);
+            const exportedKeyBuffer = new Uint8Array(exported);
+            return exportedKeyBuffer;
+            // return window.atob(exportedKeyBuffer);
         },
     },
 
@@ -62,6 +69,9 @@ const crypto = {
             bufView[i] = str.charCodeAt(i);
         }
         return buf;
+    },
+    ab2str: (buf) => {
+        return String.fromCharCode.apply(null, new Uint8Array(buf));
     },
 };
 

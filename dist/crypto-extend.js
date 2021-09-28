@@ -61,12 +61,12 @@ var waitingPublicKeyPromise = [];
  * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密。
  */
 function cryptoExtend() {
-    (function () {
-        var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
-        if (secretKey) {
-            client_crypto_1.default.AES.setKey(window.atob(secretKey));
-        }
-    })();
+    // (function (): void {
+    //     const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
+    //     if (secretKey) {
+    //         Crypto.AES.setKey(window.atob(secretKey));
+    //     }
+    // })();
     return function crypto() {
         var _this = this;
         var _a = this, beforeSend = _a.beforeSend, processData = _a.processData, processResponse = _a.processResponse, processErrorResponse = _a.processErrorResponse, clear = _a.clear;
@@ -112,17 +112,14 @@ function cryptoExtend() {
         function sendSecretKeyRequest() {
             var _this = this;
             return getPublicKey.apply(this).then(function (publicKeyResponse) { return __awaiter(_this, void 0, void 0, function () {
-                var newSecretKey, key, encryptedSecretKey, newEncryptedSecretKey;
+                var key, newEncryptedSecretKey;
                 var _this = this;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
-                        case 0:
-                            newSecretKey = client_crypto_1.default.AES.createKey();
-                            return [4 /*yield*/, crypto_1.default.AES.createKey()];
+                        case 0: return [4 /*yield*/, crypto_1.default.AES.createKey()];
                         case 1:
                             key = _a.sent();
                             console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
-                            encryptedSecretKey = client_crypto_1.default.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
                             return [4 /*yield*/, crypto_1.default.RSA.encrypt(key, publicKeyResponse.publicKey)];
                         case 2:
                             newEncryptedSecretKey = _a.sent();
@@ -130,23 +127,30 @@ function cryptoExtend() {
                             // 将加密后的秘钥传输给服务器端
                             secretKeyPromise = new Promise(function (resolve, reject) {
                                 _this
-                                    .post('/encryption/token', { token: encryptedSecretKey, token2: newEncryptedSecretKey }, {
+                                    .post('/encryption/token', { token: newEncryptedSecretKey }, {
                                     headers: {
                                         uuid: publicKeyResponse.uuid,
                                     },
                                 })
                                     .then(function () {
-                                    if (!window.btoa) {
-                                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                                        console && console.error('`window.btoa` is undefined');
-                                    }
-                                    storage_1.default.setItem(enums_1.STORAGE_KEY.SECRET_KEY, window.btoa(newSecretKey), 'session');
-                                    storage_1.default.setItem(enums_1.STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
-                                    waitingPublicKeyPromise.forEach(function (p) {
-                                        p.resolve();
+                                    return __awaiter(this, void 0, void 0, function () {
+                                        var KeyBuffer;
+                                        return __generator(this, function (_a) {
+                                            switch (_a.label) {
+                                                case 0: return [4 /*yield*/, crypto_1.default.AES.exportCryptoKey(key)];
+                                                case 1:
+                                                    KeyBuffer = _a.sent();
+                                                    storage_1.default.setItem(enums_1.STORAGE_KEY.SECRET_KEY, KeyBuffer, 'session');
+                                                    storage_1.default.setItem(enums_1.STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
+                                                    waitingPublicKeyPromise.forEach(function (p) {
+                                                        p.resolve();
+                                                    });
+                                                    waitingPublicKeyPromise = [];
+                                                    resolve();
+                                                    return [2 /*return*/];
+                                            }
+                                        });
                                     });
-                                    waitingPublicKeyPromise = [];
-                                    resolve();
                                 })
                                     .catch(function (e) {
                                     waitingPublicKeyPromise.forEach(function (p) {

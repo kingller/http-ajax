@@ -39,12 +39,12 @@ let waitingPublicKeyPromise: { resolve: () => void; reject: (e?: any) => void }[
  * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密。
  */
 function cryptoExtend(): () => void {
-    (function (): void {
-        const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
-        if (secretKey) {
-            Crypto.AES.setKey(window.atob(secretKey));
-        }
-    })();
+    // (function (): void {
+    //     const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
+    //     if (secretKey) {
+    //         Crypto.AES.setKey(window.atob(secretKey));
+    //     }
+    // })();
 
     return function crypto(): void {
         const { beforeSend, processData, processResponse, processErrorResponse, clear } = this as IAjax;
@@ -95,11 +95,11 @@ function cryptoExtend(): () => void {
         function sendSecretKeyRequest(): Promise<void> {
             return getPublicKey.apply(this).then(async (publicKeyResponse: IPublicKeyResponse) => {
                 // 生成AES秘钥
-                const newSecretKey = Crypto.AES.createKey();
+                // const newSecretKey = Crypto.AES.createKey();
                 const key = await newCrypto.AES.createKey();
                 console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
                 // 使用RSA公钥加密秘钥
-                const encryptedSecretKey = Crypto.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
+                // const encryptedSecretKey = Crypto.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
                 const newEncryptedSecretKey = await newCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
                 console.log(
                     '🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey',
@@ -111,19 +111,16 @@ function cryptoExtend(): () => void {
                     (this as IAjax)
                         .post(
                             '/encryption/token',
-                            { token: encryptedSecretKey, token2: newEncryptedSecretKey },
+                            { token: newEncryptedSecretKey },
                             {
                                 headers: {
                                     uuid: publicKeyResponse.uuid,
                                 },
                             }
                         )
-                        .then(function () {
-                            if (!window.btoa) {
-                                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                                console && console.error('`window.btoa` is undefined');
-                            }
-                            storage.setItem(STORAGE_KEY.SECRET_KEY, window.btoa(newSecretKey), 'session');
+                        .then(async function () {
+                            const KeyBuffer = await newCrypto.AES.exportCryptoKey(key);
+                            storage.setItem(STORAGE_KEY.SECRET_KEY, KeyBuffer, 'session');
                             storage.setItem(STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
                             waitingPublicKeyPromise.forEach(function (p) {
                                 p.resolve();
