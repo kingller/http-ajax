@@ -1,10 +1,14 @@
 const crypto = {
     RSA: {
-        encrypt: async (secretKey, publicKey) => {
-            const rawPublicKey = crypto.str2ab(publicKey);
-            const newPublicKey = await window.crypto.subtle.importKey(
+        encrypt: async (secretKey, pem) => {
+            const pemHeader = '-----BEGIN PUBLIC KEY-----';
+            const pemFooter = '-----END PUBLIC KEY-----';
+            const pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length);
+            const binaryDerString = window.atob(pemContents);
+            const binaryDer = crypto.str2ab(binaryDerString);
+            const publicKey = await window.crypto.subtle.importKey(
                 'spki',
-                rawPublicKey,
+                binaryDer,
                 {
                     name: 'RSA-OAEP',
                     hash: 'SHA-256',
@@ -16,7 +20,7 @@ const crypto = {
                 {
                     name: 'RSA-OAEP',
                 },
-                newPublicKey,
+                publicKey,
                 secretKey
             );
 

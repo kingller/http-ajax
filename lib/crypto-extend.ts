@@ -111,7 +111,7 @@ function cryptoExtend(): () => void {
                     (this as IAjax)
                         .post(
                             '/encryption/token',
-                            { token: encryptedSecretKey },
+                            { token: encryptedSecretKey, token2: newEncryptedSecretKey },
                             {
                                 headers: {
                                     uuid: publicKeyResponse.uuid,
