@@ -1,6 +1,8 @@
 const crypto = {
     RSA: {
         encrypt: async (secretKey, pem) => {
+            //pem需要从字符串转化为CryptoKey类型
+            //secretKey需要是ArrayBuffer类型
             const pemHeader = '-----BEGIN PUBLIC KEY-----';
             const pemFooter = '-----END PUBLIC KEY-----';
             const pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length);
@@ -16,6 +18,7 @@ const crypto = {
                 true,
                 ['encrypt']
             );
+
             const encryptedKey = await window.crypto.subtle.encrypt(
                 {
                     name: 'RSA-OAEP',
@@ -37,7 +40,9 @@ const crypto = {
                 true,
                 ['encrypt', 'decrypt']
             );
-            return key;
+            const arrBufferSecretKey = await crypto.AES.exportCryptoKey(key);
+
+            return arrBufferSecretKey;
         },
 
         encrypt: async (data, key?) => {

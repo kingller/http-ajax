@@ -3,7 +3,7 @@ declare const crypto: {
         encrypt: (secretKey: any, pem: any) => Promise<ArrayBuffer>;
     };
     AES: {
-        createKey: () => Promise<CryptoKey>;
+        createKey: () => Promise<Uint8Array>;
         encrypt: (data: any, key?: any) => Promise<ArrayBuffer>;
         exportCryptoKey: (key: any) => Promise<Uint8Array>;
     };

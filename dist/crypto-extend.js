@@ -134,21 +134,15 @@ function cryptoExtend() {
                                 })
                                     .then(function () {
                                     return __awaiter(this, void 0, void 0, function () {
-                                        var KeyBuffer;
                                         return __generator(this, function (_a) {
-                                            switch (_a.label) {
-                                                case 0: return [4 /*yield*/, crypto_1.default.AES.exportCryptoKey(key)];
-                                                case 1:
-                                                    KeyBuffer = _a.sent();
-                                                    storage_1.default.setItem(enums_1.STORAGE_KEY.SECRET_KEY, KeyBuffer, 'session');
-                                                    storage_1.default.setItem(enums_1.STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
-                                                    waitingPublicKeyPromise.forEach(function (p) {
-                                                        p.resolve();
-                                                    });
-                                                    waitingPublicKeyPromise = [];
-                                                    resolve();
-                                                    return [2 /*return*/];
-                                            }
+                                            storage_1.default.setItem(enums_1.STORAGE_KEY.SECRET_KEY, key, 'session');
+                                            storage_1.default.setItem(enums_1.STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
+                                            waitingPublicKeyPromise.forEach(function (p) {
+                                                p.resolve();
+                                            });
+                                            waitingPublicKeyPromise = [];
+                                            resolve();
+                                            return [2 /*return*/];
                                         });
                                     });
                                 })

@@ -66,7 +66,7 @@ var crypto = {
     },
     AES: {
         createKey: function () { return __awaiter(void 0, void 0, void 0, function () {
-            var key;
+            var key, arrBufferSecretKey;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, window.crypto.subtle.generateKey({
@@ -75,7 +75,10 @@ var crypto = {
                         }, true, ['encrypt', 'decrypt'])];
                     case 1:
                         key = _a.sent();
-                        return [2 /*return*/, key];
+                        return [4 /*yield*/, crypto.AES.exportCryptoKey(key)];
+                    case 2:
+                        arrBufferSecretKey = _a.sent();
+                        return [2 /*return*/, arrBufferSecretKey];
                 }
             });
         }); },
