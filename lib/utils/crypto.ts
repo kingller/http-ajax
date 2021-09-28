@@ -3,9 +3,15 @@ const crypto = {
         encrypt: async (secretKey, pem) => {
             //pem需要从字符串转化为CryptoKey类型
             //secretKey需要是ArrayBuffer类型
+
             const pemHeader = '-----BEGIN PUBLIC KEY-----';
             const pemFooter = '-----END PUBLIC KEY-----';
-            const pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length);
+            const pemContents = decodeURIComponent(pem).substring(pemHeader.length, pem.length - pemFooter.length);
+            const testPemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length - 1);
+            if (!window.atob) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                console && console.error('`window.atob` is undefined');
+            }
             const binaryDerString = window.atob(pemContents);
             const binaryDer = crypto.str2ab(binaryDerString);
             const publicKey = await window.crypto.subtle.importKey(
