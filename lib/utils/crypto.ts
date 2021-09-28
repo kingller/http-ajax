@@ -32,7 +32,8 @@ const crypto = {
                 secretKey
             );
 
-            return encryptedKey;
+            const strEncryptedKey = crypto.ab2str(encryptedKey);
+            return strEncryptedKey;
         },
     },
     AES: {

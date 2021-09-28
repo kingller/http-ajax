@@ -1,6 +1,6 @@
 declare const crypto: {
     RSA: {
-        encrypt: (secretKey: any, pem: any) => Promise<ArrayBuffer>;
+        encrypt: (secretKey: any, pem: any) => Promise<any>;
     };
     AES: {
         createKey: () => Promise<Uint8Array>;

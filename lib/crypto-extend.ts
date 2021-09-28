@@ -105,6 +105,7 @@ function cryptoExtend(): () => void {
                         '🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey',
                         newEncryptedSecretKey
                     );
+
                     (this as IAjax)
                         .post(
                             '/encryption/token',

@@ -39,7 +39,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = {
     RSA: {
         encrypt: function (secretKey, pem) { return __awaiter(void 0, void 0, void 0, function () {
-            var pemHeader, pemFooter, pemContents, binaryDerString, binaryDer, publicKey, encryptedKey;
+            var pemHeader, pemFooter, pemContents, binaryDerString, binaryDer, publicKey, encryptedKey, strEncryptedKey;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -63,7 +63,8 @@ var crypto = {
                             }, publicKey, secretKey)];
                     case 2:
                         encryptedKey = _a.sent();
-                        return [2 /*return*/, encryptedKey];
+                        strEncryptedKey = crypto.ab2str(encryptedKey);
+                        return [2 /*return*/, strEncryptedKey];
                 }
             });
         }); },
