@@ -1,6 +1,6 @@
 declare const crypto: {
     RSA: {
-        encrypt: (secretKey: any, pem: any) => Promise<any>;
+        encrypt: (secretKeyStr: any, pem: any) => Promise<any>;
     };
     AES: {
         createKey: () => Promise<any>;

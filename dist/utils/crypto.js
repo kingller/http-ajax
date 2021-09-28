@@ -38,11 +38,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = {
     RSA: {
-        encrypt: function (secretKey, pem) { return __awaiter(void 0, void 0, void 0, function () {
-            var pemHeader, pemFooter, pemContents, binaryDerString, binaryDer, publicKey, encryptedKey, strEncryptedKey;
+        encrypt: function (secretKeyStr, pem) { return __awaiter(void 0, void 0, void 0, function () {
+            var secretKey, pemHeader, pemFooter, pemContents, binaryDerString, binaryDer, publicKey, encryptedKey, strEncryptedKey;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        secretKey = crypto.str2ab(secretKeyStr);
                         pemHeader = '-----BEGIN PUBLIC KEY-----';
                         pemFooter = '-----END PUBLIC KEY-----';
                         pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length - 1);
@@ -71,7 +72,7 @@ var crypto = {
     },
     AES: {
         createKey: function () { return __awaiter(void 0, void 0, void 0, function () {
-            var key, arrBufferSecretKey, SecretKeyStr;
+            var key, arrBufferSecretKey, secretKeyStr;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, window.crypto.subtle.generateKey({
@@ -83,8 +84,8 @@ var crypto = {
                         return [4 /*yield*/, crypto.AES.exportCryptoKey(key)];
                     case 2:
                         arrBufferSecretKey = _a.sent();
-                        SecretKeyStr = crypto.ab2str(arrBufferSecretKey);
-                        return [2 /*return*/, SecretKeyStr];
+                        secretKeyStr = crypto.ab2str(arrBufferSecretKey);
+                        return [2 /*return*/, secretKeyStr];
                 }
             });
         }); },
