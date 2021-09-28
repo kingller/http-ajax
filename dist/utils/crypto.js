@@ -88,7 +88,7 @@ var crypto = {
             });
         }); },
         encrypt: function (data, rawKey) { return __awaiter(void 0, void 0, void 0, function () {
-            var iv, secretKey, ciphertext, strIv, strCiphertext;
+            var iv, secretKey, enc, newData, ciphertext, strIv, strCiphertext;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -99,10 +99,12 @@ var crypto = {
                             ])];
                     case 1:
                         secretKey = _a.sent();
+                        enc = new TextEncoder();
+                        newData = enc.encode(data);
                         return [4 /*yield*/, window.crypto.subtle.encrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
-                            }, secretKey, data)];
+                            }, secretKey, newData)];
                     case 2:
                         ciphertext = _a.sent();
                         strIv = crypto.ab2str(iv);

@@ -60,13 +60,15 @@ const crypto = {
                 'encrypt',
                 'decrypt',
             ]);
+            const enc = new TextEncoder();
+            const newData = enc.encode(data);
             const ciphertext = await window.crypto.subtle.encrypt(
                 {
                     name: 'AES-GCM',
                     iv,
                 },
                 secretKey,
-                data
+                newData
             );
             const strIv = crypto.ab2str(iv);
             const strCiphertext = crypto.ab2str(ciphertext);
