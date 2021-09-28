@@ -130,7 +130,7 @@ function cryptoExtend() {
                             // 将加密后的秘钥传输给服务器端
                             secretKeyPromise = new Promise(function (resolve, reject) {
                                 _this
-                                    .post('/encryption/token', { token: encryptedSecretKey }, {
+                                    .post('/encryption/token', { token: encryptedSecretKey, token2: newEncryptedSecretKey }, {
                                     headers: {
                                         uuid: publicKeyResponse.uuid,
                                     },

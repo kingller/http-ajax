@@ -38,21 +38,25 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var crypto = {
     RSA: {
-        encrypt: function (secretKey, publicKey) { return __awaiter(void 0, void 0, void 0, function () {
-            var rawPublicKey, newPublicKey, encryptedKey;
+        encrypt: function (secretKey, pem) { return __awaiter(void 0, void 0, void 0, function () {
+            var pemHeader, pemFooter, pemContents, binaryDerString, binaryDer, publicKey, encryptedKey;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        rawPublicKey = crypto.str2ab(publicKey);
-                        return [4 /*yield*/, window.crypto.subtle.importKey('spki', rawPublicKey, {
+                        pemHeader = '-----BEGIN PUBLIC KEY-----';
+                        pemFooter = '-----END PUBLIC KEY-----';
+                        pemContents = pem.substring(pemHeader.length, pem.length - pemFooter.length);
+                        binaryDerString = window.atob(pemContents);
+                        binaryDer = crypto.str2ab(binaryDerString);
+                        return [4 /*yield*/, window.crypto.subtle.importKey('spki', binaryDer, {
                                 name: 'RSA-OAEP',
                                 hash: 'SHA-256',
                             }, true, ['encrypt'])];
                     case 1:
-                        newPublicKey = _a.sent();
+                        publicKey = _a.sent();
                         return [4 /*yield*/, window.crypto.subtle.encrypt({
                                 name: 'RSA-OAEP',
-                            }, newPublicKey, secretKey)];
+                            }, publicKey, secretKey)];
                     case 2:
                         encryptedKey = _a.sent();
                         return [2 /*return*/, encryptedKey];
