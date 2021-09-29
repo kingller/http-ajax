@@ -446,7 +446,7 @@ function cryptoExtend() {
                                 options: options,
                             });
                         }
-                        return [2 /*return*/, params];
+                        return [2 /*return*/, Promise.resolve(params)];
                 }
             });
         }); };

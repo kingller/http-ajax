@@ -283,10 +283,10 @@ class AjaxBase {
                 params = this.stringifyParams(params, method, options);
             }
         }
-        return {
+        return Promise.resolve({
             url,
             params,
-        };
+        });
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -839,7 +839,7 @@ class AjaxBase {
             processData?: (
                 params: Ajax.IParams,
                 props: { method: Ajax.IMethod; url: string; options: Ajax.IOptions }
-            ) => Ajax.IParams;
+            ) => Promise<Ajax.IParams>;
             /** 请求结束 */
             responseEnd?: (xhr?: XMLHttpRequest, _opts?: Ajax.IRequestOptions, props?: { success: boolean }) => void;
             /** 捕获错误 */

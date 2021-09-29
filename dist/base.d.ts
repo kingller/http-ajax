@@ -178,7 +178,7 @@ declare class AjaxBase {
             method: Ajax.IMethod;
             url: string;
             options: Ajax.IOptions;
-        }) => Ajax.IParams;
+        }) => Promise<Ajax.IParams>;
         /** 请求结束 */
         responseEnd?: (xhr?: XMLHttpRequest, _opts?: Ajax.IRequestOptions, props?: {
             success: boolean;

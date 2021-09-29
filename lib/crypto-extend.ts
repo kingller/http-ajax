@@ -339,7 +339,7 @@ function cryptoExtend(): () => void {
                     options,
                 });
             }
-            return params;
+            return Promise.resolve(params);
         };
 
         (this as IAjax).processResponse = (response: IResult | null, props: IProcessResponseOptions): IResult => {
