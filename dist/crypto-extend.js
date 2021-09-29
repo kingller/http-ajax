@@ -247,23 +247,35 @@ function cryptoExtend() {
         function encryptOrDecryptDataField(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data, filed, type) {
-            if (!filed || !data) {
-                return;
-            }
-            var encryptOrDecryptFuc = type === 'encrypt' ? crypto_1.default.AES.encrypt : crypto_1.default.AES.decrypt;
-            if (/\$\{index\}(\.|$)/.test(filed)) {
-                // 需要遍历数组加密
-                var fieldPaths = filed.split('.');
-                encryptOrDecryptDataArrayField(data, fieldPaths, encryptOrDecryptFuc);
-            }
-            else {
-                var value = lodash_1.default.get(data, filed);
-                if (typeof value !== 'undefined') {
-                    var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
-                    value = encryptOrDecryptFuc(value, secretKey);
-                    lodash_1.default.set(data, filed, value);
-                }
-            }
+            return __awaiter(this, void 0, void 0, function () {
+                var encryptOrDecryptFuc, fieldPaths, value, secretKey;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            if (!filed || !data) {
+                                return [2 /*return*/];
+                            }
+                            encryptOrDecryptFuc = type === 'encrypt' ? crypto_1.default.AES.encrypt : crypto_1.default.AES.decrypt;
+                            if (!/\$\{index\}(\.|$)/.test(filed)) return [3 /*break*/, 1];
+                            fieldPaths = filed.split('.');
+                            encryptOrDecryptDataArrayField(data, fieldPaths, encryptOrDecryptFuc);
+                            return [3 /*break*/, 3];
+                        case 1:
+                            value = lodash_1.default.get(data, filed);
+                            if (!(typeof value !== 'undefined')) return [3 /*break*/, 3];
+                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                            return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
+                        case 2:
+                            // encryptOrDecryptFuc(value, secretKey).then((value) => {
+                            //     _.set(data, filed, value);
+                            // });
+                            value = _a.sent();
+                            lodash_1.default.set(data, filed, value);
+                            _a.label = 3;
+                        case 3: return [2 /*return*/];
+                    }
+                });
+            });
         }
         /** 字段加密 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

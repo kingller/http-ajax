@@ -221,12 +221,12 @@ function cryptoExtend(): () => void {
             }
         }
 
-        function encryptOrDecryptDataField(
+        async function encryptOrDecryptDataField(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data: { [name: string]: any } | any[],
             filed: string,
             type: 'encrypt' | 'decrypt'
-        ): void {
+        ) {
             if (!filed || !data) {
                 return;
             }
@@ -239,7 +239,10 @@ function cryptoExtend(): () => void {
                 let value = _.get(data, filed);
                 if (typeof value !== 'undefined') {
                     const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
-                    value = encryptOrDecryptFuc(value, secretKey);
+                    // encryptOrDecryptFuc(value, secretKey).then((value) => {
+                    //     _.set(data, filed, value);
+                    // });
+                    value = await encryptOrDecryptFuc(value, secretKey);
                     _.set(data, filed, value);
                 }
             }
