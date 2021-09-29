@@ -251,14 +251,14 @@ function cryptoExtend(): () => void {
 
         /** 字段加密 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        function encryptDataField(data: { [name: string]: any }, filed: string): void {
-            encryptOrDecryptDataField(data, filed, 'encrypt');
+        async function encryptDataField(data: { [name: string]: any }, filed: string) {
+            await encryptOrDecryptDataField(data, filed, 'encrypt');
         }
 
         /** 字段解密 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        function decryptDataField(data: { [name: string]: any } | any[], filed: string): void {
-            encryptOrDecryptDataField(data, filed, 'decrypt');
+        async function decryptDataField(data: { [name: string]: any } | any[], filed: string) {
+            await encryptOrDecryptDataField(data, filed, 'decrypt');
         }
 
         function clearCrypto(): void {
@@ -326,9 +326,9 @@ function cryptoExtend(): () => void {
                         return params;
                     }
                     if (Array.isArray(options.encrypt)) {
-                        options.encrypt.forEach((field) => {
+                        options.encrypt.forEach(async (field) => {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            encryptDataField(params as { [name: string]: any }, field);
+                            await encryptDataField(params as { [name: string]: any }, field);
                         });
                     }
                 }
@@ -378,8 +378,8 @@ function cryptoExtend(): () => void {
                             return response;
                         }
                         if (Array.isArray(decrypt)) {
-                            decrypt.forEach((field) => {
-                                decryptDataField(data, field);
+                            decrypt.forEach(async (field) => {
+                                await decryptDataField(data, field);
                             });
                         }
                     }

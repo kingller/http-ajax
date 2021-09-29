@@ -316,12 +316,30 @@ function cryptoExtend() {
         /** 字段加密 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         function encryptDataField(data, filed) {
-            encryptOrDecryptDataField(data, filed, 'encrypt');
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, encryptOrDecryptDataField(data, filed, 'encrypt')];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            });
         }
         /** 字段解密 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         function decryptDataField(data, filed) {
-            encryptOrDecryptDataField(data, filed, 'decrypt');
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, encryptOrDecryptDataField(data, filed, 'decrypt')];
+                        case 1:
+                            _a.sent();
+                            return [2 /*return*/];
+                    }
+                });
+            });
         }
         function clearCrypto() {
             storage_1.default.removeItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
@@ -386,10 +404,19 @@ function cryptoExtend() {
                         return params;
                     }
                     if (Array.isArray(options.encrypt)) {
-                        options.encrypt.forEach(function (field) {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            encryptDataField(params, field);
-                        });
+                        options.encrypt.forEach(function (field) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: 
+                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                    return [4 /*yield*/, encryptDataField(params, field)];
+                                    case 1:
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        _a.sent();
+                                        return [2 /*return*/];
+                                }
+                            });
+                        }); });
                     }
                 }
             }
@@ -439,9 +466,16 @@ function cryptoExtend() {
                             return response;
                         }
                         if (Array.isArray(decrypt)) {
-                            decrypt.forEach(function (field) {
-                                decryptDataField(data_1, field);
-                            });
+                            decrypt.forEach(function (field) { return __awaiter(_this, void 0, void 0, function () {
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0: return [4 /*yield*/, decryptDataField(data_1, field)];
+                                        case 1:
+                                            _a.sent();
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            }); });
                         }
                     }
                     response = response_data_1.setResponseData({ response: response, data: data_1, statusField: statusField });
