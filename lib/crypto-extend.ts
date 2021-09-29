@@ -162,13 +162,13 @@ function cryptoExtend(): () => void {
             return Promise.resolve();
         }
 
-        function encryptOrDecryptDataArrayField(
+        async function encryptOrDecryptDataArrayField(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             data: { [name: string]: any } | any[],
             fieldPaths: string[],
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             encryptOrDecryptFuc: (data: any, key) => any
-        ): void {
+        ) {
             let currentData = data;
             for (let index = 0; index < fieldPaths.length; index++) {
                 if (!currentData || typeof currentData !== 'object') {
@@ -188,11 +188,11 @@ function cryptoExtend(): () => void {
                     // eslint-disable-next-line no-template-curly-in-string
                     if (fieldName === '${index}') {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (currentData as any[]).forEach((v, i) => {
+                        (currentData as any[]).forEach(async (v, i) => {
                             if (typeof v !== 'undefined') {
                                 const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                (currentData as any[])[i] = encryptOrDecryptFuc(v, secretKey);
+                                (currentData as any[])[i] = await encryptOrDecryptFuc(v, secretKey);
                             }
                         });
                     } else {
@@ -201,7 +201,10 @@ function cryptoExtend(): () => void {
                         if (typeof value !== 'undefined') {
                             const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            (currentData as { [name: string]: any })[fieldName] = encryptOrDecryptFuc(value, secretKey);
+                            (currentData as { [name: string]: any })[fieldName] = await encryptOrDecryptFuc(
+                                value,
+                                secretKey
+                            );
                         }
                     }
                     return;
@@ -239,9 +242,7 @@ function cryptoExtend(): () => void {
                 let value = _.get(data, filed);
                 if (typeof value !== 'undefined') {
                     const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
-                    // encryptOrDecryptFuc(value, secretKey).then((value) => {
-                    //     _.set(data, filed, value);
-                    // });
+
                     value = await encryptOrDecryptFuc(value, secretKey);
                     _.set(data, filed, value);
                 }

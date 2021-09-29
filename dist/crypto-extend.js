@@ -184,65 +184,104 @@ function cryptoExtend() {
         data, fieldPaths, 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         encryptOrDecryptFuc) {
-            var currentData = data;
-            var _loop_1 = function (index) {
-                if (!currentData || typeof currentData !== 'object') {
-                    return "break";
-                }
-                var fieldName = fieldPaths[index];
-                if (!fieldName) {
-                    return "continue";
-                }
-                // eslint-disable-next-line no-template-curly-in-string
-                if (fieldName === '${index}') {
-                    if (!array_1.isArray(currentData)) {
-                        return "break";
+            return __awaiter(this, void 0, void 0, function () {
+                var currentData, _loop_1, index, state_1;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            currentData = data;
+                            _loop_1 = function (index) {
+                                var fieldName, value, secretKey, _a, _b, restFieldPaths_1;
+                                return __generator(this, function (_c) {
+                                    switch (_c.label) {
+                                        case 0:
+                                            if (!currentData || typeof currentData !== 'object') {
+                                                return [2 /*return*/, "break"];
+                                            }
+                                            fieldName = fieldPaths[index];
+                                            if (!fieldName) {
+                                                return [2 /*return*/, "continue"];
+                                            }
+                                            // eslint-disable-next-line no-template-curly-in-string
+                                            if (fieldName === '${index}') {
+                                                if (!array_1.isArray(currentData)) {
+                                                    return [2 /*return*/, "break"];
+                                                }
+                                            }
+                                            if (!(index === fieldPaths.length - 1)) return [3 /*break*/, 4];
+                                            if (!(fieldName === '${index}')) return [3 /*break*/, 1];
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                            currentData.forEach(function (v, i) { return __awaiter(_this, void 0, void 0, function () {
+                                                var secretKey, _a, _b;
+                                                return __generator(this, function (_c) {
+                                                    switch (_c.label) {
+                                                        case 0:
+                                                            if (!(typeof v !== 'undefined')) return [3 /*break*/, 2];
+                                                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                            _a = currentData;
+                                                            _b = i;
+                                                            return [4 /*yield*/, encryptOrDecryptFuc(v, secretKey)];
+                                                        case 1:
+                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                            _a[_b] = _c.sent();
+                                                            _c.label = 2;
+                                                        case 2: return [2 /*return*/];
+                                                    }
+                                                });
+                                            }); });
+                                            return [3 /*break*/, 3];
+                                        case 1:
+                                            value = currentData[fieldName];
+                                            if (!(typeof value !== 'undefined')) return [3 /*break*/, 3];
+                                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                            _a = currentData;
+                                            _b = fieldName;
+                                            return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
+                                        case 2:
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                            _a[_b] = _c.sent();
+                                            _c.label = 3;
+                                        case 3: return [2 /*return*/, { value: void 0 }];
+                                        case 4:
+                                            // eslint-disable-next-line no-template-curly-in-string
+                                            if (fieldName === '${index}') {
+                                                restFieldPaths_1 = fieldPaths.slice(index + 1);
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                currentData.forEach(function (d) {
+                                                    encryptOrDecryptDataArrayField(d, restFieldPaths_1, encryptOrDecryptFuc);
+                                                });
+                                                return [2 /*return*/, "break"];
+                                            }
+                                            else {
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                currentData = currentData[fieldName];
+                                            }
+                                            return [2 /*return*/];
+                                    }
+                                });
+                            };
+                            index = 0;
+                            _a.label = 1;
+                        case 1:
+                            if (!(index < fieldPaths.length)) return [3 /*break*/, 4];
+                            return [5 /*yield**/, _loop_1(index)];
+                        case 2:
+                            state_1 = _a.sent();
+                            if (typeof state_1 === "object")
+                                return [2 /*return*/, state_1.value];
+                            if (state_1 === "break")
+                                return [3 /*break*/, 4];
+                            _a.label = 3;
+                        case 3:
+                            index++;
+                            return [3 /*break*/, 1];
+                        case 4: return [2 /*return*/];
                     }
-                }
-                if (index === fieldPaths.length - 1) {
-                    // eslint-disable-next-line no-template-curly-in-string
-                    if (fieldName === '${index}') {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        currentData.forEach(function (v, i) {
-                            if (typeof v !== 'undefined') {
-                                var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                currentData[i] = encryptOrDecryptFuc(v, secretKey);
-                            }
-                        });
-                    }
-                    else {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        var value = currentData[fieldName];
-                        if (typeof value !== 'undefined') {
-                            var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            currentData[fieldName] = encryptOrDecryptFuc(value, secretKey);
-                        }
-                    }
-                    return { value: void 0 };
-                }
-                // eslint-disable-next-line no-template-curly-in-string
-                if (fieldName === '${index}') {
-                    var restFieldPaths_1 = fieldPaths.slice(index + 1);
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    currentData.forEach(function (d) {
-                        encryptOrDecryptDataArrayField(d, restFieldPaths_1, encryptOrDecryptFuc);
-                    });
-                    return "break";
-                }
-                else {
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    currentData = currentData[fieldName];
-                }
-            };
-            for (var index = 0; index < fieldPaths.length; index++) {
-                var state_1 = _loop_1(index);
-                if (typeof state_1 === "object")
-                    return state_1.value;
-                if (state_1 === "break")
-                    break;
-            }
+                });
+            });
         }
         function encryptOrDecryptDataField(
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -266,9 +305,6 @@ function cryptoExtend() {
                             secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
                             return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
                         case 2:
-                            // encryptOrDecryptFuc(value, secretKey).then((value) => {
-                            //     _.set(data, filed, value);
-                            // });
                             value = _a.sent();
                             lodash_1.default.set(data, filed, value);
                             _a.label = 3;
