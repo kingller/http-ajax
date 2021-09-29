@@ -402,7 +402,7 @@ export interface IAjax {
     Promise<any>;
     onSessionExpired: IOnSessionExpired;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getCache: <T = any>(url: string, params: IParams | undefined, options?: IOptions) => T | undefined;
+    getCache: <T = any>(url: string, params: IParams | undefined, options?: IOptions) => Promise<T | undefined>;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getAllCache: () => { [name: string]: any };
     removeCache: (url: string, params: IParams | undefined, options?: IOptions) => void;

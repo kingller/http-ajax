@@ -98,13 +98,8 @@ function cryptoExtend(): () => void {
                 secretKeyPromise = new Promise(async (resolve, reject) => {
                     // 生成AES秘钥
                     const key = await newCrypto.AES.createKey();
-                    console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
                     // 使用RSA公钥加密秘钥
                     const newEncryptedSecretKey = await newCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
-                    console.log(
-                        '🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey',
-                        newEncryptedSecretKey
-                    );
 
                     (this as IAjax)
                         .post(
@@ -213,8 +208,8 @@ function cryptoExtend(): () => void {
                 if (fieldName === '${index}') {
                     const restFieldPaths = fieldPaths.slice(index + 1);
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (currentData as any[]).forEach((d) => {
-                        encryptOrDecryptDataArrayField(d, restFieldPaths, encryptOrDecryptFuc);
+                    (currentData as any[]).forEach(async (d) => {
+                        await encryptOrDecryptDataArrayField(d, restFieldPaths, encryptOrDecryptFuc);
                     });
                     break;
                 } else {
@@ -237,7 +232,7 @@ function cryptoExtend(): () => void {
             if (/\$\{index\}(\.|$)/.test(filed)) {
                 // 需要遍历数组加密
                 const fieldPaths = filed.split('.');
-                encryptOrDecryptDataArrayField(data, fieldPaths, encryptOrDecryptFuc);
+                await encryptOrDecryptDataArrayField(data, fieldPaths, encryptOrDecryptFuc);
             } else {
                 let value = _.get(data, filed);
                 if (typeof value !== 'undefined') {
@@ -312,9 +307,9 @@ function cryptoExtend(): () => void {
             return promise;
         };
 
-        (this as IAjax).processData = (params: IParams, props: IAjaxProcessDataOptions): IParams => {
+        (this as IAjax).processData = async (params: IParams, props: IAjaxProcessDataOptions): Promise<IParams> => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processData(params, props);
+            params = await processData(params, props);
             const { options, reject } = props;
             try {
                 if (params && options && options.encrypt) {

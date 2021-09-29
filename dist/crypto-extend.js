@@ -120,11 +120,9 @@ function cryptoExtend() {
                             case 0: return [4 /*yield*/, crypto_1.default.AES.createKey()];
                             case 1:
                                 key = _a.sent();
-                                console.log('🚀 ~ file: crypto-extend.ts ~ line 100 ~ returngetPublicKey.apply ~ key', key);
                                 return [4 /*yield*/, crypto_1.default.RSA.encrypt(key, publicKeyResponse.publicKey)];
                             case 2:
                                 newEncryptedSecretKey = _a.sent();
-                                console.log('🚀 ~ file: crypto-extend.ts ~ line 104 ~ returngetPublicKey.apply ~ newEncryptedSecretKey', newEncryptedSecretKey);
                                 this
                                     .post('/encryption/token', { token: newEncryptedSecretKey }, {
                                     headers: {
@@ -250,9 +248,16 @@ function cryptoExtend() {
                                             if (fieldName === '${index}') {
                                                 restFieldPaths_1 = fieldPaths.slice(index + 1);
                                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                currentData.forEach(function (d) {
-                                                    encryptOrDecryptDataArrayField(d, restFieldPaths_1, encryptOrDecryptFuc);
-                                                });
+                                                currentData.forEach(function (d) { return __awaiter(_this, void 0, void 0, function () {
+                                                    return __generator(this, function (_a) {
+                                                        switch (_a.label) {
+                                                            case 0: return [4 /*yield*/, encryptOrDecryptDataArrayField(d, restFieldPaths_1, encryptOrDecryptFuc)];
+                                                            case 1:
+                                                                _a.sent();
+                                                                return [2 /*return*/];
+                                                        }
+                                                    });
+                                                }); });
                                                 return [2 /*return*/, "break"];
                                             }
                                             else {
@@ -295,20 +300,22 @@ function cryptoExtend() {
                                 return [2 /*return*/];
                             }
                             encryptOrDecryptFuc = type === 'encrypt' ? crypto_1.default.AES.encrypt : crypto_1.default.AES.decrypt;
-                            if (!/\$\{index\}(\.|$)/.test(filed)) return [3 /*break*/, 1];
+                            if (!/\$\{index\}(\.|$)/.test(filed)) return [3 /*break*/, 2];
                             fieldPaths = filed.split('.');
-                            encryptOrDecryptDataArrayField(data, fieldPaths, encryptOrDecryptFuc);
-                            return [3 /*break*/, 3];
+                            return [4 /*yield*/, encryptOrDecryptDataArrayField(data, fieldPaths, encryptOrDecryptFuc)];
                         case 1:
+                            _a.sent();
+                            return [3 /*break*/, 4];
+                        case 2:
                             value = lodash_1.default.get(data, filed);
-                            if (!(typeof value !== 'undefined')) return [3 /*break*/, 3];
+                            if (!(typeof value !== 'undefined')) return [3 /*break*/, 4];
                             secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
                             return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
-                        case 2:
+                        case 3:
                             value = _a.sent();
                             lodash_1.default.set(data, filed, value);
-                            _a.label = 3;
-                        case 3: return [2 /*return*/];
+                            _a.label = 4;
+                        case 4: return [2 /*return*/];
                     }
                 });
             });
@@ -390,51 +397,59 @@ function cryptoExtend() {
             }
             return promise;
         };
-        this.processData = function (params, props) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processData(params, props);
-            var options = props.options, reject = props.reject;
-            try {
-                if (params && options && options.encrypt) {
-                    params = clone_1.cloneDeep(params);
-                    if (options.encrypt === 'all') {
-                        return client_crypto_1.default.AES.encrypt(params);
-                    }
-                    if (!params || typeof params !== 'object') {
-                        return params;
-                    }
-                    if (Array.isArray(options.encrypt)) {
-                        options.encrypt.forEach(function (field) { return __awaiter(_this, void 0, void 0, function () {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: 
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    return [4 /*yield*/, encryptDataField(params, field)];
-                                    case 1:
-                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                        _a.sent();
-                                        return [2 /*return*/];
+        this.processData = function (params, props) { return __awaiter(_this, void 0, void 0, function () {
+            var options, reject;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, processData(params, props)];
+                    case 1:
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        params = _a.sent();
+                        options = props.options, reject = props.reject;
+                        try {
+                            if (params && options && options.encrypt) {
+                                params = clone_1.cloneDeep(params);
+                                if (options.encrypt === 'all') {
+                                    return [2 /*return*/, client_crypto_1.default.AES.encrypt(params)];
                                 }
+                                if (!params || typeof params !== 'object') {
+                                    return [2 /*return*/, params];
+                                }
+                                if (Array.isArray(options.encrypt)) {
+                                    options.encrypt.forEach(function (field) { return __awaiter(_this, void 0, void 0, function () {
+                                        return __generator(this, function (_a) {
+                                            switch (_a.label) {
+                                                case 0: 
+                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                return [4 /*yield*/, encryptDataField(params, field)];
+                                                case 1:
+                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                    _a.sent();
+                                                    return [2 /*return*/];
+                                            }
+                                        });
+                                    }); });
+                                }
+                            }
+                        }
+                        catch (e) {
+                            if (reject)
+                                reject(e);
+                            catch_1.catchAjaxError({
+                                e: e,
+                                method: props.method,
+                                url: props.url,
+                                params: params,
+                                callback: this.catchError,
+                                type: reject ? 'log' : 'uncaught',
+                                options: options,
                             });
-                        }); });
-                    }
+                        }
+                        return [2 /*return*/, params];
                 }
-            }
-            catch (e) {
-                if (reject)
-                    reject(e);
-                catch_1.catchAjaxError({
-                    e: e,
-                    method: props.method,
-                    url: props.url,
-                    params: params,
-                    callback: _this.catchError,
-                    type: reject ? 'log' : 'uncaught',
-                    options: options,
-                });
-            }
-            return params;
-        };
+            });
+        }); };
         this.processResponse = function (response, props) {
             response = processResponse(response, props);
             if (response === null) {

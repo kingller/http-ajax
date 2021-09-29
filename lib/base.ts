@@ -116,7 +116,10 @@ class AjaxBase {
     public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void {};
 
     /** 数据处理 */
-    public processData = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions): Ajax.IParams {
+    public processData = async function (
+        params: Ajax.IParams,
+        props: Ajax.IAjaxProcessDataOptions
+    ): Promise<Ajax.IParams> {
         return params;
     };
 
@@ -256,20 +259,20 @@ class AjaxBase {
         }
     }
 
-    private getProcessedParams(
+    private async getProcessedParams(
         method: Ajax.IMethod,
         url: string,
         params: Ajax.IParams | undefined,
         options: Ajax.IOptions = {},
         reject?: Ajax.IReject
         /* eslint-disable @typescript-eslint/indent */
-    ): {
+    ): Promise<{
         url: string;
         params: Ajax.IParams | undefined;
-    } {
+    }> {
         /* eslint-enable @typescript-eslint/indent */
         if (options.processData !== false) {
-            params = this.processData(params, { method, url, options, reject });
+            params = await this.processData(params, { method, url, options, reject });
         }
         const processedValue = processParamsInUrl(url, params);
         url = processedValue.url;
@@ -430,7 +433,7 @@ class AjaxBase {
         const beforeSendPromise = this.beforeSend({ method, url, params, options });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return promisify(beforeSendPromise)
-            .then((): void => {
+            .then(async () => {
                 if (_cancel) {
                     reject(createError('Request aborted', Ajax.CODE.CANCEL));
                     if (loadingComponent) loadingComponent.finish();
@@ -440,7 +443,7 @@ class AjaxBase {
                 if (options.onData) {
                     options.json = false;
                 }
-                const processedValue = this.getProcessedParams(method, url, params, options, reject);
+                const processedValue = await this.getProcessedParams(method, url, params, options, reject);
                 url = processedValue.url;
                 params = processedValue.params;
                 if (method === Ajax.METHODS.get) {
@@ -723,18 +726,22 @@ class AjaxBase {
         reject(error);
     }
 
-    private getCacheKey(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): string {
+    private async getCacheKey(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): Promise<string> {
         const method = Ajax.METHODS.get;
         const _options = { ...options, cache: true };
-        const processedValue = this.getProcessedParams(method, url, params, _options);
+        const processedValue = await this.getProcessedParams(method, url, params, _options);
         url = processedValue.url;
         params = processedValue.params;
         return params ? `${url}?${params}` : url;
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    public getCache<T = any>(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): T | undefined {
-        const key = this.getCacheKey(url, params, options);
+    public async getCache<T = any>(
+        url: string,
+        params: Ajax.IParams | undefined,
+        options?: Ajax.IOptions
+    ): Promise<T | undefined> {
+        const key = await this.getCacheKey(url, params, options);
         return this._cache[key];
     }
 
@@ -743,8 +750,8 @@ class AjaxBase {
         return this._cache;
     }
 
-    public removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): void {
-        const key = this.getCacheKey(url, params, options);
+    public async removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions) {
+        const key = await this.getCacheKey(url, params, options);
         delete this._cache[key];
     }
 

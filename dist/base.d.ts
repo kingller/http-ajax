@@ -22,7 +22,7 @@ declare class AjaxBase {
     /** 请求发送前 */
     beforeSend: (props: Ajax.IAjaxArgsOptions) => Ajax.IRequestResult | void;
     /** 数据处理 */
-    processData: (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions) => Ajax.IParams;
+    processData: (params: Ajax.IParams, props: Ajax.IAjaxProcessDataOptions) => Promise<Ajax.IParams>;
     /** 去除URL中:params格式参数后数据处理 */
     processDataAfter: (params: Ajax.IParams, props: Ajax.IAjaxProcessDataAfterOptions) => Ajax.IParams;
     processResponse: (response: Ajax.IResult | null, props: Ajax.IProcessResponseOptions) => Ajax.IResult;
@@ -116,11 +116,11 @@ declare class AjaxBase {
         errorMsg: string;
     }, props?: Ajax.IRequestOptions): void;
     private getCacheKey;
-    getCache<T = any>(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): T | undefined;
+    getCache<T = any>(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): Promise<T | undefined>;
     getAllCache(): {
         [name: string]: any;
     };
-    removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): void;
+    removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): Promise<void>;
     clearCache(): void;
     clear(): void;
     /** 生成cancel token */

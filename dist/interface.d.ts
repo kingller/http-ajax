@@ -322,7 +322,7 @@ export interface IAjax {
         onSessionExpired?: IOnSessionExpired;
     }, url?: string, params?: IParams | undefined, loading?: boolean, resolve?: IResolve<T>, reject?: IReject, onSessionExpired?: IOnSessionExpired, options?: IOptions, cancelExecutor?: ICancelExecutor) => Promise<any>;
     onSessionExpired: IOnSessionExpired;
-    getCache: <T = any>(url: string, params: IParams | undefined, options?: IOptions) => T | undefined;
+    getCache: <T = any>(url: string, params: IParams | undefined, options?: IOptions) => Promise<T | undefined>;
     getAllCache: () => {
         [name: string]: any;
     };
