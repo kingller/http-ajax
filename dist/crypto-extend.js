@@ -216,7 +216,7 @@ function cryptoExtend() {
                                                     switch (_c.label) {
                                                         case 0:
                                                             if (!(typeof v !== 'undefined')) return [3 /*break*/, 2];
-                                                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                                                            secretKey = window.atob(storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session'));
                                                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                             _a = currentData;
                                                             _b = i;
@@ -233,7 +233,7 @@ function cryptoExtend() {
                                         case 1:
                                             value = currentData[fieldName];
                                             if (!(typeof value !== 'undefined')) return [3 /*break*/, 3];
-                                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                                            secretKey = window.atob(storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session'));
                                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                             _a = currentData;
                                             _b = fieldName;
@@ -309,7 +309,7 @@ function cryptoExtend() {
                         case 2:
                             value = lodash_1.default.get(data, filed);
                             if (!(typeof value !== 'undefined')) return [3 /*break*/, 4];
-                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                            secretKey = window.atob(storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session'));
                             return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
                         case 3:
                             value = _a.sent();
