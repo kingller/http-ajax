@@ -65,7 +65,7 @@ var crypto = {
                     case 2:
                         encryptedKey = _a.sent();
                         strEncryptedKey = crypto.ab2str(encryptedKey);
-                        return [2 /*return*/, strEncryptedKey];
+                        return [2 /*return*/, window.btoa(strEncryptedKey)];
                 }
             });
         }); },
@@ -85,7 +85,7 @@ var crypto = {
                     case 2:
                         arrBufferSecretKey = _a.sent();
                         secretKeyStr = crypto.ab2str(arrBufferSecretKey);
-                        return [2 /*return*/, secretKeyStr];
+                        return [2 /*return*/, window.btoa(secretKeyStr)];
                 }
             });
         }); },
@@ -110,8 +110,8 @@ var crypto = {
                             }, secretKey, newData)];
                     case 2:
                         ciphertext = _a.sent();
-                        strIv = crypto.ab2str(iv);
-                        strCiphertext = crypto.ab2str(ciphertext);
+                        strIv = window.btoa(crypto.ab2str(iv));
+                        strCiphertext = window.btoa(crypto.ab2str(ciphertext));
                         return [2 /*return*/, "" + strIv + strCiphertext];
                 }
             });

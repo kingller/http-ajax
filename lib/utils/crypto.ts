@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import { Ajax } from '..';
 
 const crypto = {
     RSA: {
@@ -36,7 +35,7 @@ const crypto = {
             );
 
             const strEncryptedKey = crypto.ab2str(encryptedKey);
-            return strEncryptedKey;
+            return window.btoa(strEncryptedKey);
         },
     },
     AES: {
@@ -51,7 +50,7 @@ const crypto = {
             );
             const arrBufferSecretKey = await crypto.AES.exportCryptoKey(key);
             const secretKeyStr = crypto.ab2str(arrBufferSecretKey);
-            return secretKeyStr;
+            return window.btoa(secretKeyStr);
         },
 
         encrypt: async (data, rawKey) => {
@@ -71,8 +70,8 @@ const crypto = {
                 secretKey,
                 newData
             );
-            const strIv = crypto.ab2str(iv);
-            const strCiphertext = crypto.ab2str(ciphertext);
+            const strIv = window.btoa(crypto.ab2str(iv));
+            const strCiphertext = window.btoa(crypto.ab2str(ciphertext));
 
             return `${strIv}${strCiphertext}`;
         },
