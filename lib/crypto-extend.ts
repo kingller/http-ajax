@@ -185,7 +185,9 @@ function cryptoExtend(): () => void {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         (currentData as any[]).forEach(async (v, i) => {
                             if (typeof v !== 'undefined') {
-                                const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
+                                const secretKey = window.atob(
+                                    storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string
+                                );
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 (currentData as any[])[i] = await encryptOrDecryptFuc(v, secretKey);
                             }
@@ -194,7 +196,7 @@ function cryptoExtend(): () => void {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const value = (currentData as { [name: string]: any })[fieldName];
                         if (typeof value !== 'undefined') {
-                            const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
+                            const secretKey = window.atob(storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string);
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             (currentData as { [name: string]: any })[fieldName] = await encryptOrDecryptFuc(
                                 value,
@@ -236,7 +238,7 @@ function cryptoExtend(): () => void {
             } else {
                 let value = _.get(data, filed);
                 if (typeof value !== 'undefined') {
-                    const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
+                    const secretKey = window.atob(storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string);
 
                     value = await encryptOrDecryptFuc(value, secretKey);
                     _.set(data, filed, value);
