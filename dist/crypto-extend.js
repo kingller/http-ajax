@@ -398,55 +398,56 @@ function cryptoExtend() {
             return promise;
         };
         this.processData = function (params, props) { return __awaiter(_this, void 0, void 0, function () {
-            var options, reject;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var options, reject, _i, _a, field, e_1;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0: return [4 /*yield*/, processData(params, props)];
                     case 1:
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        params = _a.sent();
+                        params = _b.sent();
                         options = props.options, reject = props.reject;
-                        try {
-                            if (params && options && options.encrypt) {
-                                params = clone_1.cloneDeep(params);
-                                if (options.encrypt === 'all') {
-                                    return [2 /*return*/, client_crypto_1.default.AES.encrypt(params)];
-                                }
-                                if (!params || typeof params !== 'object') {
-                                    return [2 /*return*/, params];
-                                }
-                                if (Array.isArray(options.encrypt)) {
-                                    options.encrypt.forEach(function (field) { return __awaiter(_this, void 0, void 0, function () {
-                                        return __generator(this, function (_a) {
-                                            switch (_a.label) {
-                                                case 0: 
-                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                return [4 /*yield*/, encryptDataField(params, field)];
-                                                case 1:
-                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                    _a.sent();
-                                                    return [2 /*return*/];
-                                            }
-                                        });
-                                    }); });
-                                }
-                            }
+                        _b.label = 2;
+                    case 2:
+                        _b.trys.push([2, 7, , 8]);
+                        if (!(params && options && options.encrypt)) return [3 /*break*/, 6];
+                        params = clone_1.cloneDeep(params);
+                        if (options.encrypt === 'all') {
+                            return [2 /*return*/, client_crypto_1.default.AES.encrypt(params)];
                         }
-                        catch (e) {
-                            if (reject)
-                                reject(e);
-                            catch_1.catchAjaxError({
-                                e: e,
-                                method: props.method,
-                                url: props.url,
-                                params: params,
-                                callback: this.catchError,
-                                type: reject ? 'log' : 'uncaught',
-                                options: options,
-                            });
+                        if (!params || typeof params !== 'object') {
+                            return [2 /*return*/, params];
                         }
-                        return [2 /*return*/, Promise.resolve(params)];
+                        if (!Array.isArray(options.encrypt)) return [3 /*break*/, 6];
+                        _i = 0, _a = options.encrypt;
+                        _b.label = 3;
+                    case 3:
+                        if (!(_i < _a.length)) return [3 /*break*/, 6];
+                        field = _a[_i];
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        return [4 /*yield*/, encryptDataField(params, field)];
+                    case 4:
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        _b.sent();
+                        _b.label = 5;
+                    case 5:
+                        _i++;
+                        return [3 /*break*/, 3];
+                    case 6: return [3 /*break*/, 8];
+                    case 7:
+                        e_1 = _b.sent();
+                        if (reject)
+                            reject(e_1);
+                        catch_1.catchAjaxError({
+                            e: e_1,
+                            method: props.method,
+                            url: props.url,
+                            params: params,
+                            callback: this.catchError,
+                            type: reject ? 'log' : 'uncaught',
+                            options: options,
+                        });
+                        return [3 /*break*/, 8];
+                    case 8: return [2 /*return*/, params];
                 }
             });
         }); };

@@ -321,10 +321,14 @@ function cryptoExtend(): () => void {
                         return params;
                     }
                     if (Array.isArray(options.encrypt)) {
-                        options.encrypt.forEach(async (field) => {
+                        for (const field of options.encrypt) {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             await encryptDataField(params as { [name: string]: any }, field);
-                        });
+                        }
+                        // options.encrypt.forEach(async (field) => {
+                        //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        //     await encryptDataField(params as { [name: string]: any }, field);
+                        // });
                     }
                 }
             } catch (e) {
@@ -339,7 +343,7 @@ function cryptoExtend(): () => void {
                     options,
                 });
             }
-            return Promise.resolve(params);
+            return params;
         };
 
         (this as IAjax).processResponse = (response: IResult | null, props: IProcessResponseOptions): IResult => {

@@ -323,10 +323,10 @@ var AjaxBase = /** @class */ (function () {
                                 params = this.stringifyParams(params, method, options);
                             }
                         }
-                        return [2 /*return*/, Promise.resolve({
+                        return [2 /*return*/, {
                                 url: url,
                                 params: params,
-                            })];
+                            }];
                 }
             });
         });

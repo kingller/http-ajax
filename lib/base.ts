@@ -283,10 +283,10 @@ class AjaxBase {
                 params = this.stringifyParams(params, method, options);
             }
         }
-        return Promise.resolve({
+        return {
             url,
             params,
-        });
+        };
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
