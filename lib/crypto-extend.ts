@@ -327,10 +327,6 @@ function cryptoExtend(): () => void {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             await encryptDataField(params as { [name: string]: any }, field);
                         }
-                        // options.encrypt.forEach(async (field) => {
-                        //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        //     await encryptDataField(params as { [name: string]: any }, field);
-                        // });
                     }
                 }
             } catch (e) {

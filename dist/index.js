@@ -14,7 +14,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -22,10 +22,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getResponseData = exports.promisify = exports.isFormData = exports.AjaxBase = exports.Ajax = void 0;
 var ajax_1 = __importDefault(require("./ajax"));
 exports.Ajax = __importStar(require("./interface"));
 var base_1 = require("./base");
-Object.defineProperty(exports, "AjaxBase", { enumerable: true, get: function () { return base_1.default; } });
+Object.defineProperty(exports, "AjaxBase", { enumerable: true, get: function () { return __importDefault(base_1).default; } });
 var form_1 = require("./utils/form");
 Object.defineProperty(exports, "isFormData", { enumerable: true, get: function () { return form_1.isFormData; } });
 var promise_1 = require("./utils/promise");

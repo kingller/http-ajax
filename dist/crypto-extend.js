@@ -190,9 +190,9 @@ function cryptoExtend() {
                         case 0:
                             currentData = data;
                             _loop_1 = function (index) {
-                                var fieldName, value, secretKey, _a, _b, restFieldPaths_1;
-                                return __generator(this, function (_c) {
-                                    switch (_c.label) {
+                                var fieldName, value, secretKey, _b, _c, restFieldPaths_1;
+                                return __generator(this, function (_d) {
+                                    switch (_d.label) {
                                         case 0:
                                             if (!currentData || typeof currentData !== 'object') {
                                                 return [2 /*return*/, "break"];
@@ -235,13 +235,13 @@ function cryptoExtend() {
                                             if (!(typeof value !== 'undefined')) return [3 /*break*/, 3];
                                             secretKey = window.atob(storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session'));
                                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                            _a = currentData;
-                                            _b = fieldName;
+                                            _b = currentData;
+                                            _c = fieldName;
                                             return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
                                         case 2:
                                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                            _a[_b] = _c.sent();
-                                            _c.label = 3;
+                                            _b[_c] = _d.sent();
+                                            _d.label = 3;
                                         case 3: return [2 /*return*/, { value: void 0 }];
                                         case 4:
                                             // eslint-disable-next-line no-template-curly-in-string

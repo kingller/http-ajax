@@ -26,6 +26,7 @@ const crypto = {
                 ['encrypt']
             );
 
+            // const secretKey = new TextEncoder().encode(secretKeyStr.toString('utf8'));
             const encryptedKey = await window.crypto.subtle.encrypt(
                 {
                     name: 'RSA-OAEP',
@@ -35,7 +36,7 @@ const crypto = {
             );
 
             const strEncryptedKey = crypto.ab2str(encryptedKey);
-            return window.btoa(strEncryptedKey);
+            return strEncryptedKey;
         },
     },
     AES: {
@@ -50,11 +51,12 @@ const crypto = {
             );
             const arrBufferSecretKey = await crypto.AES.exportCryptoKey(key);
             const secretKeyStr = crypto.ab2str(arrBufferSecretKey);
-            return window.btoa(secretKeyStr);
+            return secretKeyStr;
         },
 
         encrypt: async (data, rawKey) => {
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const tag = window.crypto.getRandomValues(new Uint8Array(128));
             const arrBufferKey = crypto.str2ab(rawKey);
             const secretKey = await window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                 'encrypt',
@@ -66,14 +68,17 @@ const crypto = {
                 {
                     name: 'AES-GCM',
                     iv,
+                    tagLength: 128,
                 },
                 secretKey,
                 newData
             );
-            const strIv = window.btoa(crypto.ab2str(iv));
-            const strCiphertext = window.btoa(crypto.ab2str(ciphertext));
 
-            return `${strIv}${strCiphertext}`;
+            const strIv = crypto.ab2str(iv);
+            const strTag = crypto.ab2str(tag);
+            const strCiphertext = crypto.ab2str(ciphertext);
+
+            return `${strIv}${strTag}${strCiphertext}`;
         },
         decrypt: async (ciphertext, rawKey) => {
             const strIv = ciphertext.slice(0, 12);

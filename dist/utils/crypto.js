@@ -65,7 +65,7 @@ var crypto = {
                     case 2:
                         encryptedKey = _a.sent();
                         strEncryptedKey = crypto.ab2str(encryptedKey);
-                        return [2 /*return*/, window.btoa(strEncryptedKey)];
+                        return [2 /*return*/, strEncryptedKey];
                 }
             });
         }); },
@@ -85,16 +85,17 @@ var crypto = {
                     case 2:
                         arrBufferSecretKey = _a.sent();
                         secretKeyStr = crypto.ab2str(arrBufferSecretKey);
-                        return [2 /*return*/, window.btoa(secretKeyStr)];
+                        return [2 /*return*/, secretKeyStr];
                 }
             });
         }); },
         encrypt: function (data, rawKey) { return __awaiter(void 0, void 0, void 0, function () {
-            var iv, arrBufferKey, secretKey, enc, newData, ciphertext, strIv, strCiphertext;
+            var iv, tag, arrBufferKey, secretKey, enc, newData, ciphertext, strIv, strTag, strCiphertext;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         iv = window.crypto.getRandomValues(new Uint8Array(12));
+                        tag = window.crypto.getRandomValues(new Uint8Array(128));
                         arrBufferKey = crypto.str2ab(rawKey);
                         return [4 /*yield*/, window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                                 'encrypt',
@@ -107,12 +108,14 @@ var crypto = {
                         return [4 /*yield*/, window.crypto.subtle.encrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
+                                tagLength: 128,
                             }, secretKey, newData)];
                     case 2:
                         ciphertext = _a.sent();
-                        strIv = window.btoa(crypto.ab2str(iv));
-                        strCiphertext = window.btoa(crypto.ab2str(ciphertext));
-                        return [2 /*return*/, "" + strIv + strCiphertext];
+                        strIv = crypto.ab2str(iv);
+                        strTag = crypto.ab2str(tag);
+                        strCiphertext = crypto.ab2str(ciphertext);
+                        return [2 /*return*/, "" + strIv + strTag + strCiphertext];
                 }
             });
         }); },
