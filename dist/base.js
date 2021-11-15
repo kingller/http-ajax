@@ -497,7 +497,7 @@ var AjaxBase = /** @class */ (function () {
             if (options.responseType) {
                 xhr.responseType = options.responseType;
             }
-            if (!options.headers || typeof options.headers.token === 'undefined') {
+            if ((!options.headers || typeof options.headers.token === 'undefined') && !options.simple) {
                 var token = '';
                 try {
                     token = window.localStorage.getItem('token') || '';
@@ -544,16 +544,18 @@ var AjaxBase = /** @class */ (function () {
                     }
                 }
             }
-            if (!isXCorrelationIDExist) {
-                _opts.xCorrelationID = v4_1.default();
-                xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
-            }
-            if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {
-                xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
-            }
-            if (!isCacheControlExist && browser_which_1.default.ie) {
-                xhr.setRequestHeader('Cache-Control', 'no-cache');
-                xhr.setRequestHeader('Pragma', 'no-cache');
+            if (!options.simple) {
+                if (!isXCorrelationIDExist) {
+                    _opts.xCorrelationID = v4_1.default();
+                    xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
+                }
+                if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {
+                    xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+                }
+                if (!isCacheControlExist && browser_which_1.default.ie) {
+                    xhr.setRequestHeader('Cache-Control', 'no-cache');
+                    xhr.setRequestHeader('Pragma', 'no-cache');
+                }
             }
             if (options.onProgress) {
                 xhr.upload.onprogress = options.onProgress;

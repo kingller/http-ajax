@@ -57,6 +57,8 @@ export interface IOptions extends IOptionsBase {
         headers?: { [name: string]: any }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) => any;
+    /** 简单请求（不添加默认请求头，除了外部传入的） */
+    simple?: boolean;
     /** 自定义选项，用来传递值自定义处理逻辑 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [name: string]: any;

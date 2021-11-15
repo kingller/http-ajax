@@ -47,6 +47,8 @@ export interface IOptions extends IOptionsBase {
     headers?: {
         [name: string]: any;
     }) => any;
+    /** 简单请求（不添加默认请求头，除了外部传入的） */
+    simple?: boolean;
     /** 自定义选项，用来传递值自定义处理逻辑 */
     [name: string]: any;
 }
