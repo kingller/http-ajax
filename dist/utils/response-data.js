@@ -15,7 +15,7 @@ exports.setResponseData = exports.getResponseData = void 0;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getResponseData(_a) {
     var response = _a.response, statusField = _a.statusField;
-    if (typeof response === 'object') {
+    if (response && typeof response === 'object') {
         if (typeof response.apiVersion !== 'undefined') {
             return response.details;
         }
@@ -29,7 +29,7 @@ exports.getResponseData = getResponseData;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setResponseData(_a) {
     var response = _a.response, data = _a.data, statusField = _a.statusField;
-    if (typeof response === 'object') {
+    if (response && typeof response === 'object') {
         if (typeof response.apiVersion !== 'undefined') {
             return __assign(__assign({}, response), { details: data });
         }
