@@ -95,6 +95,7 @@ function cryptoExtend(): () => void {
         function sendSecretKeyRequest(): Promise<void> {
             return getPublicKey.apply(this).then((publicKeyResponse: IPublicKeyResponse) => {
                 // 将加密后的秘钥传输给服务器端
+                // eslint-disable-next-line no-async-promise-executor
                 secretKeyPromise = new Promise(async (resolve, reject) => {
                     // 生成AES秘钥
                     const key = await newCrypto.AES.createKey();
@@ -182,22 +183,21 @@ function cryptoExtend(): () => void {
                 if (index === fieldPaths.length - 1) {
                     // eslint-disable-next-line no-template-curly-in-string
                     if (fieldName === '${index}') {
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        (currentData as any[]).forEach(async (v, i) => {
+                        for (const [v, i] of currentData as any[]) {
                             if (typeof v !== 'undefined') {
-                                const secretKey = window.atob(
-                                    storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string
-                                );
+                                const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                // eslint-disable-next-line no-await-in-loop
                                 (currentData as any[])[i] = await encryptOrDecryptFuc(v, secretKey);
                             }
-                        });
+                        }
                     } else {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const value = (currentData as { [name: string]: any })[fieldName];
                         if (typeof value !== 'undefined') {
-                            const secretKey = window.atob(storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string);
+                            const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            // eslint-disable-next-line no-await-in-loop
                             (currentData as { [name: string]: any })[fieldName] = await encryptOrDecryptFuc(
                                 value,
                                 secretKey
@@ -209,10 +209,10 @@ function cryptoExtend(): () => void {
                 // eslint-disable-next-line no-template-curly-in-string
                 if (fieldName === '${index}') {
                     const restFieldPaths = fieldPaths.slice(index + 1);
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                    (currentData as any[]).forEach(async (d) => {
+                    for (const d of currentData as any[]) {
+                        // eslint-disable-next-line no-await-in-loop
                         await encryptOrDecryptDataArrayField(d, restFieldPaths, encryptOrDecryptFuc);
-                    });
+                    }
                     break;
                 } else {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -238,7 +238,7 @@ function cryptoExtend(): () => void {
             } else {
                 let value = _.get(data, filed);
                 if (typeof value !== 'undefined') {
-                    const secretKey = window.atob(storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string);
+                    const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
 
                     value = await encryptOrDecryptFuc(value, secretKey);
                     _.set(data, filed, value);
@@ -317,7 +317,8 @@ function cryptoExtend(): () => void {
                 if (params && options && options.encrypt) {
                     params = cloneDeep(params);
                     if (options.encrypt === 'all') {
-                        return Crypto.AES.encrypt(params);
+                        const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
+                        return await newCrypto.AES.encrypt(params, secretKey);
                     }
                     if (!params || typeof params !== 'object') {
                         return params;
@@ -325,6 +326,7 @@ function cryptoExtend(): () => void {
                     if (Array.isArray(options.encrypt)) {
                         for (const field of options.encrypt) {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            // eslint-disable-next-line no-await-in-loop
                             await encryptDataField(params as { [name: string]: any }, field);
                         }
                     }
@@ -344,8 +346,11 @@ function cryptoExtend(): () => void {
             return params;
         };
 
-        (this as IAjax).processResponse = (response: IResult | null, props: IProcessResponseOptions): IResult => {
-            response = processResponse(response, props);
+        (this as IAjax).processResponse = async (
+            response: IResult | null,
+            props: IProcessResponseOptions
+        ): Promise<IResult> => {
+            response = await processResponse(response, props);
             if (response === null) {
                 return response;
             }
@@ -368,16 +373,18 @@ function cryptoExtend(): () => void {
                     let data = getResponseData({ response, statusField });
 
                     if (decrypt === 'all') {
+                        const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        data = Crypto.AES.decrypt((data as any) as string);
+                        data = await newCrypto.AES.decrypt(data, secretKey);
                     } else {
                         if (!data || typeof data !== 'object') {
                             return response;
                         }
                         if (Array.isArray(decrypt)) {
-                            decrypt.forEach(async (field) => {
+                            for (const field of decrypt) {
+                                // eslint-disable-next-line no-await-in-loop
                                 await decryptDataField(data, field);
-                            });
+                            }
                         }
                     }
 

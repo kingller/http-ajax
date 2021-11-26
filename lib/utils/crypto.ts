@@ -3,8 +3,8 @@ import _ from 'lodash';
 const crypto = {
     RSA: {
         encrypt: async (secretKeyStr, pem) => {
-            //pem需要从字符串转化为CryptoKey类型
-            //secretKey需要是ArrayBuffer类型
+            // pem需要从字符串转化为CryptoKey类型
+            // secretKey需要是ArrayBuffer类型
             const secretKey = crypto.str2ab(secretKeyStr);
             const pemHeader = '-----BEGIN PUBLIC KEY-----';
             const pemFooter = '-----END PUBLIC KEY-----';
@@ -35,7 +35,7 @@ const crypto = {
                 secretKey
             );
 
-            const strEncryptedKey = crypto.ab2str(encryptedKey);
+            const strEncryptedKey = window.btoa(crypto.ab2str(encryptedKey));
             return strEncryptedKey;
         },
     },
@@ -50,20 +50,20 @@ const crypto = {
                 ['encrypt', 'decrypt']
             );
             const arrBufferSecretKey = await crypto.AES.exportCryptoKey(key);
-            const secretKeyStr = crypto.ab2str(arrBufferSecretKey);
+            const secretKeyStr = window.btoa(crypto.ab2str(arrBufferSecretKey));
             return secretKeyStr;
         },
 
         encrypt: async (data, rawKey) => {
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
-            const tag = window.crypto.getRandomValues(new Uint8Array(128));
-            const arrBufferKey = crypto.str2ab(rawKey);
+            const arrBufferKey = crypto.str2ab(window.atob(rawKey));
             const secretKey = await window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                 'encrypt',
                 'decrypt',
             ]);
             const enc = new TextEncoder();
-            const newData = enc.encode(data);
+            const newData = enc.encode(JSON.stringify(data));
+
             const ciphertext = await window.crypto.subtle.encrypt(
                 {
                     name: 'AES-GCM',
@@ -75,35 +75,35 @@ const crypto = {
             );
 
             const strIv = crypto.ab2str(iv);
-            const strTag = crypto.ab2str(tag);
             const strCiphertext = crypto.ab2str(ciphertext);
 
-            return `${strIv}${strTag}${strCiphertext}`;
+            return window.btoa(`${strIv}${strCiphertext}`);
         },
         decrypt: async (ciphertext, rawKey) => {
+            ciphertext = window.atob(ciphertext);
             const strIv = ciphertext.slice(0, 12);
             const strCiphertext = ciphertext.slice(12);
             const iv = crypto.str2ab(strIv);
             const newCiphertext = crypto.str2ab(strCiphertext);
-            const secretKey = await window.crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
+            const arrBufferKey = crypto.str2ab(window.atob(rawKey));
+            const secretKey = await window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                 'encrypt',
                 'decrypt',
             ]);
             const data = await window.crypto.subtle.decrypt(
                 {
                     name: 'AES-GCM',
-                    iv: iv,
+                    iv,
                 },
                 secretKey,
                 newCiphertext
             );
-            return data;
+            return JSON.parse(new TextDecoder().decode(data));
         },
 
         exportCryptoKey: async (key) => {
             const exported = await window.crypto.subtle.exportKey('raw', key);
-            const exportedKeyBuffer = new Uint8Array(exported);
-            return exportedKeyBuffer;
+            return exported;
         },
     },
 

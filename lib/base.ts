@@ -128,10 +128,10 @@ class AjaxBase {
         return params;
     };
 
-    public processResponse = function (
+    public processResponse = async function (
         response: Ajax.IResult | null,
         props: Ajax.IProcessResponseOptions
-    ): Ajax.IResult {
+    ): Promise<Ajax.IResult> {
         return response;
     };
 
@@ -469,7 +469,7 @@ class AjaxBase {
                 const xhr = new XMLHttpRequest();
                 let chunked: string[] = [];
                 const ajaxThis = this;
-                xhr.onreadystatechange = function (): void {
+                xhr.onreadystatechange = async function (): Promise<any> {
                     if (options.onData) {
                         if (this.readyState === 3 || this.readyState === 4) {
                             // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
@@ -524,7 +524,7 @@ class AjaxBase {
                                 res = JSON.parse(this.response || this.responseText || '{}');
                             }
                         }
-                        res = ajaxThis.processResponse(res, {
+                        res = await ajaxThis.processResponse(res, {
                             xhr,
                             method,
                             url,
@@ -550,7 +550,7 @@ class AjaxBase {
                             xCorrelationID: _opts.xCorrelationID,
                         });
                     } else if (this.status === 204) {
-                        ajaxThis.processResponse(null, {
+                        await ajaxThis.processResponse(null, {
                             xhr,
                             method,
                             url,

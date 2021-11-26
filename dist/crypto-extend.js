@@ -113,6 +113,7 @@ function cryptoExtend() {
             var _this = this;
             return getPublicKey.apply(this).then(function (publicKeyResponse) {
                 // 将加密后的秘钥传输给服务器端
+                // eslint-disable-next-line no-async-promise-executor
                 secretKeyPromise = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
                     var key, newEncryptedSecretKey;
                     return __generator(this, function (_a) {
@@ -183,107 +184,92 @@ function cryptoExtend() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         encryptOrDecryptFuc) {
             return __awaiter(this, void 0, void 0, function () {
-                var currentData, _loop_1, index, state_1;
-                var _this = this;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
+                var currentData, index, fieldName, _i, _a, _b, v, i, secretKey, _c, _d, value, secretKey, _e, _f, restFieldPaths, _g, _h, d;
+                return __generator(this, function (_j) {
+                    switch (_j.label) {
                         case 0:
                             currentData = data;
-                            _loop_1 = function (index) {
-                                var fieldName, value, secretKey, _b, _c, restFieldPaths_1;
-                                return __generator(this, function (_d) {
-                                    switch (_d.label) {
-                                        case 0:
-                                            if (!currentData || typeof currentData !== 'object') {
-                                                return [2 /*return*/, "break"];
-                                            }
-                                            fieldName = fieldPaths[index];
-                                            if (!fieldName) {
-                                                return [2 /*return*/, "continue"];
-                                            }
-                                            // eslint-disable-next-line no-template-curly-in-string
-                                            if (fieldName === '${index}') {
-                                                if (!array_1.isArray(currentData)) {
-                                                    return [2 /*return*/, "break"];
-                                                }
-                                            }
-                                            if (!(index === fieldPaths.length - 1)) return [3 /*break*/, 4];
-                                            if (!(fieldName === '${index}')) return [3 /*break*/, 1];
-                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                            currentData.forEach(function (v, i) { return __awaiter(_this, void 0, void 0, function () {
-                                                var secretKey, _a, _b;
-                                                return __generator(this, function (_c) {
-                                                    switch (_c.label) {
-                                                        case 0:
-                                                            if (!(typeof v !== 'undefined')) return [3 /*break*/, 2];
-                                                            secretKey = window.atob(storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session'));
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            _a = currentData;
-                                                            _b = i;
-                                                            return [4 /*yield*/, encryptOrDecryptFuc(v, secretKey)];
-                                                        case 1:
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            _a[_b] = _c.sent();
-                                                            _c.label = 2;
-                                                        case 2: return [2 /*return*/];
-                                                    }
-                                                });
-                                            }); });
-                                            return [3 /*break*/, 3];
-                                        case 1:
-                                            value = currentData[fieldName];
-                                            if (!(typeof value !== 'undefined')) return [3 /*break*/, 3];
-                                            secretKey = window.atob(storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session'));
-                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                            _b = currentData;
-                                            _c = fieldName;
-                                            return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
-                                        case 2:
-                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                            _b[_c] = _d.sent();
-                                            _d.label = 3;
-                                        case 3: return [2 /*return*/, { value: void 0 }];
-                                        case 4:
-                                            // eslint-disable-next-line no-template-curly-in-string
-                                            if (fieldName === '${index}') {
-                                                restFieldPaths_1 = fieldPaths.slice(index + 1);
-                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                currentData.forEach(function (d) { return __awaiter(_this, void 0, void 0, function () {
-                                                    return __generator(this, function (_a) {
-                                                        switch (_a.label) {
-                                                            case 0: return [4 /*yield*/, encryptOrDecryptDataArrayField(d, restFieldPaths_1, encryptOrDecryptFuc)];
-                                                            case 1:
-                                                                _a.sent();
-                                                                return [2 /*return*/];
-                                                        }
-                                                    });
-                                                }); });
-                                                return [2 /*return*/, "break"];
-                                            }
-                                            else {
-                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                currentData = currentData[fieldName];
-                                            }
-                                            return [2 /*return*/];
-                                    }
-                                });
-                            };
                             index = 0;
-                            _a.label = 1;
+                            _j.label = 1;
                         case 1:
-                            if (!(index < fieldPaths.length)) return [3 /*break*/, 4];
-                            return [5 /*yield**/, _loop_1(index)];
+                            if (!(index < fieldPaths.length)) return [3 /*break*/, 16];
+                            if (!currentData || typeof currentData !== 'object') {
+                                return [3 /*break*/, 16];
+                            }
+                            fieldName = fieldPaths[index];
+                            if (!fieldName) {
+                                return [3 /*break*/, 15];
+                            }
+                            // eslint-disable-next-line no-template-curly-in-string
+                            if (fieldName === '${index}') {
+                                if (!array_1.isArray(currentData)) {
+                                    return [3 /*break*/, 16];
+                                }
+                            }
+                            if (!(index === fieldPaths.length - 1)) return [3 /*break*/, 9];
+                            if (!(fieldName === '${index}')) return [3 /*break*/, 6];
+                            _i = 0, _a = currentData;
+                            _j.label = 2;
                         case 2:
-                            state_1 = _a.sent();
-                            if (typeof state_1 === "object")
-                                return [2 /*return*/, state_1.value];
-                            if (state_1 === "break")
-                                return [3 /*break*/, 4];
-                            _a.label = 3;
+                            if (!(_i < _a.length)) return [3 /*break*/, 5];
+                            _b = _a[_i], v = _b[0], i = _b[1];
+                            if (!(typeof v !== 'undefined')) return [3 /*break*/, 4];
+                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            // eslint-disable-next-line no-await-in-loop
+                            _c = currentData;
+                            _d = i;
+                            return [4 /*yield*/, encryptOrDecryptFuc(v, secretKey)];
                         case 3:
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            // eslint-disable-next-line no-await-in-loop
+                            _c[_d] = _j.sent();
+                            _j.label = 4;
+                        case 4:
+                            _i++;
+                            return [3 /*break*/, 2];
+                        case 5: return [3 /*break*/, 8];
+                        case 6:
+                            value = currentData[fieldName];
+                            if (!(typeof value !== 'undefined')) return [3 /*break*/, 8];
+                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            // eslint-disable-next-line no-await-in-loop
+                            _e = currentData;
+                            _f = fieldName;
+                            return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
+                        case 7:
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            // eslint-disable-next-line no-await-in-loop
+                            _e[_f] = _j.sent();
+                            _j.label = 8;
+                        case 8: return [2 /*return*/];
+                        case 9:
+                            if (!(fieldName === '${index}')) return [3 /*break*/, 14];
+                            restFieldPaths = fieldPaths.slice(index + 1);
+                            _g = 0, _h = currentData;
+                            _j.label = 10;
+                        case 10:
+                            if (!(_g < _h.length)) return [3 /*break*/, 13];
+                            d = _h[_g];
+                            // eslint-disable-next-line no-await-in-loop
+                            return [4 /*yield*/, encryptOrDecryptDataArrayField(d, restFieldPaths, encryptOrDecryptFuc)];
+                        case 11:
+                            // eslint-disable-next-line no-await-in-loop
+                            _j.sent();
+                            _j.label = 12;
+                        case 12:
+                            _g++;
+                            return [3 /*break*/, 10];
+                        case 13: return [3 /*break*/, 16];
+                        case 14:
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            currentData = currentData[fieldName];
+                            _j.label = 15;
+                        case 15:
                             index++;
                             return [3 /*break*/, 1];
-                        case 4: return [2 /*return*/];
+                        case 16: return [2 /*return*/];
                     }
                 });
             });
@@ -309,7 +295,7 @@ function cryptoExtend() {
                         case 2:
                             value = lodash_1.default.get(data, filed);
                             if (!(typeof value !== 'undefined')) return [3 /*break*/, 4];
-                            secretKey = window.atob(storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session'));
+                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
                             return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
                         case 3:
                             value = _a.sent();
@@ -398,7 +384,7 @@ function cryptoExtend() {
             return promise;
         };
         this.processData = function (params, props) { return __awaiter(_this, void 0, void 0, function () {
-            var options, reject, _i, _a, field, e_1;
+            var options, reject, secretKey, _i, _a, field, e_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, processData(params, props)];
@@ -408,32 +394,36 @@ function cryptoExtend() {
                         options = props.options, reject = props.reject;
                         _b.label = 2;
                     case 2:
-                        _b.trys.push([2, 7, , 8]);
-                        if (!(params && options && options.encrypt)) return [3 /*break*/, 6];
+                        _b.trys.push([2, 9, , 10]);
+                        if (!(params && options && options.encrypt)) return [3 /*break*/, 8];
                         params = clone_1.cloneDeep(params);
-                        if (options.encrypt === 'all') {
-                            return [2 /*return*/, client_crypto_1.default.AES.encrypt(params)];
-                        }
+                        if (!(options.encrypt === 'all')) return [3 /*break*/, 4];
+                        secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                        return [4 /*yield*/, crypto_1.default.AES.encrypt(params, secretKey)];
+                    case 3: return [2 /*return*/, _b.sent()];
+                    case 4:
                         if (!params || typeof params !== 'object') {
                             return [2 /*return*/, params];
                         }
-                        if (!Array.isArray(options.encrypt)) return [3 /*break*/, 6];
+                        if (!Array.isArray(options.encrypt)) return [3 /*break*/, 8];
                         _i = 0, _a = options.encrypt;
-                        _b.label = 3;
-                    case 3:
-                        if (!(_i < _a.length)) return [3 /*break*/, 6];
-                        field = _a[_i];
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        return [4 /*yield*/, encryptDataField(params, field)];
-                    case 4:
-                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        _b.sent();
                         _b.label = 5;
                     case 5:
-                        _i++;
-                        return [3 /*break*/, 3];
-                    case 6: return [3 /*break*/, 8];
+                        if (!(_i < _a.length)) return [3 /*break*/, 8];
+                        field = _a[_i];
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        // eslint-disable-next-line no-await-in-loop
+                        return [4 /*yield*/, encryptDataField(params, field)];
+                    case 6:
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                        // eslint-disable-next-line no-await-in-loop
+                        _b.sent();
+                        _b.label = 7;
                     case 7:
+                        _i++;
+                        return [3 /*break*/, 5];
+                    case 8: return [3 /*break*/, 10];
+                    case 9:
                         e_1 = _b.sent();
                         if (reject)
                             reject(e_1);
@@ -446,73 +436,89 @@ function cryptoExtend() {
                             type: reject ? 'log' : 'uncaught',
                             options: options,
                         });
-                        return [3 /*break*/, 8];
-                    case 8: return [2 /*return*/, params];
+                        return [3 /*break*/, 10];
+                    case 10: return [2 /*return*/, params];
                 }
             });
         }); };
-        this.processResponse = function (response, props) {
-            response = processResponse(response, props);
-            if (response === null) {
-                return response;
-            }
-            var options = props.options;
-            try {
-                var decrypt = (options && options.decrypt) || undefined;
-                if (!decrypt) {
-                    var xhr = props.xhr;
-                    var encryptResHeader = '';
-                    // Fixed `Refused to get unsafe header "encrypt"`
-                    if (xhr.getAllResponseHeaders().indexOf('encrypt') >= 0) {
-                        encryptResHeader = xhr.getResponseHeader('encrypt');
-                    }
-                    if (encryptResHeader) {
-                        decrypt = JSON.parse(encryptResHeader);
-                    }
-                }
-                if (decrypt) {
-                    var statusField = _this._config.statusField;
-                    var data_1 = response_data_1.getResponseData({ response: response, statusField: statusField });
-                    if (decrypt === 'all') {
+        this.processResponse = function (response, props) { return __awaiter(_this, void 0, void 0, function () {
+            var options, decrypt, xhr, encryptResHeader, statusField, data, secretKey, _i, decrypt_1, field, e_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, processResponse(response, props)];
+                    case 1:
+                        response = _a.sent();
+                        if (response === null) {
+                            return [2 /*return*/, response];
+                        }
+                        options = props.options;
+                        _a.label = 2;
+                    case 2:
+                        _a.trys.push([2, 10, , 11]);
+                        decrypt = (options && options.decrypt) || undefined;
+                        if (!decrypt) {
+                            xhr = props.xhr;
+                            encryptResHeader = '';
+                            // Fixed `Refused to get unsafe header "encrypt"`
+                            if (xhr.getAllResponseHeaders().indexOf('encrypt') >= 0) {
+                                encryptResHeader = xhr.getResponseHeader('encrypt');
+                            }
+                            if (encryptResHeader) {
+                                decrypt = JSON.parse(encryptResHeader);
+                            }
+                        }
+                        if (!decrypt) return [3 /*break*/, 9];
+                        statusField = this._config.statusField;
+                        data = response_data_1.getResponseData({ response: response, statusField: statusField });
+                        if (!(decrypt === 'all')) return [3 /*break*/, 4];
+                        secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+                        return [4 /*yield*/, crypto_1.default.AES.decrypt(data, secretKey)];
+                    case 3:
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        data_1 = client_crypto_1.default.AES.decrypt(data_1);
-                    }
-                    else {
-                        if (!data_1 || typeof data_1 !== 'object') {
-                            return response;
+                        data = _a.sent();
+                        return [3 /*break*/, 8];
+                    case 4:
+                        if (!data || typeof data !== 'object') {
+                            return [2 /*return*/, response];
                         }
-                        if (Array.isArray(decrypt)) {
-                            decrypt.forEach(function (field) { return __awaiter(_this, void 0, void 0, function () {
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0: return [4 /*yield*/, decryptDataField(data_1, field)];
-                                        case 1:
-                                            _a.sent();
-                                            return [2 /*return*/];
-                                    }
-                                });
-                            }); });
-                        }
-                    }
-                    response = response_data_1.setResponseData({ response: response, data: data_1, statusField: statusField });
+                        if (!Array.isArray(decrypt)) return [3 /*break*/, 8];
+                        _i = 0, decrypt_1 = decrypt;
+                        _a.label = 5;
+                    case 5:
+                        if (!(_i < decrypt_1.length)) return [3 /*break*/, 8];
+                        field = decrypt_1[_i];
+                        // eslint-disable-next-line no-await-in-loop
+                        return [4 /*yield*/, decryptDataField(data, field)];
+                    case 6:
+                        // eslint-disable-next-line no-await-in-loop
+                        _a.sent();
+                        _a.label = 7;
+                    case 7:
+                        _i++;
+                        return [3 /*break*/, 5];
+                    case 8:
+                        response = response_data_1.setResponseData({ response: response, data: data, statusField: statusField });
+                        _a.label = 9;
+                    case 9: return [3 /*break*/, 11];
+                    case 10:
+                        e_2 = _a.sent();
+                        props.reject(e_2);
+                        catch_1.catchAjaxError({
+                            e: e_2,
+                            method: props.method,
+                            url: props.url,
+                            params: props.params,
+                            callback: this.catchError,
+                            type: 'log',
+                            options: options,
+                            xCorrelationID: props.xCorrelationID,
+                            xhr: props.xhr,
+                        });
+                        return [3 /*break*/, 11];
+                    case 11: return [2 /*return*/, response];
                 }
-            }
-            catch (e) {
-                props.reject(e);
-                catch_1.catchAjaxError({
-                    e: e,
-                    method: props.method,
-                    url: props.url,
-                    params: props.params,
-                    callback: _this.catchError,
-                    type: 'log',
-                    options: options,
-                    xCorrelationID: props.xCorrelationID,
-                    xhr: props.xhr,
-                });
-            }
-            return response;
-        };
+            });
+        }); };
         this.clear = function () {
             clear();
             clearCrypto();

@@ -64,7 +64,7 @@ var crypto = {
                             }, publicKey, secretKey)];
                     case 2:
                         encryptedKey = _a.sent();
-                        strEncryptedKey = crypto.ab2str(encryptedKey);
+                        strEncryptedKey = window.btoa(crypto.ab2str(encryptedKey));
                         return [2 /*return*/, strEncryptedKey];
                 }
             });
@@ -84,19 +84,18 @@ var crypto = {
                         return [4 /*yield*/, crypto.AES.exportCryptoKey(key)];
                     case 2:
                         arrBufferSecretKey = _a.sent();
-                        secretKeyStr = crypto.ab2str(arrBufferSecretKey);
+                        secretKeyStr = window.btoa(crypto.ab2str(arrBufferSecretKey));
                         return [2 /*return*/, secretKeyStr];
                 }
             });
         }); },
         encrypt: function (data, rawKey) { return __awaiter(void 0, void 0, void 0, function () {
-            var iv, tag, arrBufferKey, secretKey, enc, newData, ciphertext, strIv, strTag, strCiphertext;
+            var iv, arrBufferKey, secretKey, enc, newData, ciphertext, strIv, strCiphertext;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         iv = window.crypto.getRandomValues(new Uint8Array(12));
-                        tag = window.crypto.getRandomValues(new Uint8Array(128));
-                        arrBufferKey = crypto.str2ab(rawKey);
+                        arrBufferKey = crypto.str2ab(window.atob(rawKey));
                         return [4 /*yield*/, window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                                 'encrypt',
                                 'decrypt',
@@ -104,7 +103,7 @@ var crypto = {
                     case 1:
                         secretKey = _a.sent();
                         enc = new TextEncoder();
-                        newData = enc.encode(data);
+                        newData = enc.encode(JSON.stringify(data));
                         return [4 /*yield*/, window.crypto.subtle.encrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
@@ -113,22 +112,23 @@ var crypto = {
                     case 2:
                         ciphertext = _a.sent();
                         strIv = crypto.ab2str(iv);
-                        strTag = crypto.ab2str(tag);
                         strCiphertext = crypto.ab2str(ciphertext);
-                        return [2 /*return*/, "" + strIv + strTag + strCiphertext];
+                        return [2 /*return*/, window.btoa("" + strIv + strCiphertext)];
                 }
             });
         }); },
         decrypt: function (ciphertext, rawKey) { return __awaiter(void 0, void 0, void 0, function () {
-            var strIv, strCiphertext, iv, newCiphertext, secretKey, data;
+            var strIv, strCiphertext, iv, newCiphertext, arrBufferKey, secretKey, data;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        ciphertext = window.atob(ciphertext);
                         strIv = ciphertext.slice(0, 12);
                         strCiphertext = ciphertext.slice(12);
                         iv = crypto.str2ab(strIv);
                         newCiphertext = crypto.str2ab(strCiphertext);
-                        return [4 /*yield*/, window.crypto.subtle.importKey('raw', rawKey, 'AES-GCM', true, [
+                        arrBufferKey = crypto.str2ab(window.atob(rawKey));
+                        return [4 /*yield*/, window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                                 'encrypt',
                                 'decrypt',
                             ])];
@@ -140,19 +140,18 @@ var crypto = {
                             }, secretKey, newCiphertext)];
                     case 2:
                         data = _a.sent();
-                        return [2 /*return*/, data];
+                        return [2 /*return*/, JSON.parse(new TextDecoder().decode(data))];
                 }
             });
         }); },
         exportCryptoKey: function (key) { return __awaiter(void 0, void 0, void 0, function () {
-            var exported, exportedKeyBuffer;
+            var exported;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, window.crypto.subtle.exportKey('raw', key)];
                     case 1:
                         exported = _a.sent();
-                        exportedKeyBuffer = new Uint8Array(exported);
-                        return [2 /*return*/, exportedKeyBuffer];
+                        return [2 /*return*/, exported];
                 }
             });
         }); },

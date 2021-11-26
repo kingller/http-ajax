@@ -165,7 +165,11 @@ var AjaxBase = /** @class */ (function () {
             return params;
         };
         this.processResponse = function (response, props) {
-            return response;
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, response];
+                });
+            });
         };
         /** 私有变量，请勿使用 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -440,113 +444,126 @@ var AjaxBase = /** @class */ (function () {
                         chunked = [];
                         ajaxThis = this;
                         xhr.onreadystatechange = function () {
-                            var _a;
-                            var _this = this;
-                            if (options.onData) {
-                                if (this.readyState === 3 || this.readyState === 4) {
-                                    // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
-                                    if (this.response) {
-                                        var chunks = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
-                                        if (!chunks) {
-                                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                                            console && console.error(method + " " + url + " Incorrect response");
-                                            return;
-                                        }
-                                        chunks = chunks.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
-                                        // 取出新增的数据
-                                        var data = chunks.slice(chunked.length);
-                                        data.forEach(function (item) {
-                                            try {
-                                                options.onData(JSON.parse(item));
+                            return __awaiter(this, void 0, void 0, function () {
+                                var chunks, data, res, statusField, errorResponse;
+                                var _a;
+                                var _this = this;
+                                return __generator(this, function (_b) {
+                                    switch (_b.label) {
+                                        case 0:
+                                            if (options.onData) {
+                                                if (this.readyState === 3 || this.readyState === 4) {
+                                                    // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
+                                                    if (this.response) {
+                                                        chunks = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
+                                                        if (!chunks) {
+                                                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                                                            console && console.error(method + " " + url + " Incorrect response");
+                                                            return [2 /*return*/];
+                                                        }
+                                                        chunks = chunks.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
+                                                        data = chunks.slice(chunked.length);
+                                                        data.forEach(function (item) {
+                                                            try {
+                                                                options.onData(JSON.parse(item));
+                                                            }
+                                                            catch (e) {
+                                                                options.onData(item);
+                                                            }
+                                                        });
+                                                        chunked = chunks;
+                                                    }
+                                                }
                                             }
-                                            catch (e) {
-                                                options.onData(item);
+                                            if (this.readyState !== 4)
+                                                return [2 /*return*/];
+                                            // 关闭加载效果
+                                            if (loadingComponent) {
+                                                loadingComponent.finish();
                                             }
-                                        });
-                                        chunked = chunks;
+                                            if (options && options.cancelToken) {
+                                                // 请求完成，删除缓存的cancel
+                                                ajaxThis.removeCacheCancel(options.cancelToken);
+                                            }
+                                            if (!(this.status === 200 || this.status === 201)) return [3 /*break*/, 2];
+                                            res = void 0;
+                                            statusField = ajaxThis._config.statusField;
+                                            if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
+                                                res = (_a = {},
+                                                    _a[statusField] = true,
+                                                    _a.data = this.response || this.responseText,
+                                                    _a);
+                                            }
+                                            else {
+                                                // IE9下responseType为json时，response的值为undefined，返回值需去responseText取
+                                                // 其它浏览器responseType为json时，取response
+                                                if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
+                                                    res = this.response;
+                                                }
+                                                else {
+                                                    res = JSON.parse(this.response || this.responseText || '{}');
+                                                }
+                                            }
+                                            return [4 /*yield*/, ajaxThis.processResponse(res, {
+                                                    xhr: xhr,
+                                                    method: method,
+                                                    url: url,
+                                                    params: _opts.params,
+                                                    options: options,
+                                                    resolve: resolve,
+                                                    reject: reject,
+                                                    xCorrelationID: _opts.xCorrelationID,
+                                                })];
+                                        case 1:
+                                            res = _b.sent();
+                                            res = transform_response_1.transformResponse({ response: res, options: options, xhr: xhr, statusField: statusField });
+                                            if (options.cache) {
+                                                ajaxThis._cache[url] = res;
+                                            }
+                                            ajaxThis.responseEnd(xhr, _opts, { success: true });
+                                            ajaxThis.onSuccess(xhr, {
+                                                response: res,
+                                                method: _opts.method,
+                                                url: _opts.url,
+                                                params: _opts.params,
+                                                options: options,
+                                                resolve: resolve,
+                                                reject: reject,
+                                                xCorrelationID: _opts.xCorrelationID,
+                                            });
+                                            return [3 /*break*/, 5];
+                                        case 2:
+                                            if (!(this.status === 204)) return [3 /*break*/, 4];
+                                            return [4 /*yield*/, ajaxThis.processResponse(null, {
+                                                    xhr: xhr,
+                                                    method: method,
+                                                    url: url,
+                                                    params: _opts.params,
+                                                    options: options,
+                                                    resolve: resolve,
+                                                    reject: reject,
+                                                    xCorrelationID: _opts.xCorrelationID,
+                                                })];
+                                        case 3:
+                                            _b.sent();
+                                            ajaxThis.responseEnd(xhr, _opts, { success: true });
+                                            resolve(null);
+                                            return [3 /*break*/, 5];
+                                        case 4:
+                                            ajaxThis.responseEnd(xhr, _opts, { success: false });
+                                            // @ts-ignore
+                                            if (this.aborted) {
+                                                return [2 /*return*/];
+                                            }
+                                            errorResponse = ajaxThis.processErrorResponse(this, _opts);
+                                            promise_1.promisify(errorResponse).then(function () {
+                                                ajaxThis.onError(_this, _opts);
+                                            });
+                                            _b.label = 5;
+                                        case 5: return [2 /*return*/];
                                     }
-                                }
-                            }
-                            if (this.readyState !== 4)
-                                return;
-                            // 关闭加载效果
-                            if (loadingComponent) {
-                                loadingComponent.finish();
-                            }
-                            if (options && options.cancelToken) {
-                                // 请求完成，删除缓存的cancel
-                                ajaxThis.removeCacheCancel(options.cancelToken);
-                            }
-                            if (this.status === 200 || this.status === 201) {
-                                var res = void 0;
-                                var statusField = ajaxThis._config.statusField;
-                                if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
-                                    res = (_a = {},
-                                        _a[statusField] = true,
-                                        _a.data = this.response || this.responseText,
-                                        _a);
-                                }
-                                else {
-                                    // IE9下responseType为json时，response的值为undefined，返回值需去responseText取
-                                    // 其它浏览器responseType为json时，取response
-                                    if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
-                                        res = this.response;
-                                    }
-                                    else {
-                                        res = JSON.parse(this.response || this.responseText || '{}');
-                                    }
-                                }
-                                res = ajaxThis.processResponse(res, {
-                                    xhr: xhr,
-                                    method: method,
-                                    url: url,
-                                    params: _opts.params,
-                                    options: options,
-                                    resolve: resolve,
-                                    reject: reject,
-                                    xCorrelationID: _opts.xCorrelationID,
                                 });
-                                res = transform_response_1.transformResponse({ response: res, options: options, xhr: xhr, statusField: statusField });
-                                if (options.cache) {
-                                    ajaxThis._cache[url] = res;
-                                }
-                                ajaxThis.responseEnd(xhr, _opts, { success: true });
-                                ajaxThis.onSuccess(xhr, {
-                                    response: res,
-                                    method: _opts.method,
-                                    url: _opts.url,
-                                    params: _opts.params,
-                                    options: options,
-                                    resolve: resolve,
-                                    reject: reject,
-                                    xCorrelationID: _opts.xCorrelationID,
-                                });
-                            }
-                            else if (this.status === 204) {
-                                ajaxThis.processResponse(null, {
-                                    xhr: xhr,
-                                    method: method,
-                                    url: url,
-                                    params: _opts.params,
-                                    options: options,
-                                    resolve: resolve,
-                                    reject: reject,
-                                    xCorrelationID: _opts.xCorrelationID,
-                                });
-                                ajaxThis.responseEnd(xhr, _opts, { success: true });
-                                resolve(null);
-                            }
-                            else {
-                                ajaxThis.responseEnd(xhr, _opts, { success: false });
-                                // @ts-ignore
-                                if (this.aborted) {
-                                    return;
-                                }
-                                var errorResponse = ajaxThis.processErrorResponse(this, _opts);
-                                promise_1.promisify(errorResponse).then(function () {
-                                    ajaxThis.onError(_this, _opts);
-                                });
-                            }
+                            });
                         };
                         xhr.open(method, url_1.addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
                         // xhr.responseType = 'json';
