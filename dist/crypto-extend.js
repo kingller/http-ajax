@@ -40,7 +40,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var lodash_1 = __importDefault(require("lodash"));
-var client_crypto_1 = __importDefault(require("client-crypto"));
 var storage_1 = __importDefault(require("./utils/storage"));
 var enums_1 = require("./utils/enums");
 var clone_1 = require("./utils/clone");
@@ -61,12 +60,12 @@ var waitingPublicKeyPromise = [];
  * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密。
  */
 function cryptoExtend() {
-    // (function (): void {
-    //     const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
-    //     if (secretKey) {
-    //         Crypto.AES.setKey(window.atob(secretKey));
-    //     }
-    // })();
+    (function () {
+        var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
+        if (secretKey) {
+            crypto_1.default.AES.setKey(secretKey);
+        }
+    })();
     return function crypto() {
         var _this = this;
         var _a = this, beforeSend = _a.beforeSend, processData = _a.processData, processResponse = _a.processResponse, processErrorResponse = _a.processErrorResponse, clear = _a.clear;
@@ -115,7 +114,7 @@ function cryptoExtend() {
                 // 将加密后的秘钥传输给服务器端
                 // eslint-disable-next-line no-async-promise-executor
                 secretKeyPromise = new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-                    var key, newEncryptedSecretKey;
+                    var key, encryptedSecretKey;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0: return [4 /*yield*/, crypto_1.default.AES.createKey()];
@@ -123,9 +122,9 @@ function cryptoExtend() {
                                 key = _a.sent();
                                 return [4 /*yield*/, crypto_1.default.RSA.encrypt(key, publicKeyResponse.publicKey)];
                             case 2:
-                                newEncryptedSecretKey = _a.sent();
+                                encryptedSecretKey = _a.sent();
                                 this
-                                    .post('/encryption/token', { token: newEncryptedSecretKey }, {
+                                    .post('/encryption/token', { token: encryptedSecretKey }, {
                                     headers: {
                                         uuid: publicKeyResponse.uuid,
                                     },
@@ -184,7 +183,7 @@ function cryptoExtend() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         encryptOrDecryptFuc) {
             return __awaiter(this, void 0, void 0, function () {
-                var currentData, index, fieldName, _i, _a, _b, v, i, secretKey, _c, _d, value, secretKey, _e, _f, restFieldPaths, _g, _h, d;
+                var currentData, index, fieldName, _i, _a, _b, v, i, _c, _d, value, _e, _f, restFieldPaths, _g, _h, d;
                 return __generator(this, function (_j) {
                     switch (_j.label) {
                         case 0:
@@ -214,12 +213,11 @@ function cryptoExtend() {
                             if (!(_i < _a.length)) return [3 /*break*/, 5];
                             _b = _a[_i], v = _b[0], i = _b[1];
                             if (!(typeof v !== 'undefined')) return [3 /*break*/, 4];
-                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             // eslint-disable-next-line no-await-in-loop
                             _c = currentData;
                             _d = i;
-                            return [4 /*yield*/, encryptOrDecryptFuc(v, secretKey)];
+                            return [4 /*yield*/, encryptOrDecryptFuc(v)];
                         case 3:
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             // eslint-disable-next-line no-await-in-loop
@@ -232,12 +230,11 @@ function cryptoExtend() {
                         case 6:
                             value = currentData[fieldName];
                             if (!(typeof value !== 'undefined')) return [3 /*break*/, 8];
-                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             // eslint-disable-next-line no-await-in-loop
                             _e = currentData;
                             _f = fieldName;
-                            return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
+                            return [4 /*yield*/, encryptOrDecryptFuc(value)];
                         case 7:
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             // eslint-disable-next-line no-await-in-loop
@@ -278,7 +275,7 @@ function cryptoExtend() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data, filed, type) {
             return __awaiter(this, void 0, void 0, function () {
-                var encryptOrDecryptFuc, fieldPaths, value, secretKey;
+                var encryptOrDecryptFuc, fieldPaths, value;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0:
@@ -295,8 +292,7 @@ function cryptoExtend() {
                         case 2:
                             value = lodash_1.default.get(data, filed);
                             if (!(typeof value !== 'undefined')) return [3 /*break*/, 4];
-                            secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
-                            return [4 /*yield*/, encryptOrDecryptFuc(value, secretKey)];
+                            return [4 /*yield*/, encryptOrDecryptFuc(value)];
                         case 3:
                             value = _a.sent();
                             lodash_1.default.set(data, filed, value);
@@ -337,7 +333,7 @@ function cryptoExtend() {
         function clearCrypto() {
             storage_1.default.removeItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
             storage_1.default.removeItem(enums_1.STORAGE_KEY.UUID, 'session');
-            client_crypto_1.default.AES.clearKey();
+            crypto_1.default.AES.clearKey();
             publicKeyPromise = null;
             secretKeyPromise = null;
             waitingPublicKeyPromise = [];
@@ -384,7 +380,7 @@ function cryptoExtend() {
             return promise;
         };
         this.processData = function (params, props) { return __awaiter(_this, void 0, void 0, function () {
-            var options, reject, secretKey, _i, _a, field, e_1;
+            var options, reject, _i, _a, field, e_1;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0: return [4 /*yield*/, processData(params, props)];
@@ -398,8 +394,7 @@ function cryptoExtend() {
                         if (!(params && options && options.encrypt)) return [3 /*break*/, 8];
                         params = clone_1.cloneDeep(params);
                         if (!(options.encrypt === 'all')) return [3 /*break*/, 4];
-                        secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
-                        return [4 /*yield*/, crypto_1.default.AES.encrypt(params, secretKey)];
+                        return [4 /*yield*/, crypto_1.default.AES.encrypt(params)];
                     case 3: return [2 /*return*/, _b.sent()];
                     case 4:
                         if (!params || typeof params !== 'object') {
@@ -442,7 +437,7 @@ function cryptoExtend() {
             });
         }); };
         this.processResponse = function (response, props) { return __awaiter(_this, void 0, void 0, function () {
-            var options, decrypt, xhr, encryptResHeader, statusField, data, secretKey, _i, decrypt_1, field, e_2;
+            var options, decrypt, xhr, encryptResHeader, statusField, data, _i, decrypt_1, field, e_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, processResponse(response, props)];
@@ -471,8 +466,7 @@ function cryptoExtend() {
                         statusField = this._config.statusField;
                         data = response_data_1.getResponseData({ response: response, statusField: statusField });
                         if (!(decrypt === 'all')) return [3 /*break*/, 4];
-                        secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
-                        return [4 /*yield*/, crypto_1.default.AES.decrypt(data, secretKey)];
+                        return [4 /*yield*/, crypto_1.default.AES.decrypt(data)];
                     case 3:
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         data = _a.sent();

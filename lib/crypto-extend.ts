@@ -17,7 +17,7 @@ import {
     IRequestOptions,
     IProcessResponseOptions,
 } from './interface';
-import newCrypto from './utils/crypto';
+import webCrypto from './utils/crypto';
 
 interface IPublicKeyResponse {
     publicKey: string;
@@ -39,12 +39,12 @@ let waitingPublicKeyPromise: { resolve: () => void; reject: (e?: any) => void }[
  * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密。
  */
 function cryptoExtend(): () => void {
-    // (function (): void {
-    //     const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
-    //     if (secretKey) {
-    //         Crypto.AES.setKey(window.atob(secretKey));
-    //     }
-    // })();
+    (function (): void {
+        const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
+        if (secretKey) {
+            webCrypto.AES.setKey(secretKey);
+        }
+    })();
 
     return function crypto(): void {
         const { beforeSend, processData, processResponse, processErrorResponse, clear } = this as IAjax;
@@ -98,14 +98,13 @@ function cryptoExtend(): () => void {
                 // eslint-disable-next-line no-async-promise-executor
                 secretKeyPromise = new Promise(async (resolve, reject) => {
                     // 生成AES秘钥
-                    const key = await newCrypto.AES.createKey();
+                    const key = await webCrypto.AES.createKey();
                     // 使用RSA公钥加密秘钥
-                    const newEncryptedSecretKey = await newCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
-
+                    const encryptedSecretKey = await webCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
                     (this as IAjax)
                         .post(
                             '/encryption/token',
-                            { token: newEncryptedSecretKey },
+                            { token: encryptedSecretKey },
                             {
                                 headers: {
                                     uuid: publicKeyResponse.uuid,
@@ -163,7 +162,7 @@ function cryptoExtend(): () => void {
             data: { [name: string]: any } | any[],
             fieldPaths: string[],
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            encryptOrDecryptFuc: (data: any, key) => any
+            encryptOrDecryptFuc: (data: any, key?) => any
         ) {
             let currentData = data;
             for (let index = 0; index < fieldPaths.length; index++) {
@@ -185,23 +184,18 @@ function cryptoExtend(): () => void {
                     if (fieldName === '${index}') {
                         for (const [v, i] of currentData as any[]) {
                             if (typeof v !== 'undefined') {
-                                const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 // eslint-disable-next-line no-await-in-loop
-                                (currentData as any[])[i] = await encryptOrDecryptFuc(v, secretKey);
+                                (currentData as any[])[i] = await encryptOrDecryptFuc(v);
                             }
                         }
                     } else {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const value = (currentData as { [name: string]: any })[fieldName];
                         if (typeof value !== 'undefined') {
-                            const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             // eslint-disable-next-line no-await-in-loop
-                            (currentData as { [name: string]: any })[fieldName] = await encryptOrDecryptFuc(
-                                value,
-                                secretKey
-                            );
+                            (currentData as { [name: string]: any })[fieldName] = await encryptOrDecryptFuc(value);
                         }
                     }
                     return;
@@ -230,7 +224,7 @@ function cryptoExtend(): () => void {
             if (!filed || !data) {
                 return;
             }
-            const encryptOrDecryptFuc = type === 'encrypt' ? newCrypto.AES.encrypt : newCrypto.AES.decrypt;
+            const encryptOrDecryptFuc = type === 'encrypt' ? webCrypto.AES.encrypt : webCrypto.AES.decrypt;
             if (/\$\{index\}(\.|$)/.test(filed)) {
                 // 需要遍历数组加密
                 const fieldPaths = filed.split('.');
@@ -238,9 +232,7 @@ function cryptoExtend(): () => void {
             } else {
                 let value = _.get(data, filed);
                 if (typeof value !== 'undefined') {
-                    const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
-
-                    value = await encryptOrDecryptFuc(value, secretKey);
+                    value = await encryptOrDecryptFuc(value);
                     _.set(data, filed, value);
                 }
             }
@@ -261,7 +253,7 @@ function cryptoExtend(): () => void {
         function clearCrypto(): void {
             storage.removeItem(STORAGE_KEY.SECRET_KEY, 'session');
             storage.removeItem(STORAGE_KEY.UUID, 'session');
-            Crypto.AES.clearKey();
+            webCrypto.AES.clearKey();
             publicKeyPromise = null;
             secretKeyPromise = null;
             waitingPublicKeyPromise = [];
@@ -317,8 +309,7 @@ function cryptoExtend(): () => void {
                 if (params && options && options.encrypt) {
                     params = cloneDeep(params);
                     if (options.encrypt === 'all') {
-                        const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
-                        return await newCrypto.AES.encrypt(params, secretKey);
+                        return await webCrypto.AES.encrypt(params);
                     }
                     if (!params || typeof params !== 'object') {
                         return params;
@@ -373,9 +364,8 @@ function cryptoExtend(): () => void {
                     let data = getResponseData({ response, statusField });
 
                     if (decrypt === 'all') {
-                        const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session');
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        data = await newCrypto.AES.decrypt(data, secretKey);
+                        data = await webCrypto.AES.decrypt(data);
                     } else {
                         if (!data || typeof data !== 'object') {
                             return response;
