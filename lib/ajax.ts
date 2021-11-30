@@ -49,9 +49,7 @@ export class HttpAjax extends AjaxBase {
                 window.$feedback(response.errorMsg);
             }
         } else {
-            resolve(
-                getResponseData<T>({ response, statusField })
-            );
+            resolve(getResponseData<T>({ response, statusField }));
         }
     }
 
