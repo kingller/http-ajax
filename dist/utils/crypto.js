@@ -55,16 +55,16 @@ var RSA = /** @class */ (function () {
     function RSA() {
         var _this = this;
         this.encrypt = function (secretKeyStr, pem) { return __awaiter(_this, void 0, void 0, function () {
-            var crypto, secretKey, pemHeader, pemFooter, pemContents, binaryDerString, binaryDer, publicKey, encryptedKey, strEncryptedKey;
+            var webCrypto, secretKey, pemHeader, pemFooter, pemContents, binaryDerString, binaryDer, publicKey, encryptedKey, strEncryptedKey;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        crypto = window.crypto ||
+                        webCrypto = window.crypto ||
                             window.webkitCrypto ||
                             window.mozCrypto ||
                             window.oCrypto ||
                             window.msCrypto;
-                        if (!crypto) {
+                        if (!webCrypto) {
                             return [2 /*return*/, client_crypto_1.default.RSA.encrypt(secretKeyStr, pem)];
                         }
                         secretKey = str2ab(secretKeyStr);
@@ -77,13 +77,13 @@ var RSA = /** @class */ (function () {
                         }
                         binaryDerString = window.atob(pemContents);
                         binaryDer = str2ab(binaryDerString);
-                        return [4 /*yield*/, window.crypto.subtle.importKey('spki', binaryDer, {
+                        return [4 /*yield*/, webCrypto.subtle.importKey('spki', binaryDer, {
                                 name: 'RSA-OAEP',
                                 hash: 'SHA-256',
                             }, true, ['encrypt'])];
                     case 1:
                         publicKey = _a.sent();
-                        return [4 /*yield*/, window.crypto.subtle.encrypt({
+                        return [4 /*yield*/, webCrypto.subtle.encrypt({
                                 name: 'RSA-OAEP',
                             }, publicKey, secretKey)];
                     case 2:
@@ -100,19 +100,19 @@ var AES = /** @class */ (function () {
     function AES() {
         var _this = this;
         this.createKey = function () { return __awaiter(_this, void 0, void 0, function () {
-            var crypto, key, arrBufferSecretKey, secretKeyStr;
+            var webCrypto, key, arrBufferSecretKey, secretKeyStr;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        crypto = window.crypto ||
+                        webCrypto = window.crypto ||
                             window.webkitCrypto ||
                             window.mozCrypto ||
                             window.oCrypto ||
                             window.msCrypto;
-                        if (!crypto) {
+                        if (!webCrypto) {
                             return [2 /*return*/, window.btoa(client_crypto_1.default.AES.createKey(16))];
                         }
-                        return [4 /*yield*/, window.crypto.subtle.generateKey({
+                        return [4 /*yield*/, webCrypto.subtle.generateKey({
                                 name: 'AES-GCM',
                                 length: 128,
                             }, true, ['encrypt', 'decrypt'])];
@@ -129,46 +129,46 @@ var AES = /** @class */ (function () {
         }); };
         /** 设置秘钥 */
         this.setKey = function (secretKey) {
-            var crypto = window.crypto ||
+            var webCrypto = window.crypto ||
                 window.webkitCrypto ||
                 window.mozCrypto ||
                 window.oCrypto ||
                 window.msCrypto;
-            if (!crypto) {
+            if (!webCrypto) {
                 client_crypto_1.default.AES.setKey(window.atob(secretKey));
             }
             _this._key = secretKey;
         };
         this.clearKey = function () {
-            var crypto = window.crypto ||
+            var webCrypto = window.crypto ||
                 window.webkitCrypto ||
                 window.mozCrypto ||
                 window.oCrypto ||
                 window.msCrypto;
-            if (!crypto) {
+            if (!webCrypto) {
                 client_crypto_1.default.AES.clearKey();
             }
             _this._key = undefined;
         };
         this.encrypt = function (data, rawKey) { return __awaiter(_this, void 0, void 0, function () {
-            var crypto, iv, arrBufferKey, secretKey, enc, newData, ciphertext, strIv, strCiphertext;
+            var webCrypto, iv, arrBufferKey, secretKey, enc, newData, ciphertext, strIv, strCiphertext;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!rawKey) {
                             rawKey = this._key;
                         }
-                        crypto = window.crypto ||
+                        webCrypto = window.crypto ||
                             window.webkitCrypto ||
                             window.mozCrypto ||
                             window.oCrypto ||
                             window.msCrypto;
-                        if (!crypto) {
+                        if (!webCrypto) {
                             return [2 /*return*/, client_crypto_1.default.AES.encrypt(data)];
                         }
-                        iv = window.crypto.getRandomValues(new Uint8Array(12));
+                        iv = webCrypto.getRandomValues(new Uint8Array(12));
                         arrBufferKey = str2ab(window.atob(rawKey));
-                        return [4 /*yield*/, window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
+                        return [4 /*yield*/, webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                                 'encrypt',
                                 'decrypt',
                             ])];
@@ -176,7 +176,7 @@ var AES = /** @class */ (function () {
                         secretKey = _a.sent();
                         enc = new TextEncoder();
                         newData = enc.encode(JSON.stringify(data));
-                        return [4 /*yield*/, window.crypto.subtle.encrypt({
+                        return [4 /*yield*/, webCrypto.subtle.encrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
                                 tagLength: 128,
@@ -190,19 +190,19 @@ var AES = /** @class */ (function () {
             });
         }); };
         this.decrypt = function (ciphertext, rawKey) { return __awaiter(_this, void 0, void 0, function () {
-            var crypto, strIv, strCiphertext, iv, newCiphertext, arrBufferKey, secretKey, data;
+            var webCrypto, strIv, strCiphertext, iv, newCiphertext, arrBufferKey, secretKey, data;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         if (!rawKey) {
                             rawKey = this._key;
                         }
-                        crypto = window.crypto ||
+                        webCrypto = window.crypto ||
                             window.webkitCrypto ||
                             window.mozCrypto ||
                             window.oCrypto ||
                             window.msCrypto;
-                        if (!crypto) {
+                        if (!webCrypto) {
                             return [2 /*return*/, client_crypto_1.default.AES.decrypt(ciphertext)];
                         }
                         ciphertext = window.atob(ciphertext);
@@ -211,13 +211,13 @@ var AES = /** @class */ (function () {
                         iv = str2ab(strIv);
                         newCiphertext = str2ab(strCiphertext);
                         arrBufferKey = str2ab(window.atob(rawKey));
-                        return [4 /*yield*/, window.crypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
+                        return [4 /*yield*/, webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
                                 'encrypt',
                                 'decrypt',
                             ])];
                     case 1:
                         secretKey = _a.sent();
-                        return [4 /*yield*/, window.crypto.subtle.decrypt({
+                        return [4 /*yield*/, webCrypto.subtle.decrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
                             }, secretKey, newCiphertext)];
@@ -228,10 +228,16 @@ var AES = /** @class */ (function () {
             });
         }); };
         this.exportCryptoKey = function (key) { return __awaiter(_this, void 0, void 0, function () {
-            var exported;
+            var webCrypto, exported;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, window.crypto.subtle.exportKey('raw', key)];
+                    case 0:
+                        webCrypto = window.crypto ||
+                            window.webkitCrypto ||
+                            window.mozCrypto ||
+                            window.oCrypto ||
+                            window.msCrypto;
+                        return [4 /*yield*/, webCrypto.subtle.exportKey('raw', key)];
                     case 1:
                         exported = _a.sent();
                         return [2 /*return*/, exported];

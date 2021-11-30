@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import Crypto from 'client-crypto';
 import storage from './utils/storage';
 import { STORAGE_KEY } from './utils/enums';
 import { cloneDeep } from './utils/clone';

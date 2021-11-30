@@ -9,7 +9,7 @@ declare class AES {
     clearKey: () => void;
     encrypt: (data: any, rawKey?: any) => Promise<string>;
     decrypt: (ciphertext: any, rawKey?: any) => Promise<any>;
-    exportCryptoKey: (key: any) => Promise<ArrayBuffer>;
+    exportCryptoKey: (key: any) => Promise<any>;
 }
 declare const webCrypto: {
     RSA: RSA;
