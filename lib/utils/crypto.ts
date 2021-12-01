@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import Crypto from 'client-crypto';
 
 const str2ab = (str: string) => {
     const buf: ArrayBuffer = new ArrayBuffer(str.length);
@@ -13,16 +12,32 @@ const str2ab = (str: string) => {
 const ab2str = (buf) => {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
 };
+
 class RSA {
-    encrypt = async (secretKeyStr, pem) => {
+    constructor() {
         const webCrypto =
             window.crypto ||
             (window as any).webkitCrypto ||
             (window as any).mozCrypto ||
             (window as any).oCrypto ||
             (window as any).msCrypto;
+
         if (!webCrypto) {
-            return Crypto.RSA.encrypt(secretKeyStr, pem);
+            /* eslint-disable*/
+            this.Crypto = require('client-crypto');
+            /* eslint-enable */
+        } else {
+            this.webCrypto = webCrypto;
+        }
+    }
+
+    webCrypto: any;
+
+    Crypto: any;
+
+    encrypt = async (secretKeyStr, pem) => {
+        if (!this.webCrypto) {
+            return this.Crypto.RSA.encrypt(secretKeyStr, pem);
         }
         // pem需要从字符串转化为CryptoKey类型
         // secretKey需要是ArrayBuffer类型
@@ -36,79 +51,90 @@ class RSA {
         }
         const binaryDerString = window.atob(pemContents);
         const binaryDer = str2ab(binaryDerString);
-        const publicKey = await webCrypto.subtle.importKey(
-            'spki',
-            binaryDer,
-            {
-                name: 'RSA-OAEP',
-                hash: 'SHA-256',
-            },
-            true,
-            ['encrypt']
-        );
+        try {
+            const publicKey = await this.webCrypto.subtle.importKey(
+                'spki',
+                binaryDer,
+                {
+                    name: 'RSA-OAEP',
+                    hash: 'SHA-256',
+                },
+                true,
+                ['encrypt']
+            );
+            publicKey.oncomplete = (e) => {};
+            const encryptedKey = await this.webCrypto.subtle.encrypt(
+                {
+                    name: 'RSA-OAEP',
+                },
+                publicKey,
+                secretKey
+            );
 
-        const encryptedKey = await webCrypto.subtle.encrypt(
-            {
-                name: 'RSA-OAEP',
-            },
-            publicKey,
-            secretKey
-        );
-
-        const strEncryptedKey = window.btoa(ab2str(encryptedKey));
-        return strEncryptedKey;
+            const strEncryptedKey = window.btoa(ab2str(encryptedKey));
+            return strEncryptedKey;
+        } catch (err) {
+            console.log(err);
+        }
     };
 }
 class AES {
-    private _key: string;
-
-    createKey = async () => {
+    constructor() {
         const webCrypto =
             window.crypto ||
             (window as any).webkitCrypto ||
             (window as any).mozCrypto ||
             (window as any).oCrypto ||
             (window as any).msCrypto;
+
         if (!webCrypto) {
-            return window.btoa(Crypto.AES.createKey(16));
+            /* eslint-disable*/
+            this.Crypto = require('client-crypto');
+            /* eslint-enable */
+        } else {
+            this.webCrypto = webCrypto;
         }
-        const key: CryptoKey = await webCrypto.subtle.generateKey(
-            {
-                name: 'AES-GCM',
-                length: 128,
-            },
-            true,
-            ['encrypt', 'decrypt']
-        );
-        const arrBufferSecretKey = await this.exportCryptoKey(key);
-        const secretKeyStr = window.btoa(ab2str(arrBufferSecretKey));
-        this._key = secretKeyStr;
-        return secretKeyStr;
+    }
+
+    webCrypto: any;
+
+    Crypto: any;
+
+    private _key: string;
+
+    createKey = async () => {
+        if (!this.webCrypto) {
+            return window.btoa(this.Crypto.AES.createKey(16));
+        }
+        try {
+            const key: CryptoKey = await this.webCrypto.subtle.generateKey(
+                {
+                    name: 'AES-GCM',
+                    length: 128,
+                },
+                true,
+                ['encrypt', 'decrypt']
+            );
+            const arrBufferSecretKey = await this.exportCryptoKey(key);
+            const secretKeyStr = window.btoa(ab2str(arrBufferSecretKey));
+            this._key = secretKeyStr;
+            return secretKeyStr;
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     /** 设置秘钥 */
     setKey = (secretKey: string) => {
-        const webCrypto =
-            window.crypto ||
-            (window as any).webkitCrypto ||
-            (window as any).mozCrypto ||
-            (window as any).oCrypto ||
-            (window as any).msCrypto;
-        if (!webCrypto) {
-            Crypto.AES.setKey(window.atob(secretKey));
+        if (!this.webCrypto) {
+            this.Crypto.AES.setKey(window.atob(secretKey));
         }
         this._key = secretKey;
     };
 
     clearKey = () => {
-        const webCrypto =
-            window.crypto ||
-            (window as any).webkitCrypto ||
-            (window as any).mozCrypto ||
-            (window as any).oCrypto ||
-            (window as any).msCrypto;
-        if (!webCrypto) {
-            Crypto.AES.clearKey();
+        if (!this.webCrypto) {
+            this.Crypto.AES.clearKey();
         }
         this._key = undefined;
     };
@@ -117,53 +143,44 @@ class AES {
         if (!rawKey) {
             rawKey = this._key;
         }
-        const webCrypto =
-            window.crypto ||
-            (window as any).webkitCrypto ||
-            (window as any).mozCrypto ||
-            (window as any).oCrypto ||
-            (window as any).msCrypto;
-        if (!webCrypto) {
-            return Crypto.AES.encrypt(data);
+        if (!this.webCrypto) {
+            return this.Crypto.AES.encrypt(data);
         }
 
-        const iv = webCrypto.getRandomValues(new Uint8Array(12));
+        const iv = this.webCrypto.getRandomValues(new Uint8Array(12));
         const arrBufferKey = str2ab(window.atob(rawKey));
-        const secretKey = await webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
+        const secretKey = await this.webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
             'encrypt',
             'decrypt',
         ]);
         const enc = new TextEncoder();
         const newData = enc.encode(JSON.stringify(data));
+        try {
+            const ciphertext = await this.webCrypto.subtle.encrypt(
+                {
+                    name: 'AES-GCM',
+                    iv,
+                    tagLength: 128,
+                },
+                secretKey,
+                newData
+            );
 
-        const ciphertext = await webCrypto.subtle.encrypt(
-            {
-                name: 'AES-GCM',
-                iv,
-                tagLength: 128,
-            },
-            secretKey,
-            newData
-        );
+            const strIv = ab2str(iv);
+            const strCiphertext = ab2str(ciphertext);
 
-        const strIv = ab2str(iv);
-        const strCiphertext = ab2str(ciphertext);
-
-        return window.btoa(`${strIv}${strCiphertext}`);
+            return window.btoa(`${strIv}${strCiphertext}`);
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     decrypt = async (ciphertext, rawKey?) => {
         if (!rawKey) {
             rawKey = this._key;
         }
-        const webCrypto =
-            window.crypto ||
-            (window as any).webkitCrypto ||
-            (window as any).mozCrypto ||
-            (window as any).oCrypto ||
-            (window as any).msCrypto;
-        if (!webCrypto) {
-            return Crypto.AES.decrypt(ciphertext);
+        if (!this.webCrypto) {
+            return this.Crypto.AES.decrypt(ciphertext);
         }
 
         ciphertext = window.atob(ciphertext);
@@ -172,36 +189,38 @@ class AES {
         const iv = str2ab(strIv);
         const newCiphertext = str2ab(strCiphertext);
         const arrBufferKey = str2ab(window.atob(rawKey));
-        const secretKey = await webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
-            'encrypt',
-            'decrypt',
-        ]);
-        const data = await webCrypto.subtle.decrypt(
-            {
-                name: 'AES-GCM',
-                iv,
-            },
-            secretKey,
-            newCiphertext
-        );
-        return JSON.parse(new TextDecoder().decode(data));
+        try {
+            const secretKey = await this.webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
+                'encrypt',
+                'decrypt',
+            ]);
+            const data = await this.webCrypto.subtle.decrypt(
+                {
+                    name: 'AES-GCM',
+                    iv,
+                },
+                secretKey,
+                newCiphertext
+            );
+            return JSON.parse(new TextDecoder().decode(data));
+        } catch (err) {
+            console.log(err);
+        }
     };
 
     exportCryptoKey = async (key) => {
-        const webCrypto =
-            window.crypto ||
-            (window as any).webkitCrypto ||
-            (window as any).mozCrypto ||
-            (window as any).oCrypto ||
-            (window as any).msCrypto;
-        const exported = await webCrypto.subtle.exportKey('raw', key);
-        return exported;
+        try {
+            const exported = await this.webCrypto.subtle.exportKey('raw', key);
+            return exported;
+        } catch (err) {
+            console.log(err);
+        }
     };
 }
 
-const webCrypto = {
+const Crypto = {
     RSA: new RSA(),
     AES: new AES(),
 };
 
-export default webCrypto;
+export default Crypto;

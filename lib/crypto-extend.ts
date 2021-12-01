@@ -16,7 +16,7 @@ import {
     IRequestOptions,
     IProcessResponseOptions,
 } from './interface';
-import webCrypto from './utils/crypto';
+import Crypto from './utils/crypto';
 
 interface IPublicKeyResponse {
     publicKey: string;
@@ -41,7 +41,7 @@ function cryptoExtend(): () => void {
     (function (): void {
         const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
         if (secretKey) {
-            webCrypto.AES.setKey(secretKey);
+            Crypto.AES.setKey(secretKey);
         }
     })();
 
@@ -97,9 +97,9 @@ function cryptoExtend(): () => void {
                 // eslint-disable-next-line no-async-promise-executor
                 secretKeyPromise = new Promise(async (resolve, reject) => {
                     // 生成AES秘钥
-                    const key = await webCrypto.AES.createKey();
+                    const key = await Crypto.AES.createKey();
                     // 使用RSA公钥加密秘钥
-                    const encryptedSecretKey = await webCrypto.RSA.encrypt(key, publicKeyResponse.publicKey);
+                    const encryptedSecretKey = await Crypto.RSA.encrypt(key, publicKeyResponse.publicKey);
                     (this as IAjax)
                         .post(
                             '/encryption/token',
@@ -223,7 +223,7 @@ function cryptoExtend(): () => void {
             if (!filed || !data) {
                 return;
             }
-            const encryptOrDecryptFuc = type === 'encrypt' ? webCrypto.AES.encrypt : webCrypto.AES.decrypt;
+            const encryptOrDecryptFuc = type === 'encrypt' ? Crypto.AES.encrypt : Crypto.AES.decrypt;
             if (/\$\{index\}(\.|$)/.test(filed)) {
                 // 需要遍历数组加密
                 const fieldPaths = filed.split('.');
@@ -252,7 +252,7 @@ function cryptoExtend(): () => void {
         function clearCrypto(): void {
             storage.removeItem(STORAGE_KEY.SECRET_KEY, 'session');
             storage.removeItem(STORAGE_KEY.UUID, 'session');
-            webCrypto.AES.clearKey();
+            Crypto.AES.clearKey();
             publicKeyPromise = null;
             secretKeyPromise = null;
             waitingPublicKeyPromise = [];
@@ -308,7 +308,7 @@ function cryptoExtend(): () => void {
                 if (params && options && options.encrypt) {
                     params = cloneDeep(params);
                     if (options.encrypt === 'all') {
-                        return await webCrypto.AES.encrypt(params);
+                        return await Crypto.AES.encrypt(params);
                     }
                     if (!params || typeof params !== 'object') {
                         return params;
@@ -364,7 +364,7 @@ function cryptoExtend(): () => void {
 
                     if (decrypt === 'all') {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                        data = await webCrypto.AES.decrypt(data);
+                        data = await Crypto.AES.decrypt(data);
                     } else {
                         if (!data || typeof data !== 'object') {
                             return response;
