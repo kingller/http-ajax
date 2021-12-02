@@ -29,6 +29,12 @@ class RSA {
         } else {
             this.webCrypto = webCrypto;
         }
+        if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
+            // eslint-disable-next-line global-require
+            require('webcrypto-shim');
+            // eslint-disable-next-line global-require
+            require('promiz');
+        }
     }
 
     webCrypto: any;
@@ -49,33 +55,29 @@ class RSA {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console && console.error('`window.atob` is undefined');
         }
-        const binaryDerString = window.atob(pemContents);
+        const binaryDerString = window.atob(pemContents.replace(/\s/g, ''));
         const binaryDer = str2ab(binaryDerString);
-        try {
-            const publicKey = await this.webCrypto.subtle.importKey(
-                'spki',
-                binaryDer,
-                {
-                    name: 'RSA-OAEP',
-                    hash: 'SHA-256',
-                },
-                true,
-                ['encrypt']
-            );
-            publicKey.oncomplete = (e) => {};
-            const encryptedKey = await this.webCrypto.subtle.encrypt(
-                {
-                    name: 'RSA-OAEP',
-                },
-                publicKey,
-                secretKey
-            );
+        const publicKey = await this.webCrypto.subtle.importKey(
+            'spki',
+            binaryDer,
+            {
+                name: 'RSA-OAEP',
+                hash: 'SHA-256',
+            },
+            true,
+            ['encrypt']
+        );
 
-            const strEncryptedKey = window.btoa(ab2str(encryptedKey));
-            return strEncryptedKey;
-        } catch (err) {
-            console.log(err);
-        }
+        let encryptedKey = await this.webCrypto.subtle.encrypt(
+            {
+                name: 'RSA-OAEP',
+            },
+            publicKey,
+            secretKey
+        );
+        encryptedKey = encryptedKey.result || encryptedKey;
+        const strEncryptedKey = window.btoa(ab2str(encryptedKey));
+        return strEncryptedKey;
     };
 }
 class AES {
@@ -94,6 +96,12 @@ class AES {
         } else {
             this.webCrypto = webCrypto;
         }
+        if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
+            // eslint-disable-next-line global-require
+            require('webcrypto-shim');
+            // eslint-disable-next-line global-require
+            require('promiz');
+        }
     }
 
     webCrypto: any;
@@ -106,28 +114,25 @@ class AES {
         if (!this.webCrypto) {
             return window.btoa(this.Crypto.AES.createKey(16));
         }
-        try {
-            const key: CryptoKey = await this.webCrypto.subtle.generateKey(
-                {
-                    name: 'AES-GCM',
-                    length: 128,
-                },
-                true,
-                ['encrypt', 'decrypt']
-            );
-            const arrBufferSecretKey = await this.exportCryptoKey(key);
-            const secretKeyStr = window.btoa(ab2str(arrBufferSecretKey));
-            this._key = secretKeyStr;
-            return secretKeyStr;
-        } catch (err) {
-            console.log(err);
-        }
+        let key = await this.webCrypto.subtle.generateKey(
+            {
+                name: 'AES-GCM',
+                length: 128,
+            },
+            true,
+            ['encrypt', 'decrypt']
+        );
+        key = key.result || key;
+        const arrBufferSecretKey = await this.exportCryptoKey(key);
+        const secretKeyStr = window.btoa(ab2str(arrBufferSecretKey));
+        this._key = secretKeyStr;
+        return secretKeyStr;
     };
 
     /** 设置秘钥 */
     setKey = (secretKey: string) => {
         if (!this.webCrypto) {
-            this.Crypto.AES.setKey(window.atob(secretKey));
+            this.Crypto.AES.setKey(window.atob(secretKey.replace(/\s/g, '')));
         }
         this._key = secretKey;
     };
@@ -148,31 +153,26 @@ class AES {
         }
 
         const iv = this.webCrypto.getRandomValues(new Uint8Array(12));
-        const arrBufferKey = str2ab(window.atob(rawKey));
+        const arrBufferKey = str2ab(window.atob(rawKey.replace(/\s/g, '')));
         const secretKey = await this.webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
             'encrypt',
             'decrypt',
         ]);
-        const enc = new TextEncoder();
-        const newData = enc.encode(JSON.stringify(data));
-        try {
-            const ciphertext = await this.webCrypto.subtle.encrypt(
-                {
-                    name: 'AES-GCM',
-                    iv,
-                    tagLength: 128,
-                },
-                secretKey,
-                newData
-            );
+        const newData = this.textEncode(data);
+        let ciphertext = await this.webCrypto.subtle.encrypt(
+            {
+                name: 'AES-GCM',
+                iv,
+                tagLength: 128,
+            },
+            secretKey,
+            newData
+        );
+        ciphertext = ciphertext.result || ciphertext;
+        const strIv = ab2str(iv);
+        const strCiphertext = ab2str(ciphertext);
 
-            const strIv = ab2str(iv);
-            const strCiphertext = ab2str(ciphertext);
-
-            return window.btoa(`${strIv}${strCiphertext}`);
-        } catch (err) {
-            console.log(err);
-        }
+        return window.btoa(`${strIv}${strCiphertext}`);
     };
 
     decrypt = async (ciphertext, rawKey?) => {
@@ -183,38 +183,56 @@ class AES {
             return this.Crypto.AES.decrypt(ciphertext);
         }
 
-        ciphertext = window.atob(ciphertext);
+        ciphertext = window.atob(ciphertext.replace(/\s/g, ''));
         const strIv = ciphertext.slice(0, 12);
         const strCiphertext = ciphertext.slice(12);
         const iv = str2ab(strIv);
         const newCiphertext = str2ab(strCiphertext);
-        const arrBufferKey = str2ab(window.atob(rawKey));
-        try {
-            const secretKey = await this.webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
-                'encrypt',
-                'decrypt',
-            ]);
-            const data = await this.webCrypto.subtle.decrypt(
-                {
-                    name: 'AES-GCM',
-                    iv,
-                },
-                secretKey,
-                newCiphertext
-            );
-            return JSON.parse(new TextDecoder().decode(data));
-        } catch (err) {
-            console.log(err);
-        }
+        const arrBufferKey = str2ab(window.atob(rawKey.replace(/\s/g, '')));
+        const secretKey = await this.webCrypto.subtle.importKey('raw', arrBufferKey, 'AES-GCM', true, [
+            'encrypt',
+            'decrypt',
+        ]);
+
+        let data = await this.webCrypto.subtle.decrypt(
+            {
+                name: 'AES-GCM',
+                iv,
+                tagLength: 128,
+            },
+            secretKey,
+            newCiphertext
+        );
+        data = data.result || data;
+        return JSON.parse(this.textDecode(data));
     };
 
     exportCryptoKey = async (key) => {
-        try {
-            const exported = await this.webCrypto.subtle.exportKey('raw', key);
-            return exported;
-        } catch (err) {
-            console.log(err);
+        let exported = await this.webCrypto.subtle.exportKey('raw', key);
+        exported = exported.result || exported;
+        return exported;
+    };
+
+    textEncode = (str) => {
+        if (window.TextEncoder) {
+            const enc = new TextEncoder();
+            return enc.encode(JSON.stringify(str));
         }
+        const utf8 = unescape(encodeURIComponent(JSON.stringify(str)));
+        const result = new Uint8Array(utf8.length);
+        for (let i = 0; i < utf8.length; i++) {
+            result[i] = utf8.charCodeAt(i);
+        }
+        return result;
+    };
+
+    textDecode = (buf) => {
+        if (!window.TextDecoder) {
+            // eslint-disable-next-line
+            const TextEncodingPolyfill = require('text-encoding');
+            return new TextEncodingPolyfill.TextDecoder().decode(buf);
+        }
+        return new TextDecoder().decode(buf);
     };
 }
 

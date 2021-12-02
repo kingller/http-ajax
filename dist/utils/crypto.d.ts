@@ -16,6 +16,8 @@ declare class AES {
     encrypt: (data: any, rawKey?: any) => Promise<any>;
     decrypt: (ciphertext: any, rawKey?: any) => Promise<any>;
     exportCryptoKey: (key: any) => Promise<any>;
+    textEncode: (str: any) => Uint8Array;
+    textDecode: (buf: any) => any;
 }
 declare const Crypto: {
     RSA: RSA;
