@@ -47,6 +47,33 @@ var str2ab = function (str) {
 var ab2str = function (buf) {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
 };
+var loadScript = function (src, global) {
+    return new Promise(function (resolve, reject) {
+        var script = document.querySelector("script[src=\"" + src + "\"]");
+        if (!script) {
+            script = document.createElement('script');
+            script.src = src;
+            script.onload = function () {
+                if (global) {
+                    resolve(window[global]);
+                }
+                else {
+                    resolve('');
+                }
+            };
+            script.onerror = reject;
+            document.body.appendChild(script);
+        }
+        else {
+            if (global) {
+                resolve(window[global]);
+            }
+            else {
+                resolve('');
+            }
+        }
+    });
+};
 var RSA = /** @class */ (function () {
     function RSA() {
         var _this = this;
@@ -56,7 +83,8 @@ var RSA = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         if (!this.webCrypto) {
-                            return [2 /*return*/, this.Crypto.RSA.encrypt(secretKeyStr, pem)];
+                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                            console && console.error('`window.crypto` is undefined');
                         }
                         secretKey = str2ab(secretKeyStr);
                         pemHeader = '-----BEGIN PUBLIC KEY-----';
@@ -91,18 +119,15 @@ var RSA = /** @class */ (function () {
             window.oCrypto ||
             window.msCrypto;
         if (!webCrypto) {
-            /* eslint-disable*/
-            this.Crypto = require('client-crypto');
-            /* eslint-enable */
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         }
         else {
             this.webCrypto = webCrypto;
         }
         if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
-            // eslint-disable-next-line global-require
-            require('webcrypto-shim');
-            // eslint-disable-next-line global-require
-            require('promiz');
+            loadScript('https://assets.gaiaworks.cn/static/webcrypto-shim/webcrypto-shim.js');
+            loadScript('https://assets.gaiaworks.cn/static/promiz/promiz.js');
         }
     }
     return RSA;
@@ -116,7 +141,8 @@ var AES = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         if (!this.webCrypto) {
-                            return [2 /*return*/, window.btoa(this.Crypto.AES.createKey(16))];
+                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                            console && console.error('`window.crypto` is undefined');
                         }
                         return [4 /*yield*/, this.webCrypto.subtle.generateKey({
                                 name: 'AES-GCM',
@@ -137,13 +163,15 @@ var AES = /** @class */ (function () {
         /** 设置秘钥 */
         this.setKey = function (secretKey) {
             if (!_this.webCrypto) {
-                _this.Crypto.AES.setKey(window.atob(secretKey.replace(/\s/g, '')));
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                console && console.error('`window.crypto` is undefined');
             }
             _this._key = secretKey;
         };
         this.clearKey = function () {
             if (!_this.webCrypto) {
-                _this.Crypto.AES.clearKey();
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                console && console.error('`window.crypto` is undefined');
             }
             _this._key = undefined;
         };
@@ -156,7 +184,8 @@ var AES = /** @class */ (function () {
                             rawKey = this._key;
                         }
                         if (!this.webCrypto) {
-                            return [2 /*return*/, this.Crypto.AES.encrypt(data)];
+                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                            console && console.error('`window.crypto` is undefined');
                         }
                         iv = this.webCrypto.getRandomValues(new Uint8Array(12));
                         arrBufferKey = str2ab(window.atob(rawKey.replace(/\s/g, '')));
@@ -166,13 +195,15 @@ var AES = /** @class */ (function () {
                             ])];
                     case 1:
                         secretKey = _a.sent();
-                        newData = this.textEncode(data);
+                        return [4 /*yield*/, this.textEncode(data)];
+                    case 2:
+                        newData = _a.sent();
                         return [4 /*yield*/, this.webCrypto.subtle.encrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
                                 tagLength: 128,
                             }, secretKey, newData)];
-                    case 2:
+                    case 3:
                         ciphertext = _a.sent();
                         ciphertext = ciphertext.result || ciphertext;
                         strIv = ab2str(iv);
@@ -182,15 +213,16 @@ var AES = /** @class */ (function () {
             });
         }); };
         this.decrypt = function (ciphertext, rawKey) { return __awaiter(_this, void 0, void 0, function () {
-            var strIv, strCiphertext, iv, newCiphertext, arrBufferKey, secretKey, data;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            var strIv, strCiphertext, iv, newCiphertext, arrBufferKey, secretKey, data, _a, _b;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
                     case 0:
                         if (!rawKey) {
                             rawKey = this._key;
                         }
                         if (!this.webCrypto) {
-                            return [2 /*return*/, this.Crypto.AES.decrypt(ciphertext)];
+                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                            console && console.error('`window.crypto` is undefined');
                         }
                         ciphertext = window.atob(ciphertext.replace(/\s/g, ''));
                         strIv = ciphertext.slice(0, 12);
@@ -203,16 +235,18 @@ var AES = /** @class */ (function () {
                                 'decrypt',
                             ])];
                     case 1:
-                        secretKey = _a.sent();
+                        secretKey = _c.sent();
                         return [4 /*yield*/, this.webCrypto.subtle.decrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
                                 tagLength: 128,
                             }, secretKey, newCiphertext)];
                     case 2:
-                        data = _a.sent();
+                        data = _c.sent();
                         data = data.result || data;
-                        return [2 /*return*/, JSON.parse(this.textDecode(data))];
+                        _b = (_a = JSON).parse;
+                        return [4 /*yield*/, this.textDecode(data)];
+                    case 3: return [2 /*return*/, _b.apply(_a, [_c.sent()])];
                 }
             });
         }); };
@@ -228,44 +262,51 @@ var AES = /** @class */ (function () {
                 }
             });
         }); };
-        this.textEncode = function (str) {
-            if (window.TextEncoder) {
-                var enc = new TextEncoder();
-                return enc.encode(JSON.stringify(str));
-            }
-            var utf8 = unescape(encodeURIComponent(JSON.stringify(str)));
-            var result = new Uint8Array(utf8.length);
-            for (var i = 0; i < utf8.length; i++) {
-                result[i] = utf8.charCodeAt(i);
-            }
-            return result;
-        };
-        this.textDecode = function (buf) {
-            if (!window.TextDecoder) {
-                // eslint-disable-next-line
-                var TextEncodingPolyfill = require('text-encoding');
-                return new TextEncodingPolyfill.TextDecoder().decode(buf);
-            }
-            return new TextDecoder().decode(buf);
-        };
+        this.textEncode = function (str) { return __awaiter(_this, void 0, void 0, function () {
+            var enc, utf8, result, i;
+            return __generator(this, function (_a) {
+                if (window.TextEncoder) {
+                    enc = new TextEncoder();
+                    return [2 /*return*/, enc.encode(JSON.stringify(str))];
+                }
+                utf8 = unescape(encodeURIComponent(JSON.stringify(str)));
+                result = new Uint8Array(utf8.length);
+                for (i = 0; i < utf8.length; i++) {
+                    result[i] = utf8.charCodeAt(i);
+                }
+                return [2 /*return*/, result];
+            });
+        }); };
+        this.textDecode = function (buf) { return __awaiter(_this, void 0, void 0, function () {
+            var TextEncoding;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (window.TextDecoder) {
+                            return [2 /*return*/, new TextDecoder().decode(buf)];
+                        }
+                        return [4 /*yield*/, loadScript('https://assets.gaiaworks.cn/static/text-encoding/dist/dist.js', 'TextEncoding')];
+                    case 1:
+                        TextEncoding = _a.sent();
+                        return [2 /*return*/, new TextEncoding.TextDecoder().decode(buf)];
+                }
+            });
+        }); };
         var webCrypto = window.crypto ||
             window.webkitCrypto ||
             window.mozCrypto ||
             window.oCrypto ||
             window.msCrypto;
         if (!webCrypto) {
-            /* eslint-disable*/
-            this.Crypto = require('client-crypto');
-            /* eslint-enable */
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         }
         else {
             this.webCrypto = webCrypto;
         }
         if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
-            // eslint-disable-next-line global-require
-            require('webcrypto-shim');
-            // eslint-disable-next-line global-require
-            require('promiz');
+            loadScript('https://assets.gaiaworks.cn/static/webcrypto-shim/webcrypto-shim.js');
+            loadScript('https://assets.gaiaworks.cn/static/promiz/promiz.js');
         }
     }
     return AES;

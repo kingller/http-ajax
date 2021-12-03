@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import Crypto from 'client-crypto';
+import sjcl from 'browserify-sjcl';
 import uuid from 'uuid/v4';
 import { isFormData } from './utils/form';
 import { IAjax, IAjaxProcessDataAfterOptions, IParams, IMethod, IOptions } from './interface';
@@ -50,12 +50,13 @@ function signatureExtend(): () => void {
 
             const timestamp = new Date().getTime();
             const appNonce = uuid();
+            const out = sjcl.hash.sha256.hash(
+                `${signatureStr}${timestamp}${appNonce.substring(2, appNonce.length - 1)}`
+            ); // bitArray
 
             _.merge(options, {
                 headers: {
-                    [signField]: Crypto.SHA256(
-                        `${signatureStr}${timestamp}${appNonce.substring(2, appNonce.length - 1)}`
-                    ),
+                    [signField]: sjcl.codec.hex.fromBits(out),
                     [timestampField]: timestamp,
                     [appNonceField]: appNonce,
                 },

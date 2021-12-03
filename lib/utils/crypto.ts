@@ -9,10 +9,34 @@ const str2ab = (str: string) => {
     return buf;
 };
 
-const ab2str = (buf) => {
+const ab2str = (buf: ArrayBuffer) => {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
 };
 
+const loadScript = (src: string, global?: string): Promise<any> => {
+    return new Promise((resolve, reject): void => {
+        let script = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement;
+        if (!script) {
+            script = document.createElement('script');
+            script.src = src;
+            script.onload = (): void => {
+                if (global) {
+                    resolve(window[global as keyof Window]);
+                } else {
+                    resolve('');
+                }
+            };
+            script.onerror = reject;
+            document.body.appendChild(script);
+        } else {
+            if (global) {
+                resolve(window[global as keyof Window]);
+            } else {
+                resolve('');
+            }
+        }
+    });
+};
 class RSA {
     constructor() {
         const webCrypto =
@@ -23,17 +47,14 @@ class RSA {
             (window as any).msCrypto;
 
         if (!webCrypto) {
-            /* eslint-disable*/
-            this.Crypto = require('client-crypto');
-            /* eslint-enable */
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         } else {
             this.webCrypto = webCrypto;
         }
         if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
-            // eslint-disable-next-line global-require
-            require('webcrypto-shim');
-            // eslint-disable-next-line global-require
-            require('promiz');
+            loadScript('https://assets.gaiaworks.cn/static/webcrypto-shim/webcrypto-shim.js');
+            loadScript('https://assets.gaiaworks.cn/static/promiz/promiz.js');
         }
     }
 
@@ -43,7 +64,8 @@ class RSA {
 
     encrypt = async (secretKeyStr, pem) => {
         if (!this.webCrypto) {
-            return this.Crypto.RSA.encrypt(secretKeyStr, pem);
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         }
         // pem需要从字符串转化为CryptoKey类型
         // secretKey需要是ArrayBuffer类型
@@ -90,17 +112,14 @@ class AES {
             (window as any).msCrypto;
 
         if (!webCrypto) {
-            /* eslint-disable*/
-            this.Crypto = require('client-crypto');
-            /* eslint-enable */
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         } else {
             this.webCrypto = webCrypto;
         }
         if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
-            // eslint-disable-next-line global-require
-            require('webcrypto-shim');
-            // eslint-disable-next-line global-require
-            require('promiz');
+            loadScript('https://assets.gaiaworks.cn/static/webcrypto-shim/webcrypto-shim.js');
+            loadScript('https://assets.gaiaworks.cn/static/promiz/promiz.js');
         }
     }
 
@@ -112,7 +131,8 @@ class AES {
 
     createKey = async () => {
         if (!this.webCrypto) {
-            return window.btoa(this.Crypto.AES.createKey(16));
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         }
         let key = await this.webCrypto.subtle.generateKey(
             {
@@ -132,14 +152,16 @@ class AES {
     /** 设置秘钥 */
     setKey = (secretKey: string) => {
         if (!this.webCrypto) {
-            this.Crypto.AES.setKey(window.atob(secretKey.replace(/\s/g, '')));
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         }
         this._key = secretKey;
     };
 
     clearKey = () => {
         if (!this.webCrypto) {
-            this.Crypto.AES.clearKey();
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         }
         this._key = undefined;
     };
@@ -149,7 +171,8 @@ class AES {
             rawKey = this._key;
         }
         if (!this.webCrypto) {
-            return this.Crypto.AES.encrypt(data);
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         }
 
         const iv = this.webCrypto.getRandomValues(new Uint8Array(12));
@@ -158,7 +181,7 @@ class AES {
             'encrypt',
             'decrypt',
         ]);
-        const newData = this.textEncode(data);
+        const newData = await this.textEncode(data);
         let ciphertext = await this.webCrypto.subtle.encrypt(
             {
                 name: 'AES-GCM',
@@ -180,7 +203,8 @@ class AES {
             rawKey = this._key;
         }
         if (!this.webCrypto) {
-            return this.Crypto.AES.decrypt(ciphertext);
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+            console && console.error('`window.crypto` is undefined');
         }
 
         ciphertext = window.atob(ciphertext.replace(/\s/g, ''));
@@ -204,7 +228,7 @@ class AES {
             newCiphertext
         );
         data = data.result || data;
-        return JSON.parse(this.textDecode(data));
+        return JSON.parse(await this.textDecode(data));
     };
 
     exportCryptoKey = async (key) => {
@@ -213,11 +237,12 @@ class AES {
         return exported;
     };
 
-    textEncode = (str) => {
+    textEncode = async (str) => {
         if (window.TextEncoder) {
             const enc = new TextEncoder();
             return enc.encode(JSON.stringify(str));
         }
+
         const utf8 = unescape(encodeURIComponent(JSON.stringify(str)));
         const result = new Uint8Array(utf8.length);
         for (let i = 0; i < utf8.length; i++) {
@@ -226,13 +251,15 @@ class AES {
         return result;
     };
 
-    textDecode = (buf) => {
-        if (!window.TextDecoder) {
-            // eslint-disable-next-line
-            const TextEncodingPolyfill = require('text-encoding');
-            return new TextEncodingPolyfill.TextDecoder().decode(buf);
+    textDecode = async (buf) => {
+        if (window.TextDecoder) {
+            return new TextDecoder().decode(buf);
         }
-        return new TextDecoder().decode(buf);
+        const TextEncoding = await loadScript(
+            'https://assets.gaiaworks.cn/static/text-encoding/dist/dist.js',
+            'TextEncoding'
+        );
+        return new TextEncoding.TextDecoder().decode(buf);
     };
 }
 

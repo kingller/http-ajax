@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var lodash_1 = __importDefault(require("lodash"));
-var client_crypto_1 = __importDefault(require("client-crypto"));
+var browserify_sjcl_1 = __importDefault(require("browserify-sjcl"));
 var v4_1 = __importDefault(require("uuid/v4"));
 var form_1 = require("./utils/form");
 /**
@@ -40,9 +40,10 @@ function signatureExtend() {
                 : _this.stringifyParams(params, method, { cache: true, encodeValue: false });
             var timestamp = new Date().getTime();
             var appNonce = v4_1.default();
+            var out = browserify_sjcl_1.default.hash.sha256.hash("" + signatureStr + timestamp + appNonce.substring(2, appNonce.length - 1)); // bitArray
             lodash_1.default.merge(options, {
                 headers: (_b = {},
-                    _b[signField] = client_crypto_1.default.SHA256("" + signatureStr + timestamp + appNonce.substring(2, appNonce.length - 1)),
+                    _b[signField] = browserify_sjcl_1.default.codec.hex.fromBits(out),
                     _b[timestampField] = timestamp,
                     _b[appNonceField] = appNonce,
                     _b),

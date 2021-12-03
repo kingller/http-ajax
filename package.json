@@ -52,12 +52,9 @@
     },
     "dependencies": {
         "browser-which": "^1.1.0",
-        "client-crypto": "~1.2.5",
+        "browserify-sjcl": "^1.0.9",
         "lodash": "^4.17.19",
-        "promiz": "^1.0.6",
-        "text-encoding": "^0.7.0",
-        "uuid": "^3.3.3",
-        "webcrypto-shim": "^0.1.7"
+        "uuid": "^3.3.3"
     },
     "devDependencies": {
         "@babel/polyfill": "^7.8.7",
