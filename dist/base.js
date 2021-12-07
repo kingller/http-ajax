@@ -162,7 +162,11 @@ var AjaxBase = /** @class */ (function () {
         };
         /** 去除URL中:params格式参数后数据处理 */
         this.processDataAfter = function (params, props) {
-            return params;
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    return [2 /*return*/, params];
+                });
+            });
         };
         this.processResponse = function (response, props) {
             return __awaiter(this, void 0, void 0, function () {
@@ -321,7 +325,15 @@ var AjaxBase = /** @class */ (function () {
                         processedValue = url_1.processParamsInUrl(url, params);
                         url = processedValue.url;
                         params = processedValue.params;
-                        params = this.processDataAfter(params, { method: method, url: url, options: options, reject: reject, processData: options.processData });
+                        return [4 /*yield*/, this.processDataAfter(params, {
+                                method: method,
+                                url: url,
+                                options: options,
+                                reject: reject,
+                                processData: options.processData,
+                            })];
+                    case 3:
+                        params = _a.sent();
                         if (options.processData !== false) {
                             if (!form_1.isFormData(params)) {
                                 params = this.stringifyParams(params, method, options);

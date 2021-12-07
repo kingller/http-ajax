@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { loadScript } from './load-script';
 
 const str2ab = (str: string) => {
     const buf: ArrayBuffer = new ArrayBuffer(str.length);
@@ -11,31 +12,6 @@ const str2ab = (str: string) => {
 
 const ab2str = (buf: ArrayBuffer) => {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
-};
-
-const loadScript = (src: string, global?: string): Promise<any> => {
-    return new Promise((resolve, reject): void => {
-        let script = document.querySelector(`script[src="${src}"]`) as HTMLScriptElement;
-        if (!script) {
-            script = document.createElement('script');
-            script.src = src;
-            script.onload = (): void => {
-                if (global) {
-                    resolve(window[global as keyof Window]);
-                } else {
-                    resolve('');
-                }
-            };
-            script.onerror = reject;
-            document.body.appendChild(script);
-        } else {
-            if (global) {
-                resolve(window[global as keyof Window]);
-            } else {
-                resolve('');
-            }
-        }
-    });
 };
 class RSA {
     constructor() {
@@ -53,8 +29,11 @@ class RSA {
             this.webCrypto = webCrypto;
         }
         if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
-            loadScript('https://assets.gaiaworks.cn/static/webcrypto-shim/webcrypto-shim.js');
-            loadScript('https://assets.gaiaworks.cn/static/promiz/promiz.js');
+            loadScript('https://assets.gaiaworkforce.com/libs/webcrypto/0.1.7/webcrypto-shim.min.js');
+            loadScript('https://assets.gaiaworkforce.com/libs/promiz/1.0.6/promiz.min.js');
+        }
+        if (!window.TextEncoder) {
+            loadScript('https://assets.gaiaworkforce.com/libs/text-encoding/0.7.0/encoding.js');
         }
     }
 
@@ -118,8 +97,11 @@ class AES {
             this.webCrypto = webCrypto;
         }
         if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
-            loadScript('https://assets.gaiaworks.cn/static/webcrypto-shim/webcrypto-shim.js');
-            loadScript('https://assets.gaiaworks.cn/static/promiz/promiz.js');
+            loadScript('https://assets.gaiaworkforce.com/libs/webcrypto/0.1.7/webcrypto-shim.min.js');
+            loadScript('https://assets.gaiaworkforce.com/libs/promiz/1.0.6/promiz.min.js');
+        }
+        if (!window.TextEncoder) {
+            loadScript('https://assets.gaiaworkforce.com/libs/text-encoding/0.7.0/encoding.js');
         }
     }
 
@@ -181,7 +163,7 @@ class AES {
             'encrypt',
             'decrypt',
         ]);
-        const newData = await this.textEncode(data);
+        const newData = new TextEncoder().encode(JSON.stringify(data));
         let ciphertext = await this.webCrypto.subtle.encrypt(
             {
                 name: 'AES-GCM',
@@ -228,38 +210,13 @@ class AES {
             newCiphertext
         );
         data = data.result || data;
-        return JSON.parse(await this.textDecode(data));
+        return JSON.parse(new TextDecoder().decode(data));
     };
 
     exportCryptoKey = async (key) => {
         let exported = await this.webCrypto.subtle.exportKey('raw', key);
         exported = exported.result || exported;
         return exported;
-    };
-
-    textEncode = async (str) => {
-        if (window.TextEncoder) {
-            const enc = new TextEncoder();
-            return enc.encode(JSON.stringify(str));
-        }
-
-        const utf8 = unescape(encodeURIComponent(JSON.stringify(str)));
-        const result = new Uint8Array(utf8.length);
-        for (let i = 0; i < utf8.length; i++) {
-            result[i] = utf8.charCodeAt(i);
-        }
-        return result;
-    };
-
-    textDecode = async (buf) => {
-        if (window.TextDecoder) {
-            return new TextDecoder().decode(buf);
-        }
-        const TextEncoding = await loadScript(
-            'https://assets.gaiaworks.cn/static/text-encoding/dist/dist.js',
-            'TextEncoding'
-        );
-        return new TextEncoding.TextDecoder().decode(buf);
     };
 }
 

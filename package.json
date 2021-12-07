@@ -52,7 +52,6 @@
     },
     "dependencies": {
         "browser-which": "^1.1.0",
-        "browserify-sjcl": "^1.0.9",
         "lodash": "^4.17.19",
         "uuid": "^3.3.3"
     },

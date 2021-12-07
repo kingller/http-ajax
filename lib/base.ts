@@ -124,7 +124,10 @@ class AjaxBase {
     };
 
     /** 去除URL中:params格式参数后数据处理 */
-    public processDataAfter = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataAfterOptions): Ajax.IParams {
+    public processDataAfter = async function (
+        params: Ajax.IParams,
+        props: Ajax.IAjaxProcessDataAfterOptions
+    ): Promise<Ajax.IParams> {
         return params;
     };
 
@@ -277,7 +280,13 @@ class AjaxBase {
         const processedValue = processParamsInUrl(url, params);
         url = processedValue.url;
         params = processedValue.params;
-        params = this.processDataAfter(params, { method, url, options, reject, processData: options.processData });
+        params = await this.processDataAfter(params, {
+            method,
+            url,
+            options,
+            reject,
+            processData: options.processData,
+        });
         if (options.processData !== false) {
             if (!isFormData(params)) {
                 params = this.stringifyParams(params, method, options);

@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var load_script_1 = require("./load-script");
 var str2ab = function (str) {
     var buf = new ArrayBuffer(str.length);
     var bufView = new Uint8Array(buf);
@@ -46,33 +47,6 @@ var str2ab = function (str) {
 };
 var ab2str = function (buf) {
     return String.fromCharCode.apply(null, new Uint8Array(buf));
-};
-var loadScript = function (src, global) {
-    return new Promise(function (resolve, reject) {
-        var script = document.querySelector("script[src=\"" + src + "\"]");
-        if (!script) {
-            script = document.createElement('script');
-            script.src = src;
-            script.onload = function () {
-                if (global) {
-                    resolve(window[global]);
-                }
-                else {
-                    resolve('');
-                }
-            };
-            script.onerror = reject;
-            document.body.appendChild(script);
-        }
-        else {
-            if (global) {
-                resolve(window[global]);
-            }
-            else {
-                resolve('');
-            }
-        }
-    });
 };
 var RSA = /** @class */ (function () {
     function RSA() {
@@ -126,8 +100,11 @@ var RSA = /** @class */ (function () {
             this.webCrypto = webCrypto;
         }
         if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
-            loadScript('https://assets.gaiaworks.cn/static/webcrypto-shim/webcrypto-shim.js');
-            loadScript('https://assets.gaiaworks.cn/static/promiz/promiz.js');
+            load_script_1.loadScript('https://assets.gaiaworkforce.com/libs/webcrypto/0.1.7/webcrypto-shim.min.js');
+            load_script_1.loadScript('https://assets.gaiaworkforce.com/libs/promiz/1.0.6/promiz.min.js');
+        }
+        if (!window.TextEncoder) {
+            load_script_1.loadScript('https://assets.gaiaworkforce.com/libs/text-encoding/0.7.0/encoding.js');
         }
     }
     return RSA;
@@ -195,15 +172,13 @@ var AES = /** @class */ (function () {
                             ])];
                     case 1:
                         secretKey = _a.sent();
-                        return [4 /*yield*/, this.textEncode(data)];
-                    case 2:
-                        newData = _a.sent();
+                        newData = new TextEncoder().encode(JSON.stringify(data));
                         return [4 /*yield*/, this.webCrypto.subtle.encrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
                                 tagLength: 128,
                             }, secretKey, newData)];
-                    case 3:
+                    case 2:
                         ciphertext = _a.sent();
                         ciphertext = ciphertext.result || ciphertext;
                         strIv = ab2str(iv);
@@ -213,9 +188,9 @@ var AES = /** @class */ (function () {
             });
         }); };
         this.decrypt = function (ciphertext, rawKey) { return __awaiter(_this, void 0, void 0, function () {
-            var strIv, strCiphertext, iv, newCiphertext, arrBufferKey, secretKey, data, _a, _b;
-            return __generator(this, function (_c) {
-                switch (_c.label) {
+            var strIv, strCiphertext, iv, newCiphertext, arrBufferKey, secretKey, data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
                     case 0:
                         if (!rawKey) {
                             rawKey = this._key;
@@ -235,18 +210,16 @@ var AES = /** @class */ (function () {
                                 'decrypt',
                             ])];
                     case 1:
-                        secretKey = _c.sent();
+                        secretKey = _a.sent();
                         return [4 /*yield*/, this.webCrypto.subtle.decrypt({
                                 name: 'AES-GCM',
                                 iv: iv,
                                 tagLength: 128,
                             }, secretKey, newCiphertext)];
                     case 2:
-                        data = _c.sent();
+                        data = _a.sent();
                         data = data.result || data;
-                        _b = (_a = JSON).parse;
-                        return [4 /*yield*/, this.textDecode(data)];
-                    case 3: return [2 /*return*/, _b.apply(_a, [_c.sent()])];
+                        return [2 /*return*/, JSON.parse(new TextDecoder().decode(data))];
                 }
             });
         }); };
@@ -259,36 +232,6 @@ var AES = /** @class */ (function () {
                         exported = _a.sent();
                         exported = exported.result || exported;
                         return [2 /*return*/, exported];
-                }
-            });
-        }); };
-        this.textEncode = function (str) { return __awaiter(_this, void 0, void 0, function () {
-            var enc, utf8, result, i;
-            return __generator(this, function (_a) {
-                if (window.TextEncoder) {
-                    enc = new TextEncoder();
-                    return [2 /*return*/, enc.encode(JSON.stringify(str))];
-                }
-                utf8 = unescape(encodeURIComponent(JSON.stringify(str)));
-                result = new Uint8Array(utf8.length);
-                for (i = 0; i < utf8.length; i++) {
-                    result[i] = utf8.charCodeAt(i);
-                }
-                return [2 /*return*/, result];
-            });
-        }); };
-        this.textDecode = function (buf) { return __awaiter(_this, void 0, void 0, function () {
-            var TextEncoding;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (window.TextDecoder) {
-                            return [2 /*return*/, new TextDecoder().decode(buf)];
-                        }
-                        return [4 /*yield*/, loadScript('https://assets.gaiaworks.cn/static/text-encoding/dist/dist.js', 'TextEncoding')];
-                    case 1:
-                        TextEncoding = _a.sent();
-                        return [2 /*return*/, new TextEncoding.TextDecoder().decode(buf)];
                 }
             });
         }); };
@@ -305,8 +248,11 @@ var AES = /** @class */ (function () {
             this.webCrypto = webCrypto;
         }
         if (navigator.userAgent.toLowerCase().match(/rv:([\d.]+)\) like gecko/)) {
-            loadScript('https://assets.gaiaworks.cn/static/webcrypto-shim/webcrypto-shim.js');
-            loadScript('https://assets.gaiaworks.cn/static/promiz/promiz.js');
+            load_script_1.loadScript('https://assets.gaiaworkforce.com/libs/webcrypto/0.1.7/webcrypto-shim.min.js');
+            load_script_1.loadScript('https://assets.gaiaworkforce.com/libs/promiz/1.0.6/promiz.min.js');
+        }
+        if (!window.TextEncoder) {
+            load_script_1.loadScript('https://assets.gaiaworkforce.com/libs/text-encoding/0.7.0/encoding.js');
         }
     }
     return AES;

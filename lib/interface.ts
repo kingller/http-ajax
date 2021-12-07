@@ -303,7 +303,7 @@ export interface IAjax {
     processDataAfter: (
         params: IParams,
         props: { method: IMethod; url: string; options: IOptions; reject?: IReject; processData?: boolean }
-    ) => IParams;
+    ) => Promise<IParams>;
     processResponse: (response: IResult | null, props: IProcessResponseOptions) => Promise<IResult>;
     readonly stringifyParams: (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any

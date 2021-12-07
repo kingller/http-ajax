@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import sjcl from 'browserify-sjcl';
 import uuid from 'uuid/v4';
 import { isFormData } from './utils/form';
 import { IAjax, IAjaxProcessDataAfterOptions, IParams, IMethod, IOptions } from './interface';
+import { loadScript } from './utils/load-script';
 
 /**
  * 签名扩展。
@@ -32,7 +32,7 @@ function signatureExtend(): () => void {
         // 添加标志符用来校验该扩展是否已添加
         this._signatureExtendAdded = true;
 
-        const signData = ({
+        const signData = async ({
             params,
             method,
             options,
@@ -42,7 +42,7 @@ function signatureExtend(): () => void {
             method: IMethod;
             options: IOptions;
             processData?: boolean;
-        }): void => {
+        }): Promise<void> => {
             const signatureStr =
                 isFormData(params) || processData === false
                     ? ''
@@ -50,24 +50,44 @@ function signatureExtend(): () => void {
 
             const timestamp = new Date().getTime();
             const appNonce = uuid();
-            const out = sjcl.hash.sha256.hash(
-                `${signatureStr}${timestamp}${appNonce.substring(2, appNonce.length - 1)}`
-            ); // bitArray
+            const webCrypto =
+                window.crypto ||
+                (window as any).webkitCrypto ||
+                (window as any).mozCrypto ||
+                (window as any).oCrypto ||
+                (window as any).msCrypto;
+
+            if (!webCrypto) {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                console && console.error('`window.crypto` is undefined');
+            }
+            const str = `${signatureStr}${timestamp}${appNonce.substring(2, appNonce.length - 1)}`;
+            if (!window.TextEncoder) {
+                await loadScript('https://assets.gaiaworkforce.com/libs/text-encoding/0.7.0/encoding.js');
+            }
+
+            const msgUint8 = new TextEncoder().encode(str);
+            const hashBuffer = await webCrypto.subtle.digest('SHA-256', msgUint8);
+            const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
+            const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
             _.merge(options, {
                 headers: {
-                    [signField]: sjcl.codec.hex.fromBits(out),
+                    [signField]: hashHex,
                     [timestampField]: timestamp,
                     [appNonceField]: appNonce,
                 },
             });
         };
 
-        (this as IAjax).processDataAfter = (params: IParams, props: IAjaxProcessDataAfterOptions): IParams => {
+        (this as IAjax).processDataAfter = async (
+            params: IParams,
+            props: IAjaxProcessDataAfterOptions
+        ): Promise<IParams> => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processDataAfter(params, props) as { [name: string]: any };
+            params = (await processDataAfter(params, props)) as { [name: string]: any };
             const { method, options, processData } = props;
-            signData({ params, method, options, processData });
+            await signData({ params, method, options, processData });
             return params;
         };
     };
