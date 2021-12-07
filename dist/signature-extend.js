@@ -102,7 +102,7 @@ function signatureExtend() {
                         case 3:
                             hashBuffer = _c.sent();
                             hashArray = Array.from(new Uint8Array(hashBuffer));
-                            hashHex = hashArray.map(function (b) { return b.toString(16).padStart(2, '0'); }).join('');
+                            hashHex = hashArray.map(function (b) { return lodash_1.default.padStart(b.toString(16), 2, '0'); }).join('');
                             lodash_1.default.merge(options, {
                                 headers: (_b = {},
                                     _b[signField] = hashHex,

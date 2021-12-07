@@ -69,8 +69,7 @@ function signatureExtend(): () => void {
             const msgUint8 = new TextEncoder().encode(str);
             const hashBuffer = await webCrypto.subtle.digest('SHA-256', msgUint8);
             const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-            const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
-
+            const hashHex = hashArray.map((b) => _.padStart(b.toString(16), 2, '0')).join('');
             _.merge(options, {
                 headers: {
                     [signField]: hashHex,
