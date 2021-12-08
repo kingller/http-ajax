@@ -73,7 +73,7 @@ function cryptoExtend(): () => void {
 
         function getPublicKey(): Promise<IPublicKeyResponse> {
             // 从服务端获取公钥
-            publicKeyPromise = (this as IAjax).get<IPublicKeyResponse>('/encryption/public-key');
+            publicKeyPromise = (this as IAjax).get<IPublicKeyResponse>('/encryption/native/public-key');
             return new Promise((resolve, reject) => {
                 publicKeyPromise
                     .then(function (data) {
@@ -102,7 +102,7 @@ function cryptoExtend(): () => void {
                     const encryptedSecretKey = await Crypto.RSA.encrypt(key, publicKeyResponse.publicKey);
                     (this as IAjax)
                         .post(
-                            '/encryption/token',
+                            '/encryption/native/token',
                             { token: encryptedSecretKey },
                             {
                                 headers: {
@@ -283,6 +283,7 @@ function cryptoExtend(): () => void {
                         _.merge(options, {
                             headers: {
                                 uuid: getUuid(),
+                                native: true,
                             },
                         });
                         if (options.encrypt) {

@@ -91,7 +91,7 @@ function cryptoExtend() {
         }
         function getPublicKey() {
             // 从服务端获取公钥
-            publicKeyPromise = this.get('/encryption/public-key');
+            publicKeyPromise = this.get('/encryption/native/public-key');
             return new Promise(function (resolve, reject) {
                 publicKeyPromise
                     .then(function (data) {
@@ -124,7 +124,7 @@ function cryptoExtend() {
                             case 2:
                                 encryptedSecretKey = _a.sent();
                                 this
-                                    .post('/encryption/token', { token: encryptedSecretKey }, {
+                                    .post('/encryption/native/token', { token: encryptedSecretKey }, {
                                     headers: {
                                         uuid: publicKeyResponse.uuid,
                                     },
@@ -363,6 +363,7 @@ function cryptoExtend() {
                         lodash_1.default.merge(options, {
                             headers: {
                                 uuid: getUuid(),
+                                native: true,
                             },
                         });
                         if (options.encrypt) {
