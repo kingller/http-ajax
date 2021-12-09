@@ -363,7 +363,6 @@ function cryptoExtend() {
                         lodash_1.default.merge(options, {
                             headers: {
                                 uuid: getUuid(),
-                                native: true,
                             },
                         });
                         if (options.encrypt) {

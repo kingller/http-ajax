@@ -283,7 +283,6 @@ function cryptoExtend(): () => void {
                         _.merge(options, {
                             headers: {
                                 uuid: getUuid(),
-                                native: true,
                             },
                         });
                         if (options.encrypt) {
