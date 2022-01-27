@@ -33,7 +33,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var v4_1 = __importDefault(require("uuid/v4"));
+var uuid_1 = require("uuid");
 var browser_which_1 = __importDefault(require("browser-which"));
 var promise_1 = require("./utils/promise");
 var form_1 = require("./utils/form");
@@ -546,7 +546,7 @@ var AjaxBase = /** @class */ (function () {
             }
             if (!options.simple) {
                 if (!isXCorrelationIDExist) {
-                    _opts.xCorrelationID = v4_1.default();
+                    _opts.xCorrelationID = uuid_1.v4();
                     xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
                 }
                 if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import Crypto from 'client-crypto';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import { isFormData } from './utils/form';
 import { IAjax, IAjaxProcessDataAfterOptions, IParams, IMethod, IOptions } from './interface';
 

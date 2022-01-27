@@ -9,6 +9,11 @@
 # Next
 
 
+# 5.4.0
+> 2022.01.27  
+1. <font color=orange>修改</font> `uuid`版本从`3.3.3`更新至`8.3.2`
+
+
 # 5.3.1
 > 2021.11.17  
 1. <font color=red>修复</font> 请求返回`data`为`null`时报错

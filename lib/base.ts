@@ -1,4 +1,4 @@
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import browser from 'browser-which';
 import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
