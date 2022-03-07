@@ -391,23 +391,28 @@ var AjaxBase = /** @class */ (function () {
                         // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
                         if (this.response) {
                             var chunks = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
-                            if (!chunks) {
-                                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                                console && console.error(method + " " + url + " Incorrect response");
-                                return;
+                            if (chunks) {
+                                chunks = chunks.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
+                                // 取出新增的数据
+                                var data = chunks.slice(chunked.length);
+                                data.forEach(function (item) {
+                                    try {
+                                        options.onData(JSON.parse(item));
+                                    }
+                                    catch (e) {
+                                        options.onData(item);
+                                    }
+                                });
+                                chunked = chunks;
                             }
-                            chunks = chunks.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
-                            // 取出新增的数据
-                            var data = chunks.slice(chunked.length);
-                            data.forEach(function (item) {
-                                try {
-                                    options.onData(JSON.parse(item));
+                            else {
+                                var consoleMethod = this.readyState === 4 ? 'error' : 'warn';
+                                // eslint-disable-next-line no-console
+                                if (console && console[consoleMethod]) {
+                                    // eslint-disable-next-line no-console
+                                    console[consoleMethod](method + " " + url + " Incorrect response");
                                 }
-                                catch (e) {
-                                    options.onData(item);
-                                }
-                            });
-                            chunked = chunks;
+                            }
                         }
                     }
                 }
