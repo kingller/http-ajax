@@ -565,6 +565,9 @@ var AjaxBase = /** @class */ (function () {
             if (options.onProgress) {
                 xhr.upload.onprogress = options.onProgress;
             }
+            if (typeof options.timeout === 'number') {
+                xhr.timeout = options.timeout;
+            }
             // prettier-ignore
             xhr.send(params);
             if (cancelExecutor) {

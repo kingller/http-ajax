@@ -59,6 +59,8 @@ export interface IOptions extends IOptionsBase {
     ) => any;
     /** 简单请求（不添加默认请求头，除了外部传入的） */
     simple?: boolean;
+    /** 最大请求时间（毫秒），若超出该时间，请求会自动终止 */
+    timeout?: number;
     /** 自定义选项，用来传递值自定义处理逻辑 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [name: string]: any;

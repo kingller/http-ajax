@@ -641,6 +641,10 @@ class AjaxBase {
                     xhr.upload.onprogress = options.onProgress;
                 }
 
+                if (typeof options.timeout === 'number') {
+                    xhr.timeout = options.timeout;
+                }
+
                 // prettier-ignore
                 xhr.send(
                     params as Document | Blob | BufferSource | FormData | URLSearchParams | string | null
