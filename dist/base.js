@@ -294,6 +294,7 @@ var AjaxBase = /** @class */ (function () {
     ) {
         var _this = this;
         var method;
+        var _retryTimes = 0;
         if (typeof props === 'object') {
             method = props.method;
             url = props.url;
@@ -305,6 +306,9 @@ var AjaxBase = /** @class */ (function () {
             cancelExecutor = props.cancelExecutor;
             if (props.onSessionExpired) {
                 onSessionExpired = props.onSessionExpired;
+            }
+            if (typeof props._retryTimes === 'number') {
+                _retryTimes = props._retryTimes;
             }
         }
         else {
@@ -327,6 +331,10 @@ var AjaxBase = /** @class */ (function () {
             xCorrelationID: '',
             // 请求开始时间
             startTime: new Date().getTime(),
+            /**
+             * @private 第几次重试（内部变量）
+             */
+            _retryTimes: _retryTimes,
         };
         if (!options) {
             options = {};

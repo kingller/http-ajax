@@ -86,6 +86,10 @@ declare class AjaxBase {
         cancelExecutor: Ajax.ICancelExecutor;
         /** 请求session过期回调 */
         onSessionExpired?: Ajax.IOnSessionExpired;
+        /**
+         * @private 第几次重试（内部变量）
+         */
+        _retryTimes?: number;
     }): Promise<any>;
     /**
      * 发送请求

@@ -314,6 +314,10 @@ class AjaxBase {
         cancelExecutor: Ajax.ICancelExecutor;
         /** 请求session过期回调 */
         onSessionExpired?: Ajax.IOnSessionExpired;
+        /**
+         * @private 第几次重试（内部变量）
+         */
+        _retryTimes?: number;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }): Promise<any>;
 
@@ -365,6 +369,10 @@ class AjaxBase {
                   cancelExecutor: Ajax.ICancelExecutor;
                   /** 请求session过期回调 */
                   onSessionExpired?: Ajax.IOnSessionExpired;
+                  /**
+                   * @private 第几次重试（内部变量）
+                   */
+                  _retryTimes?: number;
               },
         /* eslint-enable @typescript-eslint/indent */
         url?: string,
@@ -378,6 +386,7 @@ class AjaxBase {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ): Promise<any> {
         let method: Ajax.IMethod;
+        let _retryTimes = 0;
         if (typeof props === 'object') {
             method = props.method;
             url = props.url;
@@ -389,6 +398,9 @@ class AjaxBase {
             cancelExecutor = props.cancelExecutor;
             if (props.onSessionExpired) {
                 onSessionExpired = props.onSessionExpired;
+            }
+            if (typeof props._retryTimes === 'number') {
+                _retryTimes = props._retryTimes;
             }
         } else {
             method = props;
@@ -410,6 +422,10 @@ class AjaxBase {
             xCorrelationID: '',
             // 请求开始时间
             startTime: new Date().getTime(),
+            /**
+             * @private 第几次重试（内部变量）
+             */
+            _retryTimes,
         };
         if (!options) {
             options = {};

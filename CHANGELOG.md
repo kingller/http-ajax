@@ -10,9 +10,14 @@
 
 
 
+# 5.6.0
+> 2022.10.20  
+1. <font color=green>新增</font> `sendRequest` 添加传递参数 `_retryTimes` 第几次重试
+
+
 # 5.5.0
 > 2022.08.23  
-<font color=green>新增</font> 请求支持设置 `timeout` 最大请求时间（毫秒），若超出该时间，请求会自动终止
+1. <font color=green>新增</font> 请求支持设置 `timeout` 最大请求时间（毫秒），若超出该时间，请求会自动终止
 
 
 # 5.4.1

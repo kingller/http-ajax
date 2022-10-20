@@ -176,6 +176,10 @@ export interface IRequestOptions {
     xCorrelationID?: string;
     /** 请求开始时间 */
     startTime?: number;
+    /**
+     * @private 第几次重试（内部变量）
+     */
+    _retryTimes?: number;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
