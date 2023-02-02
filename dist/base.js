@@ -317,6 +317,9 @@ var AjaxBase = /** @class */ (function () {
         if (!onSessionExpired) {
             onSessionExpired = this.onSessionExpired;
         }
+        if (!options) {
+            options = {};
+        }
         var _opts = {
             method: method,
             url: url,
@@ -336,9 +339,6 @@ var AjaxBase = /** @class */ (function () {
              */
             _retryTimes: _retryTimes,
         };
-        if (!options) {
-            options = {};
-        }
         var _cancel = false;
         if (cancelExecutor) {
             cancelExecutor(function () {

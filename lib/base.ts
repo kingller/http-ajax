@@ -408,6 +408,9 @@ class AjaxBase {
         if (!onSessionExpired) {
             onSessionExpired = this.onSessionExpired;
         }
+        if (!options) {
+            options = {};
+        }
         const _opts = {
             method,
             url,
@@ -427,9 +430,6 @@ class AjaxBase {
              */
             _retryTimes,
         };
-        if (!options) {
-            options = {};
-        }
         let _cancel = false;
         if (cancelExecutor) {
             cancelExecutor(function (): void {

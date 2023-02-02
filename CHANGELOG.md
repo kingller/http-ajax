@@ -7,7 +7,7 @@
 
 
 # Next
-
+1. <font color=red>修复</font> 请求 `onError` 无法获取请求头
 
 
 # 5.6.0
