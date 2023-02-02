@@ -315,6 +315,10 @@ class AjaxBase {
         /** 请求session过期回调 */
         onSessionExpired?: Ajax.IOnSessionExpired;
         /**
+         * @private 链路追踪ID（内部变量）
+         */
+        xCorrelationID?: string;
+        /**
          * @private 第几次重试（内部变量）
          */
         _retryTimes?: number;
@@ -370,6 +374,10 @@ class AjaxBase {
                   /** 请求session过期回调 */
                   onSessionExpired?: Ajax.IOnSessionExpired;
                   /**
+                   * @private 链路追踪ID（内部变量）
+                   */
+                  xCorrelationID?: string;
+                  /**
                    * @private 第几次重试（内部变量）
                    */
                   _retryTimes?: number;
@@ -387,6 +395,8 @@ class AjaxBase {
     ): Promise<any> {
         let method: Ajax.IMethod;
         let _retryTimes = 0;
+        /** 链路追踪ID */
+        let xCorrelationID = '';
         if (typeof props === 'object') {
             method = props.method;
             url = props.url;
@@ -398,6 +408,9 @@ class AjaxBase {
             cancelExecutor = props.cancelExecutor;
             if (props.onSessionExpired) {
                 onSessionExpired = props.onSessionExpired;
+            }
+            if (props.xCorrelationID) {
+                xCorrelationID = props.xCorrelationID;
             }
             if (typeof props._retryTimes === 'number') {
                 _retryTimes = props._retryTimes;
@@ -422,7 +435,7 @@ class AjaxBase {
             options,
             cancelExecutor,
             // 链路追踪ID
-            xCorrelationID: '',
+            xCorrelationID,
             // 请求开始时间
             startTime: new Date().getTime(),
             /**
@@ -641,7 +654,12 @@ class AjaxBase {
                 }
                 if (!options.simple) {
                     if (!isXCorrelationIDExist) {
-                        _opts.xCorrelationID = uuid();
+                        if (
+                            // 重发的请求和前面的请求使用同样的 xCorrelationID，不需要生成新的 id
+                            !_opts.xCorrelationID
+                        ) {
+                            _opts.xCorrelationID = uuid();
+                        }
                         xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
                     }
                     if (!isContentTypeExist && !isFormData(params) && (!options || options.encrypt !== 'all')) {

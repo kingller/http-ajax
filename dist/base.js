@@ -295,6 +295,8 @@ var AjaxBase = /** @class */ (function () {
         var _this = this;
         var method;
         var _retryTimes = 0;
+        /** 链路追踪ID */
+        var xCorrelationID = '';
         if (typeof props === 'object') {
             method = props.method;
             url = props.url;
@@ -306,6 +308,9 @@ var AjaxBase = /** @class */ (function () {
             cancelExecutor = props.cancelExecutor;
             if (props.onSessionExpired) {
                 onSessionExpired = props.onSessionExpired;
+            }
+            if (props.xCorrelationID) {
+                xCorrelationID = props.xCorrelationID;
             }
             if (typeof props._retryTimes === 'number') {
                 _retryTimes = props._retryTimes;
@@ -331,7 +336,7 @@ var AjaxBase = /** @class */ (function () {
             options: options,
             cancelExecutor: cancelExecutor,
             // 链路追踪ID
-            xCorrelationID: '',
+            xCorrelationID: xCorrelationID,
             // 请求开始时间
             startTime: new Date().getTime(),
             /**
@@ -559,7 +564,11 @@ var AjaxBase = /** @class */ (function () {
             }
             if (!options.simple) {
                 if (!isXCorrelationIDExist) {
-                    _opts.xCorrelationID = uuid_1.v4();
+                    if (
+                    // 重发的请求和前面的请求使用同样的 xCorrelationID，不需要生成新的 id
+                    !_opts.xCorrelationID) {
+                        _opts.xCorrelationID = uuid_1.v4();
+                    }
                     xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
                 }
                 if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {

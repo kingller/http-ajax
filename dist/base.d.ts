@@ -87,6 +87,10 @@ declare class AjaxBase {
         /** 请求session过期回调 */
         onSessionExpired?: Ajax.IOnSessionExpired;
         /**
+         * @private 链路追踪ID（内部变量）
+         */
+        xCorrelationID?: string;
+        /**
          * @private 第几次重试（内部变量）
          */
         _retryTimes?: number;
