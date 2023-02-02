@@ -7,6 +7,11 @@
 
 
 # Next
+
+
+
+# 5.7.0
+> 2023.02.02  
 1. <font color=red>修复</font> 请求 `onError` 无法获取请求头
 2. <font color=orange>修改</font> 重发请求使用前一请求相同的链路追踪 ID
 
