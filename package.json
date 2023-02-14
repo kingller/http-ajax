@@ -1,6 +1,6 @@
 {
     "name": "http-ajax",
-    "version": "5.7.0",
+    "version": "5.8.0",
     "description": "Promise based HTTP client for the browser",
     "keywords": [
         "ajax",
@@ -52,7 +52,7 @@
     },
     "dependencies": {
         "browser-which": "^1.1.0",
-        "client-crypto": "~1.2.5",
+        "client-crypto": "~1.3.0",
         "lodash": "^4.17.21",
         "uuid": "^8.3.2"
     },

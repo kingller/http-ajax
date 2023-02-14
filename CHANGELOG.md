@@ -10,6 +10,11 @@
 
 
 
+# 5.8.0
+> 2023.02.14  
+1. <font color=red><strong>删除</strong></font> `client-crypto` 包删除 `RSA` 签名方式 `md2`, `md5`, `sha1`
+
+
 # 5.7.0
 > 2023.02.02  
 1. <font color=red>修复</font> 请求 `onError` 无法获取请求头
