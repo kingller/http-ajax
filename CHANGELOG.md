@@ -10,6 +10,11 @@
 
 
 
+# 5.8.1
+> 2023.02.14  
+1. <font color=red>修复</font> 编译时 `pandora-jsencrypt` 包报错 Can't resolve './JSEncrypt'
+
+
 # 5.8.0
 > 2023.02.14  
 1. <font color=red><strong>删除</strong></font> `client-crypto` 包删除 `RSA` 签名方式 `md2`, `md5`, `sha1`
