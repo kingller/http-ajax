@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import _, { lowerFirst } from 'lodash';
 import Crypto from 'client-crypto';
 import storage from './utils/storage';
 import { STORAGE_KEY } from './utils/enums';
@@ -13,10 +13,12 @@ import {
     IAjaxProcessDataOptions,
     IRequestResult,
     IParams,
+    IOptions,
     IResult,
     IRequestOptions,
     IProcessResponseOptions,
 } from './interface';
+import { Ajax } from '.';
 
 interface IPublicKeyResponse {
     publicKey: string;
@@ -32,10 +34,10 @@ let waitingPublicKeyPromise: { resolve: () => void; reject: (e?: any) => void }[
 
 /**
  * 加解密扩展。
- * 加密请求前未获取到密钥或返回470状态时，首先发送请求/api/encryption/public-key获取服务端RSA公钥。
- * 客户端生成AES密钥，并使用RSA加密后发送请求/api/encryption/token传输给服务端，服务端客户端使用该密钥加解密。
- * 请求头中将会添加字段uuid，encrypt（uuid:唯一标识码，服务端根据该uuid获取密钥；encrypt：加密字段，服务端根据该字段解密）。
- * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密。
+ * 加密请求前未获取到密钥或返回 470 状态时，首先发送请求/api/encryption/public-key 获取服务端 RSA 公钥。
+ * 客户端生成 AES 密钥，并使用 RSA 加密后发送请求/api/encryption/token 传输给服务端，服务端客户端使用该密钥加解密。
+ * 请求头中将会添加字段 uuid，encrypt（uuid:唯一标识码，服务端根据该 uuid 获取密钥；encrypt：加密字段，服务端根据该字段解密）。
+ * 解密请求将会在响应头中添加字段 encrypt：加密字段，客户端根据该字段解密。
  */
 function cryptoExtend(): () => void {
     (function (): void {
@@ -93,9 +95,9 @@ function cryptoExtend(): () => void {
 
         function sendSecretKeyRequest(): Promise<void> {
             return getPublicKey.apply(this).then((publicKeyResponse: IPublicKeyResponse) => {
-                // 生成AES秘钥
+                // 生成 AES 秘钥
                 const newSecretKey = Crypto.AES.createKey();
-                // 使用RSA公钥加密秘钥
+                // 使用 RSA 公钥加密秘钥
                 const encryptedSecretKey = Crypto.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
                 // 将加密后的秘钥传输给服务器端
                 secretKeyPromise = new Promise((resolve, reject) => {
@@ -268,7 +270,7 @@ function cryptoExtend(): () => void {
             promise = promisify(promise);
             const { options } = props;
             const uuid = getUuid();
-            // 由于解密需要服务端返回响应头才知道，故统一添加唯一标志符uuid，服务端将根据uuid取得AES密钥
+            // 由于解密需要服务端返回响应头才知道，故统一添加唯一标志符 uuid，服务端将根据 uuid 取得 AES 密钥
             if (uuid) {
                 _.merge(options, {
                     headers: {
@@ -276,9 +278,9 @@ function cryptoExtend(): () => void {
                     },
                 });
             }
-            // 解密的不会传options.decrypt，这里只是提供了手动指定decrypt功能
-            // 解密需去响应头获取encrypt字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成AES密钥并传输给服务端
-            // 加密请求则根据options.encrypt，如果没有AES密钥，则生成并传输给服务端
+            // 解密的不会传 options.decrypt，这里只是提供了手动指定 decrypt 功能
+            // 解密需去响应头获取 encrypt 字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成 AES 密钥并传输给服务端
+            // 加密请求则根据 options.encrypt，如果没有 AES 密钥，则生成并传输给服务端
             if (options && (options.encrypt || options.decrypt)) {
                 return promise.then(() => {
                     return createSecretKey.apply(this).then(() => {
@@ -302,23 +304,60 @@ function cryptoExtend(): () => void {
             return promise;
         };
 
-        (this as IAjax).processData = (params: IParams, props: IAjaxProcessDataOptions): IParams => {
+        (this as IAjax).encryptUrlParams = (
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processData(params, props);
-            const { options, reject } = props;
-            try {
-                if (params && options && options.encrypt) {
-                    params = cloneDeep(params);
-                    if (options.encrypt === 'all') {
-                        return Crypto.AES.encrypt(params);
+            urlParams: { [name: string]: any },
+            encrypt: string[] | 'all'
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ): { [name: string]: any } => {
+            const paramsName = _.keys(urlParams);
+            _.forEach(paramsName, (field) => {
+                if (encrypt === 'all') {
+                    encryptDataField(urlParams, field);
+                } else {
+                    if (_.includes(encrypt, field)) {
+                        encryptDataField(urlParams, field);
                     }
-                    if (!params || typeof params !== 'object') {
-                        return params;
+                }
+            });
+
+            return urlParams;
+        };
+
+        (this as IAjax).processData = (
+            params: IParams,
+            props: IAjaxProcessDataOptions
+        ): { params: IParams; options: IOptions } => {
+            params = processData(params, props).params;
+            const { reject, method } = props;
+            let { options } = props;
+            try {
+                if ((params || options.params) && options && options.encrypt) {
+                    params = cloneDeep(params);
+                    options = cloneDeep(options);
+                    if (options.encrypt === 'all') {
+                        if (method === Ajax.METHODS.get) {
+                            params = _.merge(params, options.params);
+                            delete options.params;
+                        } else {
+                            options.params = Crypto.AES.encrypt(options.params);
+                        }
+                        params = Crypto.AES.encrypt(params);
+                        return { params, options };
+                    }
+                    if (typeof options.params !== 'object' && typeof params !== 'object') {
+                        return { params, options };
                     }
                     if (Array.isArray(options.encrypt)) {
                         options.encrypt.forEach((field) => {
-                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            encryptDataField(params as { [name: string]: any }, field);
+                            if (_.has(params, field)) {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                encryptDataField(params as { [name: string]: any }, field);
+                            }
+                            if (_.has(options.params, field)) {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                encryptDataField(options.params as { [name: string]: any }, field);
+                            }
                         });
                     }
                 }
@@ -334,7 +373,7 @@ function cryptoExtend(): () => void {
                     options,
                 });
             }
-            return params;
+            return { params, options };
         };
 
         (this as IAjax).processResponse = (response: IResult | null, props: IProcessResponseOptions): IResult => {
@@ -406,7 +445,7 @@ function cryptoExtend(): () => void {
             if (!publicKeyPromise && !secretKeyPromise) {
                 clearCrypto();
             }
-            // 解密需去响应头获取encrypt字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成AES密钥并传输给服务端
+            // 解密需去响应头获取 encrypt 字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成 AES 密钥并传输给服务端
             createSecretKey.apply(this).then(
                 () => {
                     const { method, url, params, loading, resolve, reject, options, cancelExecutor } = _opts;

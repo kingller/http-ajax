@@ -1,4 +1,4 @@
-import { IParams } from '../interface';
+import { IParams, IOptions } from '../interface';
 import { isFormData } from './form';
 
 export function addPrefixToUrl(url: string, globalPrefix: string, optionsPrefix: string | undefined): string {
@@ -14,65 +14,49 @@ export function addPrefixToUrl(url: string, globalPrefix: string, optionsPrefix:
 function fillParamsInUrl(
     url: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    params: { [name: string]: any }
-    /* eslint-disable @typescript-eslint/indent */
+    urlParams: { [name: string]: any }
 ): {
     url: string;
-    params: IParams | undefined;
 } {
-    /* eslint-enable @typescript-eslint/indent */
-    params = { ...params };
     const modules = url.split('/');
-    let hasParamRemoved = false;
+
     const urlModules = modules.map(function (m) {
         if (m && /^:\w/.test(m)) {
             const paramName = m.match(/^:(.*)$/)[1];
-            const value = encodeURIComponent(params[paramName]);
-            delete params[paramName];
-            hasParamRemoved = true;
-            return value;
+            return urlParams[paramName];
         }
         return m;
     });
-    if (hasParamRemoved) {
-        if (Object.keys(params).length === 0) {
-            params = null;
-        }
-    }
     return {
         url: urlModules.join('/'),
-        params,
     };
 }
 
 export function processParamsInUrl(
     url: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    urlParams: { [name: string]: any },
     params: IParams | undefined
-    /* eslint-disable @typescript-eslint/indent */
 ): {
     url: string;
-    params: IParams | undefined;
 } {
-    /* eslint-enable @typescript-eslint/indent */
-    if (url && /(^|\/):\w/.test(url) && params && typeof params === 'object' && !isFormData(params)) {
+    if (url && /(^|\/):\w/.test(url) && urlParams && !isFormData(params)) {
         const matchQueryString = url.match(/(.*?)\?(.*)/);
         let queryStringInUrl = '';
         if (matchQueryString) {
             url = matchQueryString[1];
             queryStringInUrl = matchQueryString[2];
         }
-        let { url: filledUrl, params: restParams } = fillParamsInUrl(url, params);
+        let { url: filledUrl } = fillParamsInUrl(url, urlParams);
         if (queryStringInUrl) {
             filledUrl = `${filledUrl}?${queryStringInUrl}`;
         }
         return {
             url: filledUrl,
-            params: restParams,
         };
     }
 
     return {
         url,
-        params,
     };
 }

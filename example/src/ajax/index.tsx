@@ -9,6 +9,7 @@ import ErrorRequest from './error/box';
 import BigPipe from './bigpipe/box';
 import TransformResponse from './transform-response/box';
 import UrlParams from './url-params/box';
+import OptionsParams from './option-params/box';
 import './index.css';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -24,11 +25,11 @@ export default class Ajax extends React.PureComponent {
         return (
             <DemoPage>
                 <section className="markdown">
-                    <p>ajax用于发送请求和服务器交换数据</p>
+                    <p>ajax 用于发送请求和服务器交换数据</p>
                     <h2 id="何时使用">
                         <span>何时使用</span>
                     </h2>
-                    <p>封装ajax命令，处理不同返回值</p>
+                    <p>封装 ajax 命令，处理不同返回值</p>
                 </section>
                 <div>
                     <Page>
@@ -42,6 +43,7 @@ export default class Ajax extends React.PureComponent {
                             <BigPipe />
                             <TransformResponse />
                             <UrlParams />
+                            <OptionsParams />
                         </div>
                     </Page>
                     <PropsTable title="Options" of={optionsDoc} />
