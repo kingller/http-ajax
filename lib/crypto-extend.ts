@@ -332,8 +332,8 @@ function cryptoExtend(): () => void {
                 if (options && options.encrypt) {
                     const { encrypt } = options;
                     if (urlParams) {
-                        urlParams = cloneDeep(urlParams);
                         if (options.encrypt === 'all') {
+                            urlParams = cloneDeep(urlParams);
                             Object.keys(urlParams).forEach((field) => {
                                 encryptDataField(urlParams, field);
                             });

@@ -9,6 +9,11 @@
 # Next
 
 
+# 5.9.0
+> 2023.05.23  
+1. <font color=green>新增</font> `options` 增加参数 `params` ，支持传入 query parameters，发送请求时拼接到 URL 上
+2. <font color=red><strong>删除</strong></font> `processDataAfter`
+
 
 # 5.8.1
 > 2023.02.14  
