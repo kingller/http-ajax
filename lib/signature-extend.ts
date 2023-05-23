@@ -1,8 +1,6 @@
 import _ from 'lodash';
 import Crypto from 'client-crypto';
 import { v4 as uuid } from 'uuid';
-import { isFormData } from './utils/form';
-import { needFormatData } from './utils/url';
 import { METHODS } from './interface';
 import type {
     IAjax,
