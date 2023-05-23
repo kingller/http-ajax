@@ -2,18 +2,27 @@ import _ from 'lodash';
 import Crypto from 'client-crypto';
 import { v4 as uuid } from 'uuid';
 import { isFormData } from './utils/form';
-import { IAjax, IAjaxProcessDataAfterOptions, IParams, IMethod, IOptions } from './interface';
+import { needFormatData } from './utils/url';
+import { METHODS } from './interface';
+import type {
+    IAjax,
+    IProcessParamsAfterOptions,
+    IProcessParamsAfterResult,
+    IParams,
+    IMethod,
+    IOptions,
+} from './interface';
 
 /**
  * 签名扩展。
- * 将会在请求头中添加字段sign，timestamp，app-nonce。
+ * 将会在请求头中添加字段 sign，timestamp，app-nonce。
  * sign：签名文本；
- * timestamp（签名参数）：UTC时间（用于校验是否已过期）；
- * app-nonce（签名参数）：只使用一次标识码（用于校验是否已发送过，存入redis几分钟后过期）。
+ * timestamp（签名参数）：UTC 时间（用于校验是否已过期）；
+ * app-nonce（签名参数）：只使用一次标识码（用于校验是否已发送过，存入 redis 几分钟后过期）。
  */
 function signatureExtend(): () => void {
     return function signature(): void {
-        const { processDataAfter } = this as IAjax;
+        const { processParamsAfter } = this as IAjax;
 
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码
@@ -34,40 +43,54 @@ function signatureExtend(): () => void {
 
         const signData = ({
             params,
+            paramsInOptions,
             method,
             options,
             processData,
         }: {
             params: IParams;
+            paramsInOptions: IOptions['params'] | string;
             method: IMethod;
             options: IOptions;
             processData?: boolean;
         }): void => {
-            const signatureStr =
-                isFormData(params) || processData === false
-                    ? ''
-                    : (this as IAjax).stringifyParams(params, method, { cache: true, encodeValue: false });
+            let signatureStr = '';
+            const { requestBody, queryParams } = (this as IAjax).stringifyParams({
+                params,
+                paramsInOptions,
+                method,
+                cache: true,
+                encodeValue: false,
+                processData,
+            });
+            if (method === METHODS.get) {
+                if (queryParams) {
+                    signatureStr = queryParams;
+                }
+            } else {
+                if (requestBody && typeof requestBody === 'string') {
+                    signatureStr = requestBody;
+                }
+            }
 
             const timestamp = new Date().getTime();
             const appNonce = uuid();
+            const end = appNonce.length - 1;
 
             _.merge(options, {
                 headers: {
-                    [signField]: Crypto.SHA256(
-                        `${signatureStr}${timestamp}${appNonce.substring(2, appNonce.length - 1)}`
-                    ),
+                    [signField]: Crypto.SHA256(`${signatureStr}${timestamp}${appNonce.substring(2, end)}`),
                     [timestampField]: timestamp,
                     [appNonceField]: appNonce,
                 },
             });
         };
 
-        (this as IAjax).processDataAfter = (params: IParams, props: IAjaxProcessDataAfterOptions): IParams => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processDataAfter(params, props) as { [name: string]: any };
+        (this as IAjax).processParamsAfter = (props: IProcessParamsAfterOptions): IProcessParamsAfterResult => {
+            const { params, paramsInOptions } = processParamsAfter(props);
             const { method, options, processData } = props;
-            signData({ params, method, options, processData });
-            return params;
+            signData({ params, paramsInOptions, method, options, processData });
+            return { params, paramsInOptions };
         };
     };
 }

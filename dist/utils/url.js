@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.processParamsInUrl = exports.addPrefixToUrl = void 0;
+exports.splitUrlParams = exports.needFormatData = exports.processParamsInUrl = exports.addPrefixToUrl = void 0;
 var form_1 = require("./form");
 function addPrefixToUrl(url, globalPrefix, optionsPrefix) {
     if (typeof optionsPrefix === 'string') {
@@ -23,58 +23,104 @@ function addPrefixToUrl(url, globalPrefix, optionsPrefix) {
     return "" + globalPrefix + url;
 }
 exports.addPrefixToUrl = addPrefixToUrl;
+function getParamsInUrl(url) {
+    var modules = url.split('/');
+    var params = [];
+    modules.forEach(function (m) {
+        if (m && /^:\w/.test(m)) {
+            var paramName = m.match(/^:(.*)$/)[1];
+            params.push(paramName);
+        }
+    });
+    return params;
+}
 function fillParamsInUrl(url, 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-params
-/* eslint-disable @typescript-eslint/indent */
-) {
-    /* eslint-enable @typescript-eslint/indent */
-    params = __assign({}, params);
+urlParams) {
     var modules = url.split('/');
-    var hasParamRemoved = false;
     var urlModules = modules.map(function (m) {
         if (m && /^:\w/.test(m)) {
             var paramName = m.match(/^:(.*)$/)[1];
-            var value = encodeURIComponent(params[paramName]);
-            delete params[paramName];
-            hasParamRemoved = true;
-            return value;
+            return encodeURIComponent(urlParams[paramName]);
         }
         return m;
     });
-    if (hasParamRemoved) {
-        if (Object.keys(params).length === 0) {
-            params = null;
-        }
-    }
     return {
         url: urlModules.join('/'),
-        params: params,
     };
 }
-function processParamsInUrl(url, params
-/* eslint-disable @typescript-eslint/indent */
-) {
-    /* eslint-enable @typescript-eslint/indent */
-    if (url && /(^|\/):\w/.test(url) && params && typeof params === 'object' && !form_1.isFormData(params)) {
+function processParamsInUrl(url, 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+urlParams) {
+    if (url && urlParams) {
         var matchQueryString = url.match(/(.*?)\?(.*)/);
         var queryStringInUrl = '';
         if (matchQueryString) {
             url = matchQueryString[1];
             queryStringInUrl = matchQueryString[2];
         }
-        var _a = fillParamsInUrl(url, params), filledUrl = _a.url, restParams = _a.params;
+        var filledUrl = fillParamsInUrl(url, urlParams).url;
         if (queryStringInUrl) {
             filledUrl = filledUrl + "?" + queryStringInUrl;
         }
         return {
             url: filledUrl,
-            params: restParams,
         };
     }
     return {
         url: url,
-        params: params,
     };
 }
 exports.processParamsInUrl = processParamsInUrl;
+function needFormatData(_a) {
+    var params = _a.params, processData = _a.processData;
+    return processData !== false && !form_1.isFormData(params);
+}
+exports.needFormatData = needFormatData;
+function splitUrlParams(_a) {
+    var url = _a.url, params = _a.params, paramsInOptions = _a.paramsInOptions, processData = _a.processData;
+    var urlParamNames = getParamsInUrl(url);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    var urlParams = {};
+    if (!urlParamNames ||
+        !urlParamNames.length ||
+        ((!params || typeof params !== 'object') && (!paramsInOptions || typeof paramsInOptions !== 'object'))) {
+        return {
+            urlParams: urlParams,
+            params: params,
+            paramsInOptions: paramsInOptions,
+        };
+    }
+    var findInParams = false;
+    if (params && typeof params === 'object' && needFormatData({ params: params, processData: processData })) {
+        params = __assign({}, params);
+        findInParams = true;
+    }
+    var findInOptions = false;
+    if (paramsInOptions && typeof paramsInOptions === 'object') {
+        paramsInOptions = __assign({}, paramsInOptions);
+        findInOptions = true;
+    }
+    for (var _i = 0, urlParamNames_1 = urlParamNames; _i < urlParamNames_1.length; _i++) {
+        var paramName = urlParamNames_1[_i];
+        if (findInOptions) {
+            if (paramName in paramsInOptions) {
+                urlParams[paramName] = paramsInOptions[paramName];
+                delete paramsInOptions[paramName];
+                continue;
+            }
+        }
+        if (findInParams) {
+            if (paramName in params) {
+                urlParams[paramName] = params[paramName];
+                delete params[paramName];
+            }
+        }
+    }
+    return {
+        urlParams: Object.keys(urlParams).length > 0 ? urlParams : null,
+        params: params,
+        paramsInOptions: paramsInOptions,
+    };
+}
+exports.splitUrlParams = splitUrlParams;

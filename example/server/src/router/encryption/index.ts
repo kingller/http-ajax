@@ -33,7 +33,7 @@ function checkSecretKey(ctx: any): boolean {
 }
 
 function getSecretKey(ctx: any): string {
-    // 使用redis时需先去header里获取uuid作为key
+    // 使用 redis 时需先去 header 里获取 uuid 作为 key
     return ctx.session.secretKey;
 }
 
@@ -51,9 +51,9 @@ export default class Encryption {
 
     @post('/encryption/token')
     public async createSecretKey(ctx) {
-        // 这里为方便演示，使用了session。
-        // 生产环境中请使用redis集群，key为请求header中的uuid。
-        // 所有项目请共用该redis
+        // 这里为方便演示，使用了 session。
+        // 生产环境中请使用 redis 集群，key 为请求 header 中的 uuid。
+        // 所有项目请共用该 redis
         const token = ctx.request.body.token;
         const secretKey = rsaKey.decrypt(token, 'utf8');
         ctx.session.secretKey = secretKey;
@@ -84,8 +84,16 @@ export default class Encryption {
             return;
         }
 
+        let data;
         const encryptFields = JSON.parse(ctx.request.header.encrypt);
-        const data = utils.decryptData(_.omit(ctx.request.query, ['_v']), getSecretKey(ctx), encryptFields);
+
+        if (encryptFields === 'all') {
+            data = utils.decryptData(ctx.request.querystring, getSecretKey(ctx), encryptFields);
+        } else {
+            console.log(getSecretKey(ctx));
+
+            data = utils.decryptData(_.omit(ctx.request.query, ['_v']), getSecretKey(ctx), encryptFields);
+        }
 
         ctx.body = {
             result: true,
@@ -129,17 +137,17 @@ export default class Encryption {
         let data = [
             {
                 userId: 1,
-                userName: '姓名1',
+                userName: '姓名 1',
                 pwd: '123456',
             },
             {
                 userId: 2,
-                userName: '姓名2',
+                userName: '姓名 2',
                 pwd: '236789',
             },
             {
                 userId: 3,
-                userName: '姓名3',
+                userName: '姓名 3',
                 pwd: 'abcdef',
                 employees: [
                     {

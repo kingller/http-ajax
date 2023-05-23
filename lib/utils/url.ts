@@ -1,4 +1,4 @@
-import { IParams } from '../interface';
+import { IParams, IOptions } from '../interface';
 import { isFormData } from './form';
 
 export function addPrefixToUrl(url: string, globalPrefix: string, optionsPrefix: string | undefined): string {
@@ -11,68 +11,138 @@ export function addPrefixToUrl(url: string, globalPrefix: string, optionsPrefix:
     return `${globalPrefix}${url}`;
 }
 
+function getParamsInUrl(url: string): string[] {
+    const modules = url.split('/');
+
+    const params: string[] = [];
+    modules.forEach(function (m) {
+        if (m && /^:\w/.test(m)) {
+            const paramName = m.match(/^:(.*)$/)[1];
+            params.push(paramName);
+        }
+    });
+    return params;
+}
+
 function fillParamsInUrl(
     url: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    params: { [name: string]: any }
-    /* eslint-disable @typescript-eslint/indent */
+    urlParams: { [name: string]: any }
 ): {
     url: string;
-    params: IParams | undefined;
 } {
-    /* eslint-enable @typescript-eslint/indent */
-    params = { ...params };
     const modules = url.split('/');
-    let hasParamRemoved = false;
+
     const urlModules = modules.map(function (m) {
         if (m && /^:\w/.test(m)) {
             const paramName = m.match(/^:(.*)$/)[1];
-            const value = encodeURIComponent(params[paramName]);
-            delete params[paramName];
-            hasParamRemoved = true;
-            return value;
+            return encodeURIComponent(urlParams[paramName]);
         }
         return m;
     });
-    if (hasParamRemoved) {
-        if (Object.keys(params).length === 0) {
-            params = null;
-        }
-    }
     return {
         url: urlModules.join('/'),
-        params,
     };
 }
 
 export function processParamsInUrl(
     url: string,
-    params: IParams | undefined
-    /* eslint-disable @typescript-eslint/indent */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    urlParams: { [name: string]: any }
 ): {
     url: string;
-    params: IParams | undefined;
 } {
-    /* eslint-enable @typescript-eslint/indent */
-    if (url && /(^|\/):\w/.test(url) && params && typeof params === 'object' && !isFormData(params)) {
+    if (url && urlParams) {
         const matchQueryString = url.match(/(.*?)\?(.*)/);
         let queryStringInUrl = '';
         if (matchQueryString) {
             url = matchQueryString[1];
             queryStringInUrl = matchQueryString[2];
         }
-        let { url: filledUrl, params: restParams } = fillParamsInUrl(url, params);
+        let { url: filledUrl } = fillParamsInUrl(url, urlParams);
         if (queryStringInUrl) {
             filledUrl = `${filledUrl}?${queryStringInUrl}`;
         }
         return {
             url: filledUrl,
-            params: restParams,
         };
     }
 
     return {
         url,
+    };
+}
+
+export function needFormatData({
+    params,
+    processData,
+}: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params: { [name: string]: any } | string;
+    processData?: boolean;
+}) {
+    return processData !== false && !isFormData(params);
+}
+
+export function splitUrlParams({
+    url,
+    params,
+    paramsInOptions,
+    processData,
+}: {
+    url: string;
+    params: IParams;
+    paramsInOptions: IOptions['params'];
+    processData?: boolean;
+}): {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    urlParams: { [name: string]: any };
+    params: IParams;
+    paramsInOptions: IOptions['params'];
+} {
+    const urlParamNames = getParamsInUrl(url);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const urlParams: { [name: string]: any } = {};
+    if (
+        !urlParamNames ||
+        !urlParamNames.length ||
+        ((!params || typeof params !== 'object') && (!paramsInOptions || typeof paramsInOptions !== 'object'))
+    ) {
+        return {
+            urlParams,
+            params,
+            paramsInOptions,
+        };
+    }
+    let findInParams = false;
+    if (params && typeof params === 'object' && needFormatData({ params, processData })) {
+        params = { ...params };
+        findInParams = true;
+    }
+    let findInOptions = false;
+    if (paramsInOptions && typeof paramsInOptions === 'object') {
+        paramsInOptions = { ...paramsInOptions };
+        findInOptions = true;
+    }
+    for (const paramName of urlParamNames) {
+        if (findInOptions) {
+            if (paramName in paramsInOptions) {
+                urlParams[paramName] = paramsInOptions[paramName];
+                delete paramsInOptions[paramName];
+                continue;
+            }
+        }
+        if (findInParams) {
+            if (paramName in (params as object)) {
+                urlParams[paramName] = params[paramName];
+                delete params[paramName];
+            }
+        }
+    }
+
+    return {
+        urlParams: Object.keys(urlParams).length > 0 ? urlParams : null,
         params,
+        paramsInOptions,
     };
 }

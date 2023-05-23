@@ -14,33 +14,33 @@ export enum METHODS {
 export type IMethod = METHODS.get | METHODS.post | METHODS.put | METHODS.del;
 
 export interface IOptionsBase {
-    /** 设置url前缀 */
+    /** 设置 url 前缀 */
     prefix?: string;
     /** 设置请求头 */
     headers?: {
         [name: string]: string;
     };
-    /** 使用当前loading名称来显示loading */
+    /** 使用当前 loading 名称来显示 loading */
     loadingName?: string;
-    /** 上下文，loading也可以从context.loading里取 */
+    /** 上下文，loading 也可以从 context.loading 里取 */
     context?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         [name: string]: any;
     };
-    /** 可以根据该值cancel请求，相同的cancelToken会取消掉前一个请求 */
+    /** 可以根据该值 cancel 请求，相同的 cancelToken 会取消掉前一个请求 */
     cancelToken?: string;
 }
 
 export interface IOptions extends IOptionsBase {
-    /** 为false时不格式化请求参数 */
+    /** 为 false 时不格式化请求参数 */
     processData?: boolean;
-    /** 为false时不调用JSON.parse处理返回值 */
+    /** 为 false 时不调用 JSON.parse 处理返回值 */
     json?: boolean;
-    /** 为false时，不弹出错误提示 */
+    /** 为 false 时，不弹出错误提示 */
     autoPopupErrorMsg?: boolean;
-    /** 设置请求responseType */
+    /** 设置请求 responseType */
     responseType?: '' | 'arraybuffer' | 'blob' | 'document' | 'json' | 'text';
-    /** 设置为true，缓存本次请求到的数据 */
+    /** 设置为 true，缓存本次请求到的数据 */
     cache?: boolean | string;
     /** 当陆陆续续获取数据片段时的回调函数 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,6 +61,9 @@ export interface IOptions extends IOptionsBase {
     simple?: boolean;
     /** 最大请求时间（毫秒），若超出该时间，请求会自动终止 */
     timeout?: number;
+    /** 传入 query parameters，发送请求时拼接到 URL 上 */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params?: { [name: string]: any };
     /** 自定义选项，用来传递值自定义处理逻辑 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [name: string]: any;
@@ -106,9 +109,32 @@ export interface IAjaxProcessDataOptions {
     reject?: IReject;
 }
 
-export interface IAjaxProcessDataAfterOptions extends IAjaxProcessDataOptions {
-    /** 为false时不格式化请求参数 */
+export interface IProcessParamsOptions extends IAjaxProcessDataOptions {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    urlParams: { [name: string]: any };
+    params: IParams;
+    paramsInOptions: IOptions['params'];
+    /** 为 false 时不格式化请求参数 */
     processData?: boolean;
+}
+
+export interface IProcessParamsResult {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    urlParams: { [name: string]: any };
+    params: IParams;
+    paramsInOptions: IOptions['params'] | string;
+}
+
+export interface IProcessParamsAfterOptions extends IAjaxProcessDataOptions {
+    params: IParams;
+    paramsInOptions: IOptions['params'] | string;
+    /** 为 false 时不格式化请求参数 */
+    processData?: boolean;
+}
+
+export interface IProcessParamsAfterResult {
+    params: IParams;
+    paramsInOptions: IOptions['params'] | string;
 }
 
 export interface IProcessResponseOptions extends IAjaxArgsOptions {
@@ -154,7 +180,7 @@ export type IRequestResult<T = any> = IPromise<T>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IRequest = <T = any>(url: string, params?: IParams, options?: IOptions) => IRequestResult<T>;
 
-// session过期
+// session 过期
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type IOnSessionExpired = <T = any>(
     error?: { errorCode: number; errorMsg: string },
@@ -172,7 +198,7 @@ export interface IRequestOptions {
     onSessionExpired: IOnSessionExpired;
     options?: IOptions;
     cancelExecutor: ICancelExecutor;
-    /** 链路追踪ID */
+    /** 链路追踪 ID */
     xCorrelationID?: string;
     /** 请求开始时间 */
     startTime?: number;
@@ -197,7 +223,7 @@ export interface IOnSuccess<T = any> {
             url?: string;
             /** 请求参数 */
             params?: IParams | undefined;
-            /** 链路追踪ID */
+            /** 链路追踪 ID */
             xCorrelationID?: string;
         }
     ): void;
@@ -224,26 +250,37 @@ export interface ICatchErrorOptions {
     /** 请求参数 */
     params?: IParams | undefined;
     options?: IOptions;
-    /** 链路追踪ID */
+    /** 链路追踪 ID */
     xCorrelationID?: string;
     xhr?: XMLHttpRequest;
 }
 
 export type ICatchError = (props: ICatchErrorOptions) => void;
 
-export interface IStringifyParamsOptions extends IOptions {
-    /** GET请求时是否对值用encodeURIComponent编码（签名时使用，签名不对value编码。内部参数，请勿使用） */
+export interface IStringifyParamsOptions {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params: { [name: string]: any } | string;
+    /** 传入 query parameters，发送请求时拼接到 URL 上 */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    paramsInOptions?: { [name: string]: any } | string;
+    /** method */
+    method: IMethod;
+    /** GET 请求时是否对值用 encodeURIComponent 编码（签名时使用，签名不对 value 编码。内部参数，请勿使用） */
     encodeValue?: boolean;
+    /** 设置为 true，缓存本次请求到的数据 */
+    cache?: IOptions['cache'];
+    /** 为 false 时不格式化请求参数 */
+    processData?: IOptions['processData'];
 }
 
 export interface IConfigOptions {
     /**
-     * Get请求是否添加随机字符串阻止缓存
+     * Get 请求是否添加随机字符串阻止缓存
      * @default false
      */
     noCache?: boolean;
     /**
-     * url前缀
+     * url 前缀
      * @default '/api'
      */
     prefix?: string;
@@ -261,7 +298,7 @@ export interface IConfigOptions {
      */
     onError?: IOnError;
     /**
-     * session过期回调
+     * session 过期回调
      */
     onSessionExpired?: IOnSessionExpired;
     /**
@@ -308,17 +345,13 @@ export interface IAjax {
         params: IParams,
         props: { method: IMethod; url: string; options: IOptions; reject?: IReject }
     ) => IParams;
-    processDataAfter: (
-        params: IParams,
-        props: { method: IMethod; url: string; options: IOptions; reject?: IReject; processData?: boolean }
-    ) => IParams;
+    processParams: (props: IProcessParamsOptions) => IProcessParamsResult;
+    processParamsAfter: (props: IProcessParamsAfterOptions) => IProcessParamsAfterResult;
     processResponse: (response: IResult | null, props: IProcessResponseOptions) => IResult;
-    readonly stringifyParams: (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        params: { [name: string]: any } | string,
-        method: IMethod,
-        options?: IStringifyParamsOptions
-    ) => string;
+    readonly stringifyParams: (props: IStringifyParamsOptions) => {
+        requestBody: string | IParams | undefined;
+        queryParams: string;
+    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: <T = any>(
         xhr: XMLHttpRequest | undefined,
@@ -333,16 +366,16 @@ export interface IAjax {
             url?: string;
             /** 请求参数 */
             params?: IParams | undefined;
-            /** 链路追踪ID */
+            /** 链路追踪 ID */
             xCorrelationID?: string;
         }
     ) => void;
     /** 请求结束 */
     responseEnd?: (xhr?: XMLHttpRequest, _opts?: IRequestOptions, props?: { success: boolean }) => void;
-    /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
+    /** 添加默认 AJAX 错误处理程序（请勿使用，内部扩展插件使用，外部请使用 onError） */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void | Promise<void>;
-    /** 添加默认AJAX错误处理程序 */
+    /** 添加默认 AJAX 错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
     /** 捕获错误 */
@@ -362,7 +395,7 @@ export interface IAjax {
         /** 请求参数 */
         params?: IParams | undefined;
         options?: IOptions;
-        /** 链路追踪ID */
+        /** 链路追踪 ID */
         xCorrelationID?: string;
         xhr?: XMLHttpRequest;
     }) => void;
@@ -385,7 +418,7 @@ export interface IAjax {
             url: string;
             /** 请求参数 */
             params?: IParams | undefined;
-            /** 是否显示loading */
+            /** 是否显示 loading */
             loading: boolean;
             /** resolve */
             resolve: IResolve<T>;
@@ -395,7 +428,7 @@ export interface IAjax {
             options?: IOptions;
             /** 取消请求方法 */
             cancelExecutor: ICancelExecutor;
-            /** 请求session过期回调 */
+            /** 请求 session 过期回调 */
             onSessionExpired?: IOnSessionExpired;
         },
         url?: string,

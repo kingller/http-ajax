@@ -117,12 +117,18 @@ var AjaxBase = /** @class */ (function () {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         this.beforeSend = function (props) { };
         /** 数据处理 */
-        this.processData = function (params, props) {
+        this.processData = function (params, options) {
             return params;
         };
-        /** 去除URL中:params格式参数后数据处理 */
-        this.processDataAfter = function (params, props) {
-            return params;
+        /** 参数处理 */
+        this.processParams = function (_a) {
+            var urlParams = _a.urlParams, params = _a.params, paramsInOptions = _a.paramsInOptions;
+            return { urlParams: urlParams, params: params, paramsInOptions: paramsInOptions };
+        };
+        /** 去除 URL 中:params 格式参数后参数处理 */
+        this.processParamsAfter = function (_a) {
+            var params = _a.params, paramsInOptions = _a.paramsInOptions;
+            return { params: params, paramsInOptions: paramsInOptions };
         };
         this.processResponse = function (response, props) {
             return response;
@@ -133,44 +139,86 @@ var AjaxBase = /** @class */ (function () {
         /** 私有变量，请勿使用 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this._cacheCancel = {};
-        this.stringifyParams = function (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        params, method, options) {
-            // 如果调用方已经将参数序列化成字符串，直接返回
-            if (typeof params === 'string')
-                return params;
-            // 对于非GET请求，直接序列化该参数对象
-            // requestBody为undefined时，将其转为空字符串，避免IE下出现错误：invalid JSON, only supports object and array
-            // requestBody为null时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
-            if (method !== Ajax.METHODS.get)
-                return (typeof params !== 'undefined' && params !== null && JSON.stringify(params)) || '';
-            // 对于GET请求，将参数拼成key1=val1&key2=val2的格式
+        /** 将参数拼成 key1=val1&key2=val2 的格式 */
+        this.fillQueryParams = function (_a) {
+            var params = _a.params, encodeValue = _a.encodeValue;
             var array = [];
-            if (params && typeof params === 'object') {
-                var paramsKeys = Object.keys(params).sort();
-                for (var i = 0; i < paramsKeys.length; i++) {
-                    var key = paramsKeys[i];
-                    var value = '';
-                    if (typeof params[key] !== 'undefined' && params[key] !== null) {
-                        if (params[key] instanceof Array) {
-                            value = params[key].join(',');
-                        }
-                        else {
-                            value = params[key];
-                        }
+            var paramsKeys = Object.keys(params);
+            for (var i = 0; i < paramsKeys.length; i++) {
+                var key = paramsKeys[i];
+                var value = '';
+                if (typeof params[key] !== 'undefined' && params[key] !== null) {
+                    if (params[key] instanceof Array) {
+                        value = params[key].join(',');
                     }
-                    if (!options || options.encodeValue !== false) {
-                        value = encodeURIComponent(value);
+                    else {
+                        value = params[key];
                     }
-                    array.push(key + "=" + value);
                 }
+                if (encodeValue !== false) {
+                    value = encodeURIComponent(value);
+                }
+                array.push(key + "=" + value);
+            }
+            array.sort();
+            return array;
+        };
+        this.stringifyParams = function (_a) {
+            var params = _a.params, paramsInOptions = _a.paramsInOptions, method = _a.method, encodeValue = _a.encodeValue, cache = _a.cache, processData = _a.processData;
+            var requestBody = undefined;
+            var queryParamsArray = [];
+            var isNeedFormat = 
+            // 如果调用方已经将参数序列化成字符串，直接返回
+            // processData === false 直接返回
+            // FormData 直接返回
+            typeof params !== 'string' && url_1.needFormatData({ params: params, processData: processData });
+            if (method === Ajax.METHODS.get) {
+                if (isNeedFormat) {
+                    // 对于 GET 请求，将参数拼成 key1=val1&key2=val2 的格式
+                    if (params && typeof params === 'object') {
+                        queryParamsArray = _this.fillQueryParams({ params: params, encodeValue: encodeValue });
+                    }
+                }
+                else {
+                    if (typeof params === 'string') {
+                        queryParamsArray.push(params);
+                    }
+                    else {
+                        requestBody = params;
+                    }
+                }
+            }
+            else {
+                if (isNeedFormat) {
+                    // requestBody 为 undefined 时，将其转为空字符串，避免 IE 下出现错误：invalid JSON, only supports object and array
+                    // requestBody 为 null 时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
+                    requestBody = (typeof params !== 'undefined' && params !== null && JSON.stringify(params)) || '';
+                }
+                else {
+                    requestBody = params;
+                }
+            }
+            if (paramsInOptions) {
+                if (typeof paramsInOptions === 'object') {
+                    // 将参数拼成 key1=val1&key2=val2 的格式
+                    queryParamsArray.push.apply(queryParamsArray, _this.fillQueryParams({ params: paramsInOptions, encodeValue: encodeValue }));
+                }
+                else {
+                    queryParamsArray.push(paramsInOptions);
+                }
+            }
+            if (params && paramsInOptions) {
+                queryParamsArray.sort();
             }
             if (_this._config.noCache) {
-                if (!options || !options.cache) {
-                    array.push("_v=" + Math.floor(Math.random() * 1000000));
+                if (!cache) {
+                    queryParamsArray.push("_v=" + Math.floor(Math.random() * 1000000));
                 }
             }
-            return array.join('&');
+            return {
+                requestBody: requestBody,
+                queryParams: queryParamsArray.join('&'),
+            };
         };
         /** 配置 */
         this.config = function (options) {
@@ -222,10 +270,10 @@ var AjaxBase = /** @class */ (function () {
             resolve(response);
         }
     };
-    /** 添加默认AJAX错误处理程序（请勿使用，内部扩展插件使用，外部请使用onError） */
+    /** 添加默认 AJAX 错误处理程序（请勿使用，内部扩展插件使用，外部请使用 onError） */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function
     AjaxBase.prototype.processErrorResponse = function (xhr, _opts) { };
-    /** 添加默认AJAX错误处理程序 */
+    /** 添加默认 AJAX 错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.onError = function (xhr, _opts) {
         _opts.reject(xhr);
@@ -253,7 +301,7 @@ var AjaxBase = /** @class */ (function () {
         // @ts-ignore
         return window[this.$loading];
     };
-    /** 移除缓存的cancel请求 */
+    /** 移除缓存的 cancel 请求 */
     AjaxBase.prototype.removeCacheCancel = function (token) {
         if (this._cacheCancel[token]) {
             delete this._cacheCancel[token];
@@ -267,18 +315,52 @@ var AjaxBase = /** @class */ (function () {
         if (options.processData !== false) {
             params = this.processData(params, { method: method, url: url, options: options, reject: reject });
         }
-        var processedValue = url_1.processParamsInUrl(url, params);
-        url = processedValue.url;
-        params = processedValue.params;
-        params = this.processDataAfter(params, { method: method, url: url, options: options, reject: reject, processData: options.processData });
-        if (options.processData !== false) {
-            if (!form_1.isFormData(params)) {
-                params = this.stringifyParams(params, method, options);
-            }
-        }
-        return {
+        var processedUrlParams = url_1.splitUrlParams({
             url: url,
             params: params,
+            paramsInOptions: options.params,
+            processData: options.processData,
+        });
+        var urlParams = processedUrlParams.urlParams;
+        var optionsParams = processedUrlParams.paramsInOptions;
+        params = processedUrlParams.params;
+        var processedParams = this.processParams({
+            urlParams: urlParams,
+            params: params,
+            paramsInOptions: optionsParams,
+            method: method,
+            url: url,
+            options: options,
+            reject: reject,
+            processData: options.processData,
+        });
+        urlParams = processedParams.urlParams;
+        params = processedParams.params;
+        var paramsInOptions = processedParams.paramsInOptions;
+        if (urlParams) {
+            var processedValue = url_1.processParamsInUrl(url, urlParams);
+            url = processedValue.url;
+        }
+        this.processParamsAfter({
+            params: params,
+            paramsInOptions: paramsInOptions,
+            method: method,
+            url: url,
+            options: options,
+            reject: reject,
+            processData: options.processData,
+        });
+        var _a = this.stringifyParams({
+            params: params,
+            paramsInOptions: paramsInOptions,
+            method: method,
+            cache: options.cache,
+            processData: options.processData,
+        }), requestBody = _a.requestBody, queryParams = _a.queryParams;
+        return {
+            url: url,
+            requestBody: requestBody,
+            queryParams: queryParams,
         };
     };
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -295,7 +377,7 @@ var AjaxBase = /** @class */ (function () {
         var _this = this;
         var method;
         var _retryTimes = 0;
-        /** 链路追踪ID */
+        /** 链路追踪 ID */
         var xCorrelationID = '';
         if (typeof props === 'object') {
             method = props.method;
@@ -335,7 +417,7 @@ var AjaxBase = /** @class */ (function () {
             onSessionExpired: onSessionExpired,
             options: options,
             cancelExecutor: cancelExecutor,
-            // 链路追踪ID
+            // 链路追踪 ID
             xCorrelationID: xCorrelationID,
             // 请求开始时间
             startTime: new Date().getTime(),
@@ -371,12 +453,9 @@ var AjaxBase = /** @class */ (function () {
             }
             var processedValue = _this.getProcessedParams(method, url, params, options, reject);
             url = processedValue.url;
-            params = processedValue.params;
-            if (method === Ajax.METHODS.get) {
-                if (params) {
-                    url = url + "?" + params;
-                }
-                params = undefined;
+            var queryParams = processedValue.queryParams, requestBody = processedValue.requestBody;
+            if (queryParams) {
+                url = url + "?" + queryParams;
             }
             if (options.cache && _this._cache[url] !== undefined) {
                 if (loadingComponent)
@@ -436,7 +515,7 @@ var AjaxBase = /** @class */ (function () {
                     loadingComponent.finish();
                 }
                 if (options && options.cancelToken) {
-                    // 请求完成，删除缓存的cancel
+                    // 请求完成，删除缓存的 cancel
                     ajaxThis.removeCacheCancel(options.cancelToken);
                 }
                 if (this.status === 200 || this.status === 201) {
@@ -449,8 +528,8 @@ var AjaxBase = /** @class */ (function () {
                             _a);
                     }
                     else {
-                        // IE9下responseType为json时，response的值为undefined，返回值需去responseText取
-                        // 其它浏览器responseType为json时，取response
+                        // IE9 下 responseType 为 json 时，response 的值为 undefined，返回值需去 responseText 取
+                        // 其它浏览器 responseType 为 json 时，取 response
                         if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
                             res = this.response;
                         }
@@ -538,7 +617,7 @@ var AjaxBase = /** @class */ (function () {
                     var lowerCaseKey = k.toLowerCase();
                     if (lowerCaseKey === 'content-type') {
                         isContentTypeExist = true;
-                        // 支持不设置Content-Type
+                        // 支持不设置 Content-Type
                         if (v) {
                             xhr.setRequestHeader(k, v);
                         }
@@ -586,7 +665,7 @@ var AjaxBase = /** @class */ (function () {
                 xhr.timeout = options.timeout;
             }
             // prettier-ignore
-            xhr.send(params);
+            xhr.send(requestBody);
             if (cancelExecutor) {
                 cancelExecutor(function () {
                     if (xhr.readyState === XMLHttpRequest.DONE) {
@@ -625,7 +704,7 @@ var AjaxBase = /** @class */ (function () {
             if (promise) {
                 promise.cancel = cancel;
             }
-            // 如果是再次发送的请求， 前一请求缓存已从_cacheCancel清除，这里需要重新设置
+            // 如果是再次发送的请求，前一请求缓存已从_cacheCancel 清除，这里需要重新设置
             if (options && options.cancelToken && promise && !_this._cacheCancel[options.cancelToken]) {
                 _this._cacheCancel[options.cancelToken] = promise;
             }
@@ -636,13 +715,13 @@ var AjaxBase = /** @class */ (function () {
         });
         promise.cancel = cancel;
         if (options && options.cancelToken) {
-            // 传入cancelToken的话就缓存cancel, 用来取消请求
+            // 传入 cancelToken 的话就缓存 cancel, 用来取消请求
             this.cancel(options.cancelToken);
             this._cacheCancel[options.cancelToken] = promise;
         }
         return promise;
     };
-    /** session过期回调 */
+    /** session 过期回调 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.onSessionExpired = function (error, props) {
         var reject = props.reject;
@@ -653,7 +732,7 @@ var AjaxBase = /** @class */ (function () {
         var _options = __assign(__assign({}, options), { cache: true });
         var processedValue = this.getProcessedParams(method, url, params, _options);
         url = processedValue.url;
-        params = processedValue.params;
+        params = processedValue.queryParams;
         return params ? url + "?" + params : url;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -675,11 +754,11 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.clear = function () {
         this.clearCache();
     };
-    /** 生成cancel token */
+    /** 生成 cancel token */
     AjaxBase.prototype.cancelToken = function () {
         return new Date().getTime() + "_" + Math.random();
     };
-    /** cancel请求 */
+    /** cancel 请求 */
     AjaxBase.prototype.cancel = function (token) {
         if (!token) {
             return;
