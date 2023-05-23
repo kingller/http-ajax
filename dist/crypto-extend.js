@@ -12,16 +12,17 @@ var array_1 = require("./utils/array");
 var promise_1 = require("./utils/promise");
 var catch_1 = require("./utils/catch");
 var response_data_1 = require("./utils/response-data");
+var url_1 = require("./utils/url");
 var publicKeyPromise = null;
 var secretKeyPromise = null;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 var waitingPublicKeyPromise = [];
 /**
  * 加解密扩展。
- * 加密请求前未获取到密钥或返回470状态时，首先发送请求/api/encryption/public-key获取服务端RSA公钥。
- * 客户端生成AES密钥，并使用RSA加密后发送请求/api/encryption/token传输给服务端，服务端客户端使用该密钥加解密。
- * 请求头中将会添加字段uuid，encrypt（uuid:唯一标识码，服务端根据该uuid获取密钥；encrypt：加密字段，服务端根据该字段解密）。
- * 解密请求将会在响应头中添加字段encrypt：加密字段，客户端根据该字段解密。
+ * 加密请求前未获取到密钥或返回 470 状态时，首先发送请求/api/encryption/public-key 获取服务端 RSA 公钥。
+ * 客户端生成 AES 密钥，并使用 RSA 加密后发送请求/api/encryption/token 传输给服务端，服务端客户端使用该密钥加解密。
+ * 请求头中将会添加字段 uuid，encrypt（uuid:唯一标识码，服务端根据该 uuid 获取密钥；encrypt：加密字段，服务端根据该字段解密）。
+ * 解密请求将会在响应头中添加字段 encrypt：加密字段，客户端根据该字段解密。
  */
 function cryptoExtend() {
     (function () {
@@ -32,7 +33,7 @@ function cryptoExtend() {
     })();
     return function crypto() {
         var _this = this;
-        var _a = this, beforeSend = _a.beforeSend, processData = _a.processData, processResponse = _a.processResponse, processErrorResponse = _a.processErrorResponse, clear = _a.clear;
+        var _a = this, beforeSend = _a.beforeSend, processParams = _a.processParams, processResponse = _a.processResponse, processErrorResponse = _a.processErrorResponse, clear = _a.clear;
         // 校验该扩展是否已添加过
         if (this._cryptoExtendAdded) {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -75,9 +76,9 @@ function cryptoExtend() {
         function sendSecretKeyRequest() {
             var _this = this;
             return getPublicKey.apply(this).then(function (publicKeyResponse) {
-                // 生成AES秘钥
+                // 生成 AES 秘钥
                 var newSecretKey = client_crypto_1.default.AES.createKey();
-                // 使用RSA公钥加密秘钥
+                // 使用 RSA 公钥加密秘钥
                 var encryptedSecretKey = client_crypto_1.default.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
                 // 将加密后的秘钥传输给服务器端
                 secretKeyPromise = new Promise(function (resolve, reject) {
@@ -245,7 +246,7 @@ function cryptoExtend() {
             promise = promise_1.promisify(promise);
             var options = props.options;
             var uuid = getUuid();
-            // 由于解密需要服务端返回响应头才知道，故统一添加唯一标志符uuid，服务端将根据uuid取得AES密钥
+            // 由于解密需要服务端返回响应头才知道，故统一添加唯一标志符 uuid，服务端将根据 uuid 取得 AES 密钥
             if (uuid) {
                 lodash_1.default.merge(options, {
                     headers: {
@@ -253,9 +254,9 @@ function cryptoExtend() {
                     },
                 });
             }
-            // 解密的不会传options.decrypt，这里只是提供了手动指定decrypt功能
-            // 解密需去响应头获取encrypt字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成AES密钥并传输给服务端
-            // 加密请求则根据options.encrypt，如果没有AES密钥，则生成并传输给服务端
+            // 解密的不会传 options.decrypt，这里只是提供了手动指定 decrypt 功能
+            // 解密需去响应头获取 encrypt 字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成 AES 密钥并传输给服务端
+            // 加密请求则根据 options.encrypt，如果没有 AES 密钥，则生成并传输给服务端
             if (options && (options.encrypt || options.decrypt)) {
                 return promise.then(function () {
                     return createSecretKey.apply(_this).then(function () {
@@ -278,24 +279,51 @@ function cryptoExtend() {
             }
             return promise;
         };
-        this.processData = function (params, props) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processData(params, props);
-            var options = props.options, reject = props.reject;
+        function encryptParams(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        params, encrypt
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        ) {
+            if (encrypt === 'all') {
+                return client_crypto_1.default.AES.encrypt(params);
+            }
+            if (!params || typeof params !== 'object') {
+                return params;
+            }
+            if (Array.isArray(encrypt)) {
+                params = clone_1.cloneDeep(params);
+                encrypt.forEach(function (field) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    encryptDataField(params, field);
+                });
+            }
+            return params;
+        }
+        this.processParams = function (props) {
+            var _a = processParams(props), urlParams = _a.urlParams, params = _a.params, paramsInOptions = _a.paramsInOptions;
+            var options = props.options, reject = props.reject, processData = props.processData;
             try {
-                if (params && options && options.encrypt) {
-                    params = clone_1.cloneDeep(params);
-                    if (options.encrypt === 'all') {
-                        return client_crypto_1.default.AES.encrypt(params);
-                    }
-                    if (!params || typeof params !== 'object') {
-                        return params;
-                    }
-                    if (Array.isArray(options.encrypt)) {
-                        options.encrypt.forEach(function (field) {
+                if (options && options.encrypt) {
+                    var encrypt = options.encrypt;
+                    if (urlParams) {
+                        urlParams = clone_1.cloneDeep(urlParams);
+                        if (options.encrypt === 'all') {
+                            Object.keys(urlParams).forEach(function (field) {
+                                encryptDataField(urlParams, field);
+                            });
+                        }
+                        else {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            encryptDataField(params, field);
-                        });
+                            urlParams = encryptParams(urlParams, encrypt);
+                        }
+                    }
+                    if (params) {
+                        if (url_1.needFormatData({ params: params, processData: processData })) {
+                            params = encryptParams(params, encrypt);
+                        }
+                    }
+                    if (paramsInOptions) {
+                        paramsInOptions = encryptParams(paramsInOptions, encrypt);
                     }
                 }
             }
@@ -312,7 +340,7 @@ function cryptoExtend() {
                     options: options,
                 });
             }
-            return params;
+            return { urlParams: urlParams, params: params, paramsInOptions: paramsInOptions };
         };
         this.processResponse = function (response, props) {
             response = processResponse(response, props);
@@ -378,7 +406,7 @@ function cryptoExtend() {
             if (!publicKeyPromise && !secretKeyPromise) {
                 clearCrypto();
             }
-            // 解密需去响应头获取encrypt字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成AES密钥并传输给服务端
+            // 解密需去响应头获取 encrypt 字段，响应头返回前不知道该请求是需解密请求，所以解密请求需在 470 之后生成 AES 密钥并传输给服务端
             createSecretKey.apply(_this).then(function () {
                 var method = _opts.method, url = _opts.url, params = _opts.params, loading = _opts.loading, resolve = _opts.resolve, reject = _opts.reject, options = _opts.options, cancelExecutor = _opts.cancelExecutor;
                 // prettier-ignore

@@ -6,18 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var lodash_1 = __importDefault(require("lodash"));
 var client_crypto_1 = __importDefault(require("client-crypto"));
 var uuid_1 = require("uuid");
-var form_1 = require("./utils/form");
+var interface_1 = require("./interface");
 /**
  * 签名扩展。
- * 将会在请求头中添加字段sign，timestamp，app-nonce。
+ * 将会在请求头中添加字段 sign，timestamp，app-nonce。
  * sign：签名文本；
- * timestamp（签名参数）：UTC时间（用于校验是否已过期）；
- * app-nonce（签名参数）：只使用一次标识码（用于校验是否已发送过，存入redis几分钟后过期）。
+ * timestamp（签名参数）：UTC 时间（用于校验是否已过期）；
+ * app-nonce（签名参数）：只使用一次标识码（用于校验是否已发送过，存入 redis 几分钟后过期）。
  */
 function signatureExtend() {
     return function signature() {
         var _this = this;
-        var processDataAfter = this.processDataAfter;
+        var processParamsAfter = this.processParamsAfter;
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码
         var appNonceField = ['app', ['non', 'ce'].join('')].join('-');
@@ -34,26 +34,42 @@ function signatureExtend() {
         this._signatureExtendAdded = true;
         var signData = function (_a) {
             var _b;
-            var params = _a.params, method = _a.method, options = _a.options, processData = _a.processData;
-            var signatureStr = form_1.isFormData(params) || processData === false
-                ? ''
-                : _this.stringifyParams(params, method, { cache: true, encodeValue: false });
+            var params = _a.params, paramsInOptions = _a.paramsInOptions, method = _a.method, options = _a.options, processData = _a.processData;
+            var signatureStr = '';
+            var _c = _this.stringifyParams({
+                params: params,
+                paramsInOptions: paramsInOptions,
+                method: method,
+                cache: true,
+                encodeValue: false,
+                processData: processData,
+            }), requestBody = _c.requestBody, queryParams = _c.queryParams;
+            if (method === interface_1.METHODS.get) {
+                if (queryParams) {
+                    signatureStr = queryParams;
+                }
+            }
+            else {
+                if (requestBody && typeof requestBody === 'string') {
+                    signatureStr = requestBody;
+                }
+            }
             var timestamp = new Date().getTime();
             var appNonce = uuid_1.v4();
+            var end = appNonce.length - 1;
             lodash_1.default.merge(options, {
                 headers: (_b = {},
-                    _b[signField] = client_crypto_1.default.SHA256("" + signatureStr + timestamp + appNonce.substring(2, appNonce.length - 1)),
+                    _b[signField] = client_crypto_1.default.SHA256("" + signatureStr + timestamp + appNonce.substring(2, end)),
                     _b[timestampField] = timestamp,
                     _b[appNonceField] = appNonce,
                     _b),
             });
         };
-        this.processDataAfter = function (params, props) {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            params = processDataAfter(params, props);
+        this.processParamsAfter = function (props) {
+            var _a = processParamsAfter(props), params = _a.params, paramsInOptions = _a.paramsInOptions;
             var method = props.method, options = props.options, processData = props.processData;
-            signData({ params: params, method: method, options: options, processData: processData });
-            return params;
+            signData({ params: params, paramsInOptions: paramsInOptions, method: method, options: options, processData: processData });
+            return { params: params, paramsInOptions: paramsInOptions };
         };
     };
 }

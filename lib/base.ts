@@ -4,10 +4,9 @@ import { promisify } from './utils/promise';
 import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
 import { transformResponse } from './utils/transform-response';
-import { addPrefixToUrl, processParamsInUrl } from './utils/url';
+import { addPrefixToUrl, processParamsInUrl, splitUrlParams, needFormatData } from './utils/url';
 import { ILoading } from './interface';
 import * as Ajax from './interface';
-import _ from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createError(message: string, code?: string | number, request?: any, response?: any): Ajax.IError {
@@ -117,106 +116,25 @@ class AjaxBase {
     public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void {};
 
     /** 数据处理 */
-    public processData = function (
-        params: Ajax.IParams,
-        props: Ajax.IAjaxProcessDataOptions
-    ): { params: Ajax.IParams; options: Ajax.IOptions } {
-        const { options } = props;
-        return { params, options };
-    };
-
-    public encryptUrlParams = function (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        urlParams: { [name: string]: any },
-        encrypt: string[] | 'all'
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): { [name: string]: any } {
-        return urlParams;
-    };
-
-    public processUrlParams = function (
-        url: string,
-        params: Ajax.IParams,
-        options: Ajax.IOptions
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ): { urlParams: { [name: string]: any }; params: Ajax.IParams; options: Ajax.IOptions } {
-        const placeholders = url.match(/:[a-zA-Z]+/g);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let urlParams: { [name: string]: any } = {};
-        if (!placeholders || (typeof params !== 'object' && typeof options !== 'object')) {
-            return {
-                urlParams,
-                params,
-                options,
-            };
-        }
-        if (typeof params === 'object') {
-            params = { ...params };
-        }
-        options = { ...options };
-        _.forEach(placeholders, (item) => {
-            const filed = item.substring(1);
-            if (params[filed] || options.params[filed]) {
-                _.set(urlParams, filed, params[filed] || options.params[filed]);
-                if (params[filed]) {
-                    delete params[filed];
-                } else {
-                    delete options.params[filed];
-                }
-            }
-        });
-        if (urlParams) {
-            if (options.encrypt) {
-                urlParams = this.encryptUrlParams(urlParams, options.encrypt);
-                _.forEach(urlParams, (value, key) => {
-                    urlParams[key] = encodeURIComponent(urlParams[key]);
-                });
-            }
-
-            if (params && typeof params === 'object' && Object.keys(params).length === 0) {
-                params = null;
-            }
-            if (options.params && typeof options.params === 'object' && Object.keys(options.params).length === 0) {
-                options.params = null;
-            }
-        }
-
-        return {
-            urlParams,
-            params,
-            options,
-        };
-    };
-
-    /** 处理 option 中的 params */
-    public processParamsToArray = function (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        params: { [name: string]: any } | string,
-        options: Ajax.IOptions
-    ): string[] {
-        const array: string[] = [];
-        const paramsKeys = Object.keys(params).sort();
-        for (let i = 0; i < paramsKeys.length; i++) {
-            const key = paramsKeys[i];
-            let value = '';
-            if (typeof params[key] !== 'undefined' && params[key] !== null) {
-                if (params[key] instanceof Array) {
-                    value = params[key].join(',');
-                } else {
-                    value = params[key];
-                }
-            }
-            if (!options || options.encodeValue !== false) {
-                value = encodeURIComponent(value);
-            }
-            array.push(`${key}=${value}`);
-        }
-        return array;
-    };
-
-    /** 去除 URL 中:params 格式参数后数据处理 */
-    public processDataAfter = function (params: Ajax.IParams, props: Ajax.IAjaxProcessDataAfterOptions): Ajax.IParams {
+    public processData = function (params: Ajax.IParams, options: Ajax.IAjaxProcessDataOptions): Ajax.IParams {
         return params;
+    };
+
+    /** 参数处理 */
+    public processParams = function ({
+        urlParams,
+        params,
+        paramsInOptions,
+    }: Ajax.IProcessParamsOptions): Ajax.IProcessParamsResult {
+        return { urlParams, params, paramsInOptions };
+    };
+
+    /** 去除 URL 中:params 格式参数后参数处理 */
+    public processParamsAfter = function ({
+        params,
+        paramsInOptions,
+    }: Ajax.IProcessParamsAfterOptions): Ajax.IProcessParamsAfterResult {
+        return { params, paramsInOptions };
     };
 
     public processResponse = function (
@@ -302,33 +220,98 @@ class AjaxBase {
         return window[this.$loading];
     }
 
-    public readonly stringifyParams = (
+    /** 将参数拼成 key1=val1&key2=val2 的格式 */
+    private fillQueryParams = function ({
+        params,
+        encodeValue,
+    }: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        params: { [name: string]: any } | string,
-        method: Ajax.IMethod,
-        options: Ajax.IStringifyParamsOptions
-    ): string => {
-        // 如果调用方已经将参数序列化成字符串，直接返回
-        if (typeof params === 'string') return params;
-        // 对于非 GET 请求，直接序列化该参数对象
-        // requestBody 为 undefined 时，将其转为空字符串，避免 IE 下出现错误：invalid JSON, only supports object and array
-        // requestBody 为 null 时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
-        if (method !== Ajax.METHODS.get)
-            return (typeof params !== 'undefined' && params !== null && JSON.stringify(params)) || '';
-        // 对于 GET 请求，将参数拼成 key1=val1&key2=val2 的格式
-        let array: string[] = [];
-        if (params && typeof params === 'object') {
-            array = _.concat(array, this.processParamsToArray(params, options));
+        params: { [name: string]: any } | string;
+        encodeValue?: boolean;
+    }): string[] {
+        const array: string[] = [];
+        const paramsKeys = Object.keys(params);
+        for (let i = 0; i < paramsKeys.length; i++) {
+            const key = paramsKeys[i];
+            let value = '';
+            if (typeof params[key] !== 'undefined' && params[key] !== null) {
+                if (params[key] instanceof Array) {
+                    value = params[key].join(',');
+                } else {
+                    value = params[key];
+                }
+            }
+            if (encodeValue !== false) {
+                value = encodeURIComponent(value);
+            }
+            array.push(`${key}=${value}`);
         }
-        if (options.params && typeof options.params === 'object') {
-            array = _.concat(array, this.processParamsToArray(options.params, options));
-        }
-        if (this._config.noCache) {
-            if (!options || !options.cache) {
-                array.push(`_v=${Math.floor(Math.random() * 1000000)}`);
+        array.sort();
+        return array;
+    };
+
+    public readonly stringifyParams = ({
+        params,
+        paramsInOptions,
+        method,
+        encodeValue,
+        cache,
+        processData,
+    }: Ajax.IStringifyParamsOptions): {
+        requestBody: string | Ajax.IParams | undefined;
+        queryParams: string;
+    } => {
+        let requestBody: string | Ajax.IParams = undefined;
+        let queryParamsArray: string[] = [];
+        const isNeedFormat =
+            // 如果调用方已经将参数序列化成字符串，直接返回
+            // processData === false 直接返回
+            // FormData 直接返回
+            typeof params !== 'string' && needFormatData({ params, processData });
+        if (method === Ajax.METHODS.get) {
+            if (isNeedFormat) {
+                // 对于 GET 请求，将参数拼成 key1=val1&key2=val2 的格式
+                if (params && typeof params === 'object') {
+                    queryParamsArray = this.fillQueryParams({ params, encodeValue });
+                }
+            } else {
+                if (typeof params === 'string') {
+                    queryParamsArray.push(params);
+                } else {
+                    requestBody = params;
+                }
+            }
+        } else {
+            if (isNeedFormat) {
+                // requestBody 为 undefined 时，将其转为空字符串，避免 IE 下出现错误：invalid JSON, only supports object and array
+                // requestBody 为 null 时，将其转为空字符串，避免出现错误：invalid JSON, only supports object and array
+                requestBody = (typeof params !== 'undefined' && params !== null && JSON.stringify(params)) || '';
+            } else {
+                requestBody = params;
             }
         }
-        return array.join('&');
+
+        if (paramsInOptions) {
+            if (typeof paramsInOptions === 'object') {
+                // 将参数拼成 key1=val1&key2=val2 的格式
+                queryParamsArray.push(...this.fillQueryParams({ params: paramsInOptions, encodeValue }));
+            } else {
+                queryParamsArray.push(paramsInOptions);
+            }
+        }
+        if (params && paramsInOptions) {
+            queryParamsArray.sort();
+        }
+        if (this._config.noCache) {
+            if (!cache) {
+                queryParamsArray.push(`_v=${Math.floor(Math.random() * 1000000)}`);
+            }
+        }
+
+        return {
+            requestBody,
+            queryParams: queryParamsArray.join('&'),
+        };
     };
 
     /** 移除缓存的 cancel 请求 */
@@ -347,33 +330,59 @@ class AjaxBase {
         /* eslint-disable @typescript-eslint/indent */
     ): {
         url: string;
-        params: Ajax.IParams | undefined;
-        options: Ajax.IOptions | undefined;
+        requestBody: Ajax.IParams | string;
+        queryParams: string;
     } {
         /* eslint-enable @typescript-eslint/indent */
-        const processedUrlParams = this.processUrlParams(url, params, options);
-        const { urlParams } = processedUrlParams;
-        params = processedUrlParams.params;
-        options = processedUrlParams.options;
         if (options.processData !== false) {
-            const processedData = this.processData(params, { method, url, options, reject });
-            params = processedData.params;
-            options = processedData.options;
+            params = this.processData(params, { method, url, options, reject });
         }
-        if (urlParams) {
-            const processedValue = processParamsInUrl(url, urlParams, params);
-            url = processedValue.url;
-        }
-        params = this.processDataAfter(params, { method, url, options, reject, processData: options.processData });
-        if (options.processData !== false) {
-            if (!isFormData(params)) {
-                params = this.stringifyParams(params, method, options);
-            }
-        }
-        return {
+        const processedUrlParams = splitUrlParams({
             url,
             params,
+            paramsInOptions: options.params,
+            processData: options.processData,
+        });
+        let { urlParams } = processedUrlParams;
+        const { paramsInOptions: optionsParams } = processedUrlParams;
+        params = processedUrlParams.params;
+        const processedParams = this.processParams({
+            urlParams,
+            params,
+            paramsInOptions: optionsParams,
+            method,
+            url,
             options,
+            reject,
+            processData: options.processData,
+        });
+        urlParams = processedParams.urlParams;
+        params = processedParams.params;
+        const { paramsInOptions } = processedParams;
+        if (urlParams) {
+            const processedValue = processParamsInUrl(url, urlParams);
+            url = processedValue.url;
+        }
+        this.processParamsAfter({
+            params,
+            paramsInOptions,
+            method,
+            url,
+            options,
+            reject,
+            processData: options.processData,
+        });
+        const { requestBody, queryParams } = this.stringifyParams({
+            params,
+            paramsInOptions,
+            method,
+            cache: options.cache,
+            processData: options.processData,
+        });
+        return {
+            url,
+            requestBody,
+            queryParams,
         };
     }
 
@@ -562,23 +571,9 @@ class AjaxBase {
                 }
                 const processedValue = this.getProcessedParams(method, url, params, options, reject);
                 url = processedValue.url;
-                params = processedValue.params;
-                options = processedValue.options;
-                if (method === Ajax.METHODS.get) {
-                    if (params) {
-                        url = `${url}?${params}`;
-                    }
-                    params = undefined;
-                } else {
-                    if (options.params) {
-                        let ParamsString: string;
-                        if (typeof options.params === 'string') {
-                            ParamsString = options.params;
-                        } else {
-                            ParamsString = this.processParamsToArray(options.params, options).join('&');
-                        }
-                        url += `?${ParamsString}`;
-                    }
+                const { queryParams, requestBody } = processedValue;
+                if (queryParams) {
+                    url = `${url}?${queryParams}`;
                 }
                 if (options.cache && this._cache[url] !== undefined) {
                     if (loadingComponent) loadingComponent.finish();
@@ -783,7 +778,7 @@ class AjaxBase {
 
                 // prettier-ignore
                 xhr.send(
-                    params as Document | Blob | BufferSource | FormData | URLSearchParams | string | null
+                    requestBody as Document | Blob | BufferSource | FormData | URLSearchParams | string | null
                 );
 
                 if (cancelExecutor) {
@@ -874,7 +869,7 @@ class AjaxBase {
         const _options = { ...options, cache: true };
         const processedValue = this.getProcessedParams(method, url, params, _options);
         url = processedValue.url;
-        params = processedValue.params;
+        params = processedValue.queryParams;
         return params ? `${url}?${params}` : url;
     }
 

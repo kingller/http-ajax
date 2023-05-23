@@ -41,7 +41,7 @@ export default class Code extends React.PureComponent {
     postData = () => {
         this.setState({ dataFromPost: null });
         ajax.post<IUser>(
-            '/example/users/:userId/:c',
+            '/example/users/:userId',
             {
                 a: 1,
                 b: 2,

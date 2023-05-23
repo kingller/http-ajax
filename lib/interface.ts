@@ -61,9 +61,9 @@ export interface IOptions extends IOptionsBase {
     simple?: boolean;
     /** 最大请求时间（毫秒），若超出该时间，请求会自动终止 */
     timeout?: number;
-    /** 传入 query，发送请求时拼接到 URL 上 */
+    /** 传入 query parameters，发送请求时拼接到 URL 上 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    params?: { [name: string]: any } | string;
+    params?: { [name: string]: any };
     /** 自定义选项，用来传递值自定义处理逻辑 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [name: string]: any;
@@ -109,9 +109,32 @@ export interface IAjaxProcessDataOptions {
     reject?: IReject;
 }
 
-export interface IAjaxProcessDataAfterOptions extends IAjaxProcessDataOptions {
+export interface IProcessParamsOptions extends IAjaxProcessDataOptions {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    urlParams: { [name: string]: any };
+    params: IParams;
+    paramsInOptions: IOptions['params'];
     /** 为 false 时不格式化请求参数 */
     processData?: boolean;
+}
+
+export interface IProcessParamsResult {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    urlParams: { [name: string]: any };
+    params: IParams;
+    paramsInOptions: IOptions['params'] | string;
+}
+
+export interface IProcessParamsAfterOptions extends IAjaxProcessDataOptions {
+    params: IParams;
+    paramsInOptions: IOptions['params'] | string;
+    /** 为 false 时不格式化请求参数 */
+    processData?: boolean;
+}
+
+export interface IProcessParamsAfterResult {
+    params: IParams;
+    paramsInOptions: IOptions['params'] | string;
 }
 
 export interface IProcessResponseOptions extends IAjaxArgsOptions {
@@ -234,9 +257,20 @@ export interface ICatchErrorOptions {
 
 export type ICatchError = (props: ICatchErrorOptions) => void;
 
-export interface IStringifyParamsOptions extends IOptions {
+export interface IStringifyParamsOptions {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    params: { [name: string]: any } | string;
+    /** 传入 query parameters，发送请求时拼接到 URL 上 */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    paramsInOptions?: { [name: string]: any } | string;
+    /** method */
+    method: IMethod;
     /** GET 请求时是否对值用 encodeURIComponent 编码（签名时使用，签名不对 value 编码。内部参数，请勿使用） */
     encodeValue?: boolean;
+    /** 设置为 true，缓存本次请求到的数据 */
+    cache?: IOptions['cache'];
+    /** 为 false 时不格式化请求参数 */
+    processData?: IOptions['processData'];
 }
 
 export interface IConfigOptions {
@@ -307,23 +341,17 @@ export interface IAjax {
     prefix: string;
     $loading: string;
     beforeSend: (props: { method: IMethod; url: string; params: IParams; options: IOptions }) => IRequestResult | void;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    encryptUrlParams: (urlParams: { [name: string]: any }, encrypt: string[] | 'all') => { [name: string]: any };
     processData: (
         params: IParams,
         props: { method: IMethod; url: string; options: IOptions; reject?: IReject }
-    ) => { params: IParams; options: IOptions };
-    processDataAfter: (
-        params: IParams,
-        props: { method: IMethod; url: string; options: IOptions; reject?: IReject; processData?: boolean }
     ) => IParams;
+    processParams: (props: IProcessParamsOptions) => IProcessParamsResult;
+    processParamsAfter: (props: IProcessParamsAfterOptions) => IProcessParamsAfterResult;
     processResponse: (response: IResult | null, props: IProcessResponseOptions) => IResult;
-    readonly stringifyParams: (
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        params: { [name: string]: any } | string,
-        method: IMethod,
-        options?: IStringifyParamsOptions
-    ) => string;
+    readonly stringifyParams: (props: IStringifyParamsOptions) => {
+        requestBody: string | IParams | undefined;
+        queryParams: string;
+    };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onSuccess: <T = any>(
         xhr: XMLHttpRequest | undefined,

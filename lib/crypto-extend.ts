@@ -1,4 +1,4 @@
-import _, { lowerFirst } from 'lodash';
+import _ from 'lodash';
 import Crypto from 'client-crypto';
 import storage from './utils/storage';
 import { STORAGE_KEY } from './utils/enums';
@@ -7,18 +7,17 @@ import { isArray } from './utils/array';
 import { promisify } from './utils/promise';
 import { catchAjaxError } from './utils/catch';
 import { getResponseData, setResponseData } from './utils/response-data';
+import { needFormatData } from './utils/url';
 import {
     IAjax,
     IAjaxArgsOptions,
-    IAjaxProcessDataOptions,
     IRequestResult,
-    IParams,
-    IOptions,
     IResult,
     IRequestOptions,
     IProcessResponseOptions,
+    IProcessParamsOptions,
+    IProcessParamsResult,
 } from './interface';
-import { Ajax } from '.';
 
 interface IPublicKeyResponse {
     publicKey: string;
@@ -48,7 +47,7 @@ function cryptoExtend(): () => void {
     })();
 
     return function crypto(): void {
-        const { beforeSend, processData, processResponse, processErrorResponse, clear } = this as IAjax;
+        const { beforeSend, processParams, processResponse, processErrorResponse, clear } = this as IAjax;
 
         // 校验该扩展是否已添加过
         if (this._cryptoExtendAdded) {
@@ -304,61 +303,52 @@ function cryptoExtend(): () => void {
             return promise;
         };
 
-        (this as IAjax).encryptUrlParams = (
+        function encryptParams(
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            urlParams: { [name: string]: any },
+            params: { [name: string]: any } | string,
             encrypt: string[] | 'all'
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        ): { [name: string]: any } => {
-            const paramsName = _.keys(urlParams);
-            _.forEach(paramsName, (field) => {
-                if (encrypt === 'all') {
-                    encryptDataField(urlParams, field);
-                } else {
-                    if (_.includes(encrypt, field)) {
-                        encryptDataField(urlParams, field);
-                    }
-                }
-            });
+        ): { [name: string]: any } | string {
+            if (encrypt === 'all') {
+                return Crypto.AES.encrypt(params);
+            }
+            if (!params || typeof params !== 'object') {
+                return params;
+            }
+            if (Array.isArray(encrypt)) {
+                params = cloneDeep(params);
+                encrypt.forEach((field) => {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    encryptDataField(params as { [name: string]: any }, field);
+                });
+            }
+            return params;
+        }
 
-            return urlParams;
-        };
-
-        (this as IAjax).processData = (
-            params: IParams,
-            props: IAjaxProcessDataOptions
-        ): { params: IParams; options: IOptions } => {
-            params = processData(params, props).params;
-            const { reject, method } = props;
-            let { options } = props;
+        (this as IAjax).processParams = (props: IProcessParamsOptions): IProcessParamsResult => {
+            let { urlParams, params, paramsInOptions } = processParams(props);
+            const { options, reject, processData } = props;
             try {
-                if ((params || options.params) && options && options.encrypt) {
-                    params = cloneDeep(params);
-                    options = cloneDeep(options);
-                    if (options.encrypt === 'all') {
-                        if (method === Ajax.METHODS.get) {
-                            params = _.merge(params, options.params);
-                            delete options.params;
+                if (options && options.encrypt) {
+                    const { encrypt } = options;
+                    if (urlParams) {
+                        urlParams = cloneDeep(urlParams);
+                        if (options.encrypt === 'all') {
+                            Object.keys(urlParams).forEach((field) => {
+                                encryptDataField(urlParams, field);
+                            });
                         } else {
-                            options.params = Crypto.AES.encrypt(options.params);
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                            urlParams = encryptParams(urlParams, encrypt) as { [name: string]: any };
                         }
-                        params = Crypto.AES.encrypt(params);
-                        return { params, options };
                     }
-                    if (typeof options.params !== 'object' && typeof params !== 'object') {
-                        return { params, options };
+                    if (params) {
+                        if (needFormatData({ params, processData })) {
+                            params = encryptParams(params, encrypt);
+                        }
                     }
-                    if (Array.isArray(options.encrypt)) {
-                        options.encrypt.forEach((field) => {
-                            if (_.has(params, field)) {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                encryptDataField(params as { [name: string]: any }, field);
-                            }
-                            if (_.has(options.params, field)) {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                encryptDataField(options.params as { [name: string]: any }, field);
-                            }
-                        });
+                    if (paramsInOptions) {
+                        paramsInOptions = encryptParams(paramsInOptions, encrypt);
                     }
                 }
             } catch (e) {
@@ -373,7 +363,7 @@ function cryptoExtend(): () => void {
                     options,
                 });
             }
-            return { params, options };
+            return { urlParams, params, paramsInOptions };
         };
 
         (this as IAjax).processResponse = (response: IResult | null, props: IProcessResponseOptions): IResult => {
