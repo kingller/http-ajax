@@ -981,7 +981,7 @@ class AjaxBase {
         } = {}
     ): void => {
         if (typeof options.noCache !== 'undefined') {
-            console.warn('http-ajax: `noCache` will be deprecated in next version `4.0.0`');
+            console.warn('http-ajax: `noCache` will be deprecated');
         }
         for (const key in options) {
             if (Object.prototype.hasOwnProperty.call(options, key)) {

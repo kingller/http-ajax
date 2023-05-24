@@ -88,10 +88,8 @@ export default class Encryption {
         const encryptFields = JSON.parse(ctx.request.header.encrypt);
 
         if (encryptFields === 'all') {
-            data = utils.decryptData(ctx.request.querystring, getSecretKey(ctx), encryptFields);
+            data = utils.decryptData(ctx.request.querystring.split(/&?_v=/)[0], getSecretKey(ctx), encryptFields);
         } else {
-            console.log(getSecretKey(ctx));
-
             data = utils.decryptData(_.omit(ctx.request.query, ['_v']), getSecretKey(ctx), encryptFields);
         }
 

@@ -224,7 +224,7 @@ var AjaxBase = /** @class */ (function () {
         this.config = function (options) {
             if (options === void 0) { options = {}; }
             if (typeof options.noCache !== 'undefined') {
-                console.warn('http-ajax: `noCache` will be deprecated in next version `4.0.0`');
+                console.warn('http-ajax: `noCache` will be deprecated');
             }
             for (var key in options) {
                 if (Object.prototype.hasOwnProperty.call(options, key)) {
