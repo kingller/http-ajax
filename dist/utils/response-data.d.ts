@@ -1,3 +1,4 @@
+export declare function isOpenApi(response: any): boolean;
 export declare function getResponseData<T = any>({ response, statusField }: {
     response: any;
     statusField: string;

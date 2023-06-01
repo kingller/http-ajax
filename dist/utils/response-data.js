@@ -11,12 +11,24 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setResponseData = exports.getResponseData = void 0;
+exports.setResponseData = exports.getResponseData = exports.isOpenApi = void 0;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function _isOpenApi(response) {
+    return typeof response.code !== 'undefined' && typeof response.details !== 'undefined';
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isOpenApi(response) {
+    if (response && typeof response === 'object') {
+        return _isOpenApi(response);
+    }
+    return false;
+}
+exports.isOpenApi = isOpenApi;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getResponseData(_a) {
     var response = _a.response, statusField = _a.statusField;
     if (response && typeof response === 'object') {
-        if (typeof response.apiVersion !== 'undefined') {
+        if (_isOpenApi(response)) {
             return response.details;
         }
         if (typeof response[statusField] !== 'undefined') {
@@ -30,7 +42,7 @@ exports.getResponseData = getResponseData;
 function setResponseData(_a) {
     var response = _a.response, data = _a.data, statusField = _a.statusField;
     if (response && typeof response === 'object') {
-        if (typeof response.apiVersion !== 'undefined') {
+        if (_isOpenApi(response)) {
             return __assign(__assign({}, response), { details: data });
         }
         if (typeof response[statusField] !== 'undefined') {

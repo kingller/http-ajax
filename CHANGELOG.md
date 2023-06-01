@@ -9,6 +9,11 @@
 # Next
 
 
+# 5.10.0
+> 2023.06.01  
+1. <font color=orange>修改</font> 判断是否 `open api` 从判断响应体是否有 `apiVersion` 字段，改为判断是否有 `code` 和 `details` 字段
+
+
 # 5.9.0
 > 2023.05.23  
 1. <font color=green>新增</font> `options` 增加参数 `params` ，支持传入 query parameters，发送请求时拼接到 URL 上

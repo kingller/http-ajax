@@ -10,4 +10,6 @@ export { promisify } from './utils/promise';
 
 export { getResponseData } from './utils/response-data';
 
+export { isOpenApi } from './utils/response-data';
+
 export default ajax;
