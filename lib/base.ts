@@ -5,7 +5,6 @@ import { isFormData } from './utils/form';
 import { catchAjaxError } from './utils/catch';
 import { transformResponse } from './utils/transform-response';
 import { addPrefixToUrl, processParamsInUrl, splitUrlParams, needFormatData } from './utils/url';
-import { ILoading } from './interface';
 import * as Ajax from './interface';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -204,20 +203,6 @@ class AjaxBase {
 
     public setLoading(loadingName: string): void {
         this.$loading = loadingName;
-    }
-
-    /** 加载进度条 */
-    public getLoading(options: Ajax.IOptions): ILoading | undefined {
-        // @ts-ignore
-        if (options.loadingName && window[options.loadingName]) {
-            // @ts-ignore
-            return window[options.loadingName];
-        }
-        if (options.context && options.context.loading) {
-            return options.context.loading;
-        }
-        // @ts-ignore
-        return window[this.$loading];
     }
 
     /** 将参数拼成 key1=val1&key2=val2 的格式 */
@@ -549,20 +534,14 @@ class AjaxBase {
                 _cancel = true;
             });
         }
-        // 启用加载效果
-        let loadingComponent: ILoading = null;
-        if (loading && this.getLoading(options)) {
-            loadingComponent = this.getLoading(options);
-            loadingComponent.start();
-        }
 
-        const beforeSendPromise = this.beforeSend({ method, url, params, options });
+        const beforeSendPromise = this.beforeSend({ method, url, params, options, loadable: loading });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return promisify(beforeSendPromise)
             .then((): void => {
                 if (_cancel) {
                     reject(createError('Request aborted', Ajax.CODE.CANCEL));
-                    if (loadingComponent) loadingComponent.finish();
+                    this.responseEnd(undefined, _opts, { success: false });
                     return;
                 }
 
@@ -576,7 +555,6 @@ class AjaxBase {
                     url = `${url}?${queryParams}`;
                 }
                 if (options.cache && this._cache[url] !== undefined) {
-                    if (loadingComponent) loadingComponent.finish();
                     this.responseEnd(undefined, _opts, { success: true });
                     this.onSuccess<T>(undefined, {
                         response: this._cache[url],
@@ -623,11 +601,6 @@ class AjaxBase {
                     }
 
                     if (this.readyState !== 4) return;
-
-                    // 关闭加载效果
-                    if (loadingComponent) {
-                        loadingComponent.finish();
-                    }
 
                     if (options && options.cancelToken) {
                         // 请求完成，删除缓存的 cancel
@@ -955,10 +928,6 @@ class AjaxBase {
              */
             onSessionExpired?: Ajax.IOnSessionExpired;
             /**
-             * 加载进度条
-             */
-            getLoading?: (options: Ajax.IOptions) => ILoading;
-            /**
              * 请求发送前
              */
             beforeSend?: (props: {
@@ -966,6 +935,7 @@ class AjaxBase {
                 url: string;
                 params: Ajax.IParams;
                 options: Ajax.IOptions;
+                loadable?: boolean;
             }) => Ajax.IRequestResult | void;
             /**
              * 数据处理
@@ -991,7 +961,6 @@ class AjaxBase {
                     key === 'onSuccess' ||
                     key === 'onError' ||
                     key === 'onSessionExpired' ||
-                    key === 'getLoading' ||
                     key === 'beforeSend' ||
                     key === 'processData' ||
                     key === 'responseEnd' ||

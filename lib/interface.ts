@@ -100,6 +100,7 @@ export interface IAjaxArgsOptions {
     url: string;
     params: IParams;
     options: IOptions;
+    loadable?: boolean;
 }
 
 export interface IAjaxProcessDataOptions {
@@ -302,13 +303,15 @@ export interface IConfigOptions {
      */
     onSessionExpired?: IOnSessionExpired;
     /**
-     * 加载进度条
-     */
-    getLoading?: (options: IOptions) => ILoading;
-    /**
      * 请求发送前
      */
-    beforeSend?: (props: { method: IMethod; url: string; params: IParams; options: IOptions }) => IRequestResult | void;
+    beforeSend?: (props: {
+        method: IMethod;
+        url: string;
+        params: IParams;
+        options: IOptions;
+        loadable?: boolean;
+    }) => IRequestResult | void;
     /**
      * 数据处理
      */
@@ -340,7 +343,13 @@ export interface IAjax {
     };
     prefix: string;
     $loading: string;
-    beforeSend: (props: { method: IMethod; url: string; params: IParams; options: IOptions }) => IRequestResult | void;
+    beforeSend: (props: {
+        method: IMethod;
+        url: string;
+        params: IParams;
+        options: IOptions;
+        loadable?: boolean;
+    }) => IRequestResult | void;
     processData: (
         params: IParams,
         props: { method: IMethod; url: string; options: IOptions; reject?: IReject }
@@ -454,10 +463,6 @@ export interface IAjax {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     isCancel: (error: { errorMsg: string; errorCode: string | number } | any) => boolean;
     setLoading: (loadingName: string) => void;
-    /**
-     * 加载进度条
-     */
-    getLoading?: (options: IOptions) => ILoading;
     /** 配置 */
     config: (options?: IConfigOptions) => void;
     Ajax: () => IAjax;
@@ -508,7 +513,7 @@ export interface ILoading {
     start: () => void;
     finish: (num?: number) => void;
     count?: () => number;
-    name?: string;
+    name?: string | symbol;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     getLoading?: () => any;
 }
