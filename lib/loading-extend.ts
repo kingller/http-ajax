@@ -18,10 +18,13 @@ function loadingExtend(argsOptions?: {
         const { beforeSend, responseEnd } = this as IAjax;
         const ajaxThis = this;
         function getLoading(options: IOptions): ILoading | void {
-            if (options.loadingName) {
-                if (_getLoading) {
-                    return _getLoading({ loadingName: options.loadingName });
+            if (_getLoading) {
+                const customLoading = _getLoading({ loadingName: options.loadingName });
+                if (customLoading) {
+                    return customLoading;
                 }
+            }
+            if (options.loadingName) {
                 if ((window as object)[options.loadingName]) {
                     const loading = (window as object)[options.loadingName] as ILoading;
                     return loading;

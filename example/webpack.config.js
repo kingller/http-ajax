@@ -40,12 +40,7 @@ let config = {
                 use: {
                     loader: 'babel-loader',
                 },
-                include: [
-                    path.join(__dirname, 'src'),
-                    path.join(__dirname, 'js'),
-                    path.join(__dirname, 'components'),
-                    path.join(__dirname, 'node_modules', 'highlight\.js'),
-                ],
+                exclude: /\/node_modules\//
             },
             {
                 test: /\.less$/,
