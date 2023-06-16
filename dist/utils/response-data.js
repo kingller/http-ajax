@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.setResponseData = exports.getResponseData = exports.isOpenApi = void 0;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function _isOpenApi(response) {
-    return typeof response.code !== 'undefined' && typeof response.details !== 'undefined';
+    return response.code !== undefined && response.details !== undefined;
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isOpenApi(response) {
@@ -31,7 +31,7 @@ function getResponseData(_a) {
         if (_isOpenApi(response)) {
             return response.details;
         }
-        if (typeof response[statusField] !== 'undefined') {
+        if (response[statusField] !== undefined) {
             return response.data;
         }
     }
@@ -45,7 +45,7 @@ function setResponseData(_a) {
         if (_isOpenApi(response)) {
             return __assign(__assign({}, response), { details: data });
         }
-        if (typeof response[statusField] !== 'undefined') {
+        if (response[statusField] !== undefined) {
             return __assign(__assign({}, response), { data: data });
         }
     }

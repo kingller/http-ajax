@@ -512,10 +512,8 @@ export interface ISignatureExtend {
 export interface ILoading {
     start: () => void;
     finish: (num?: number) => void;
-    count?: () => number;
-    name?: string | symbol;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    getLoading?: () => any;
+    [name: string]: any;
 }
 
 // ----- loading end ------- //

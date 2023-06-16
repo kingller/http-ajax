@@ -1,6 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function _isOpenApi(response: { [name: string]: any }) {
-    return typeof response.code !== 'undefined' && typeof response.details !== 'undefined';
+    return response.code !== undefined && response.details !== undefined;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -17,7 +17,7 @@ export function getResponseData<T = any>({ response, statusField }: { response: 
         if (_isOpenApi(response)) {
             return response.details;
         }
-        if (typeof response[statusField] !== 'undefined') {
+        if (response[statusField] !== undefined) {
             return response.data;
         }
     }
@@ -30,7 +30,7 @@ export function setResponseData({ response, data, statusField }: { response: any
         if (_isOpenApi(response)) {
             return { ...response, details: data };
         }
-        if (typeof response[statusField] !== 'undefined') {
+        if (response[statusField] !== undefined) {
             return { ...response, data };
         }
     }

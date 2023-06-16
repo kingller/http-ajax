@@ -19,7 +19,7 @@ var storage = {
         catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console &&
-                console.error("Failed to get " + key + " from " + (type === 'session' ? 'sessionStorage' : 'localStorage'));
+                console.error("Failed to get ".concat(key, " from ").concat(type === 'session' ? 'sessionStorage' : 'localStorage'));
             return undefined;
         }
     },
@@ -37,7 +37,7 @@ var storage = {
         catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console &&
-                console.error("Failed to set " + key + " into " + (type === 'session' ? 'sessionStorage' : 'localStorage'));
+                console.error("Failed to set ".concat(key, " into ").concat(type === 'session' ? 'sessionStorage' : 'localStorage'));
         }
     },
     removeItem: function (key, type) {
@@ -50,7 +50,7 @@ var storage = {
         catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             console &&
-                console.error("Failed to remove " + key + " into " + (type === 'session' ? 'sessionStorage' : 'localStorage'));
+                console.error("Failed to remove ".concat(key, " into ").concat(type === 'session' ? 'sessionStorage' : 'localStorage'));
         }
     },
     clear: function (type) {
@@ -60,7 +60,7 @@ var storage = {
         }
         catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            console && console.error("Failed to clear " + (type === 'session' ? 'sessionStorage' : 'localStorage'));
+            console && console.error("Failed to clear ".concat(type === 'session' ? 'sessionStorage' : 'localStorage'));
         }
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-empty-function

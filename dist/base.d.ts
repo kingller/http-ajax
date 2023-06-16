@@ -1,4 +1,3 @@
-import { ILoading } from './interface';
 import * as Ajax from './interface';
 interface IConfigItem {
     noCache: boolean;
@@ -52,8 +51,6 @@ declare class AjaxBase {
     /** 捕获错误 */
     catchError(props: Ajax.ICatchErrorOptions): void;
     setLoading(loadingName: string): void;
-    /** 加载进度条 */
-    getLoading(options: Ajax.IOptions): ILoading | undefined;
     /** 将参数拼成 key1=val1&key2=val2 的格式 */
     private fillQueryParams;
     readonly stringifyParams: ({ params, paramsInOptions, method, encodeValue, cache, processData, }: Ajax.IStringifyParamsOptions) => {
@@ -63,7 +60,7 @@ declare class AjaxBase {
     /** 移除缓存的 cancel 请求 */
     private removeCacheCancel;
     private getProcessedParams;
-    responseEnd(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { success: boolean }: {
+    responseEnd(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { success }: {
         success: any;
     }): void;
     /**
@@ -172,10 +169,6 @@ declare class AjaxBase {
          */
         onSessionExpired?: Ajax.IOnSessionExpired;
         /**
-         * 加载进度条
-         */
-        getLoading?: (options: Ajax.IOptions) => ILoading;
-        /**
          * 请求发送前
          */
         beforeSend?: (props: {
@@ -183,6 +176,7 @@ declare class AjaxBase {
             url: string;
             params: Ajax.IParams;
             options: Ajax.IOptions;
+            loadable?: boolean;
         }) => Ajax.IRequestResult | void;
         /**
          * 数据处理

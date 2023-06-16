@@ -1,6 +1,7 @@
-import ajax, { Ajax } from 'http-ajax';
-import cryptoExtend from 'http-ajax/dist/crypto-extend';
-import signatureExtend from 'http-ajax/dist/signature-extend';
+import ajax, { Ajax } from '../../lib/index';
+import cryptoExtend from '../../lib//crypto-extend';
+import signatureExtend from '../../lib/signature-extend';
+import loadingExtend from '../../lib/loading-extend';
 
 let refreshTokenPromise: Promise<any> = null;
 
@@ -53,6 +54,9 @@ ajax.config({
         }
     },
 });
+
+// 添加显示loading扩展
+ajax.extend(loadingExtend());
 
 // 添加加解密扩展
 ajax.extend(cryptoExtend());

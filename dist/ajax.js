@@ -47,10 +47,10 @@ var HttpAjax = /** @class */ (function (_super) {
                 'onError',
                 'onSessionExpired',
                 'onCryptoExpired',
-                'getLoading',
                 'catchError',
                 'clear',
                 '_config',
+                '_loadingExtendAdded',
                 '_cryptoExtendAdded',
                 '_signatureExtendAdded',
             ];
@@ -92,7 +92,7 @@ var HttpAjax = /** @class */ (function (_super) {
             }
         }
         else {
-            resolve(response_data_1.getResponseData({ response: response, statusField: statusField }));
+            resolve((0, response_data_1.getResponseData)({ response: response, statusField: statusField }));
         }
     };
     /** 添加默认AJAX错误处理程序 */

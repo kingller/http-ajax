@@ -7,7 +7,7 @@ export declare enum METHODS {
     put = "PUT",
     del = "DELETE"
 }
-export declare type IMethod = METHODS.get | METHODS.post | METHODS.put | METHODS.del;
+export type IMethod = METHODS.get | METHODS.post | METHODS.put | METHODS.del;
 export interface IOptionsBase {
     /** 设置 url 前缀 */
     prefix?: string;
@@ -58,13 +58,13 @@ export interface IOptions extends IOptionsBase {
     /** 自定义选项，用来传递值自定义处理逻辑 */
     [name: string]: any;
 }
-export declare type IResolve<T = any> = (value?: T | PromiseLike<T>) => void;
-export declare type IReject = (reason?: any) => void;
-export declare type ICancelExecutor = (c: () => void) => void;
+export type IResolve<T = any> = (value?: T | PromiseLike<T>) => void;
+export type IReject = (reason?: any) => void;
+export type ICancelExecutor = (c: () => void) => void;
 export interface IPromise<T> extends Promise<T> {
     cancel?: () => void;
 }
-export declare type IParams = {
+export type IParams = {
     [name: string]: any;
 } | string | Document | Blob | ArrayBufferView | ArrayBuffer | FormData | URLSearchParams | ReadableStream<Uint8Array>;
 export interface IAjaxArgsOptions {
@@ -72,6 +72,7 @@ export interface IAjaxArgsOptions {
     url: string;
     params: IParams;
     options: IOptions;
+    loadable?: boolean;
 }
 export interface IAjaxProcessDataOptions {
     method: IMethod;
@@ -130,9 +131,9 @@ export interface IError {
     isAjaxError?: boolean;
     toJSON: () => object;
 }
-export declare type IRequestResult<T = any> = IPromise<T>;
-export declare type IRequest = <T = any>(url: string, params?: IParams, options?: IOptions) => IRequestResult<T>;
-export declare type IOnSessionExpired = <T = any>(error?: {
+export type IRequestResult<T = any> = IPromise<T>;
+export type IRequest = <T = any>(url: string, params?: IParams, options?: IOptions) => IRequestResult<T>;
+export type IOnSessionExpired = <T = any>(error?: {
     errorCode: number;
     errorMsg: string;
 }, _opts?: IRequestOptions) => void;
@@ -194,7 +195,7 @@ export interface ICatchErrorOptions {
     xCorrelationID?: string;
     xhr?: XMLHttpRequest;
 }
-export declare type ICatchError = (props: ICatchErrorOptions) => void;
+export type ICatchError = (props: ICatchErrorOptions) => void;
 export interface IStringifyParamsOptions {
     params: {
         [name: string]: any;
@@ -241,10 +242,6 @@ export interface IConfigOptions {
      */
     onSessionExpired?: IOnSessionExpired;
     /**
-     * 加载进度条
-     */
-    getLoading?: (options: IOptions) => ILoading;
-    /**
      * 请求发送前
      */
     beforeSend?: (props: {
@@ -252,6 +249,7 @@ export interface IConfigOptions {
         url: string;
         params: IParams;
         options: IOptions;
+        loadable?: boolean;
     }) => IRequestResult | void;
     /**
      * 数据处理
@@ -286,6 +284,7 @@ export interface IAjax {
         url: string;
         params: IParams;
         options: IOptions;
+        loadable?: boolean;
     }) => IRequestResult | void;
     processData: (params: IParams, props: {
         method: IMethod;
@@ -379,10 +378,6 @@ export interface IAjax {
         errorCode: string | number;
     } | any) => boolean;
     setLoading: (loadingName: string) => void;
-    /**
-     * 加载进度条
-     */
-    getLoading?: (options: IOptions) => ILoading;
     /** 配置 */
     config: (options?: IConfigOptions) => void;
     Ajax: () => IAjax;
@@ -394,7 +389,7 @@ export interface IAjax {
 export interface ICryptoExtend {
     (): () => void;
 }
-export declare type IOnCryptoExpired = <T = any>(error?: {
+export type IOnCryptoExpired = <T = any>(error?: {
     errorCode: number;
     errorMsg: string;
 }, _opts?: IRequestOptions) => void;
@@ -414,7 +409,5 @@ export interface ISignatureExtend {
 export interface ILoading {
     start: () => void;
     finish: (num?: number) => void;
-    count?: () => number;
-    name?: string;
-    getLoading?: () => any;
+    [name: string]: any;
 }

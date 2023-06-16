@@ -55,11 +55,11 @@ function signatureExtend() {
                 }
             }
             var timestamp = new Date().getTime();
-            var appNonce = uuid_1.v4();
+            var appNonce = (0, uuid_1.v4)();
             var end = appNonce.length - 1;
             lodash_1.default.merge(options, {
                 headers: (_b = {},
-                    _b[signField] = client_crypto_1.default.SHA256("" + signatureStr + timestamp + appNonce.substring(2, end)),
+                    _b[signField] = client_crypto_1.default.SHA256("".concat(signatureStr).concat(timestamp).concat(appNonce.substring(2, end))),
                     _b[timestampField] = timestamp,
                     _b[appNonceField] = appNonce,
                     _b),

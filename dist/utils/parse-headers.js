@@ -31,7 +31,7 @@ function parseHeaders(headers
                 headerMap[key] = (headerMap[key] ? headerMap[key] : []).concat([val]);
             }
             else {
-                headerMap[key] = headerMap[key] ? headerMap[key] + ", " + val : val;
+                headerMap[key] = headerMap[key] ? "".concat(headerMap[key], ", ").concat(val) : val;
             }
         }
     });

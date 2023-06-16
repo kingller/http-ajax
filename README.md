@@ -33,6 +33,7 @@ npm start
 
 ```
 import ajax, { Ajax } from 'http-ajax';
+import loadingExtend from 'http-ajax/dist/loading-extend';
 import cryptoExtend from 'http-ajax/dist/crypto-extend';
 import signatureExtend from 'http-ajax/dist/signature-extend';
 import _ from 'lodash';
@@ -117,27 +118,6 @@ ajax.config({
         }
     },
     /**
-     * 自定义加载进度条
-     */
-    getLoading: (options: Ajax.IOptions): {
-        start: () => void;
-        finish: () => void;
-    } => {
-        // 自定义加载进度条显示
-        // 必须返回一个对象 { start: () => void; finish: () => void; }
-        // 调用ajax.loadable时会调用start显示进度条，请求结束调用finish结束进度条
-        return {
-            start: () => {
-                // 添加显示loading逻辑
-                console.log('start loading');
-            },
-            finish: () => {
-                // 添加隐藏loading逻辑
-                console.log('end loading');
-            },
-        }
-    },
-    /**
      * 请求发送前
      */
     beforeSend: (props: {
@@ -169,6 +149,9 @@ ajax.config({
         // 这里可以自定义记录错误日志
     }
 });
+
+// 添加显示loading扩展
+ajax.extend(loadingExtend());
 
 // 添加加解密扩展
 ajax.extend(cryptoExtend());

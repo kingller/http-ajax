@@ -153,7 +153,7 @@ function cryptoExtend() {
                 }
                 // eslint-disable-next-line no-template-curly-in-string
                 if (fieldName === '${index}') {
-                    if (!array_1.isArray(currentData)) {
+                    if (!(0, array_1.isArray)(currentData)) {
                         return "break";
                     }
                 }
@@ -243,7 +243,7 @@ function cryptoExtend() {
             if (beforeSend) {
                 promise = beforeSend(props);
             }
-            promise = promise_1.promisify(promise);
+            promise = (0, promise_1.promisify)(promise);
             var options = props.options;
             var uuid = getUuid();
             // 由于解密需要服务端返回响应头才知道，故统一添加唯一标志符 uuid，服务端将根据 uuid 取得 AES 密钥
@@ -291,7 +291,7 @@ function cryptoExtend() {
                 return params;
             }
             if (Array.isArray(encrypt)) {
-                params = clone_1.cloneDeep(params);
+                params = (0, clone_1.cloneDeep)(params);
                 encrypt.forEach(function (field) {
                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     encryptDataField(params, field);
@@ -307,7 +307,7 @@ function cryptoExtend() {
                     var encrypt = options.encrypt;
                     if (urlParams) {
                         if (options.encrypt === 'all') {
-                            urlParams = clone_1.cloneDeep(urlParams);
+                            urlParams = (0, clone_1.cloneDeep)(urlParams);
                             Object.keys(urlParams).forEach(function (field) {
                                 encryptDataField(urlParams, field);
                             });
@@ -318,7 +318,7 @@ function cryptoExtend() {
                         }
                     }
                     if (params) {
-                        if (url_1.needFormatData({ params: params, processData: processData })) {
+                        if ((0, url_1.needFormatData)({ params: params, processData: processData })) {
                             params = encryptParams(params, encrypt);
                         }
                     }
@@ -330,7 +330,7 @@ function cryptoExtend() {
             catch (e) {
                 if (reject)
                     reject(e);
-                catch_1.catchAjaxError({
+                (0, catch_1.catchAjaxError)({
                     e: e,
                     method: props.method,
                     url: props.url,
@@ -363,7 +363,7 @@ function cryptoExtend() {
                 }
                 if (decrypt) {
                     var statusField = _this._config.statusField;
-                    var data_1 = response_data_1.getResponseData({ response: response, statusField: statusField });
+                    var data_1 = (0, response_data_1.getResponseData)({ response: response, statusField: statusField });
                     if (decrypt === 'all') {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         data_1 = client_crypto_1.default.AES.decrypt(data_1);
@@ -378,12 +378,12 @@ function cryptoExtend() {
                             });
                         }
                     }
-                    response = response_data_1.setResponseData({ response: response, data: data_1, statusField: statusField });
+                    response = (0, response_data_1.setResponseData)({ response: response, data: data_1, statusField: statusField });
                 }
             }
             catch (e) {
                 props.reject(e);
-                catch_1.catchAjaxError({
+                (0, catch_1.catchAjaxError)({
                     e: e,
                     method: props.method,
                     url: props.url,
@@ -420,7 +420,7 @@ function cryptoExtend() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this.processErrorResponse = function (xhr, _opts) {
             var errorResponse = processErrorResponse(xhr, _opts);
-            return promise_1.promisify(errorResponse).then(function () {
+            return (0, promise_1.promisify)(errorResponse).then(function () {
                 if (xhr.status === 470 && _this.onCryptoExpired) {
                     // 加密密钥过期
                     _this.onCryptoExpired({

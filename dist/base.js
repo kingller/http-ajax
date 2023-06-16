@@ -12,7 +12,11 @@ var __assign = (this && this.__assign) || function () {
 };
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -158,7 +162,7 @@ var AjaxBase = /** @class */ (function () {
                 if (encodeValue !== false) {
                     value = encodeURIComponent(value);
                 }
-                array.push(key + "=" + value);
+                array.push("".concat(key, "=").concat(value));
             }
             array.sort();
             return array;
@@ -171,7 +175,7 @@ var AjaxBase = /** @class */ (function () {
             // 如果调用方已经将参数序列化成字符串，直接返回
             // processData === false 直接返回
             // FormData 直接返回
-            typeof params !== 'string' && url_1.needFormatData({ params: params, processData: processData });
+            typeof params !== 'string' && (0, url_1.needFormatData)({ params: params, processData: processData });
             if (method === Ajax.METHODS.get) {
                 if (isNeedFormat) {
                     // 对于 GET 请求，将参数拼成 key1=val1&key2=val2 的格式
@@ -212,7 +216,7 @@ var AjaxBase = /** @class */ (function () {
             }
             if (_this._config.noCache) {
                 if (!cache) {
-                    queryParamsArray.push("_v=" + Math.floor(Math.random() * 1000000));
+                    queryParamsArray.push("_v=".concat(Math.floor(Math.random() * 1000000)));
                 }
             }
             return {
@@ -233,7 +237,6 @@ var AjaxBase = /** @class */ (function () {
                         key === 'onSuccess' ||
                         key === 'onError' ||
                         key === 'onSessionExpired' ||
-                        key === 'getLoading' ||
                         key === 'beforeSend' ||
                         key === 'processData' ||
                         key === 'responseEnd' ||
@@ -282,24 +285,11 @@ var AjaxBase = /** @class */ (function () {
     AjaxBase.prototype.catchError = function (props) {
         var errorCode = props.errorCode, errorMsg = props.errorMsg, remark = props.remark, type = props.type;
         if (type === 'uncaught') {
-            throw new Error((errorCode || '') + " " + errorMsg + " " + (remark || ''));
+            throw new Error("".concat(errorCode || '', " ").concat(errorMsg, " ").concat(remark || ''));
         }
     };
     AjaxBase.prototype.setLoading = function (loadingName) {
         this.$loading = loadingName;
-    };
-    /** 加载进度条 */
-    AjaxBase.prototype.getLoading = function (options) {
-        // @ts-ignore
-        if (options.loadingName && window[options.loadingName]) {
-            // @ts-ignore
-            return window[options.loadingName];
-        }
-        if (options.context && options.context.loading) {
-            return options.context.loading;
-        }
-        // @ts-ignore
-        return window[this.$loading];
     };
     /** 移除缓存的 cancel 请求 */
     AjaxBase.prototype.removeCacheCancel = function (token) {
@@ -315,7 +305,7 @@ var AjaxBase = /** @class */ (function () {
         if (options.processData !== false) {
             params = this.processData(params, { method: method, url: url, options: options, reject: reject });
         }
-        var processedUrlParams = url_1.splitUrlParams({
+        var processedUrlParams = (0, url_1.splitUrlParams)({
             url: url,
             params: params,
             paramsInOptions: options.params,
@@ -338,7 +328,7 @@ var AjaxBase = /** @class */ (function () {
         params = processedParams.params;
         var paramsInOptions = processedParams.paramsInOptions;
         if (urlParams) {
-            var processedValue = url_1.processParamsInUrl(url, urlParams);
+            var processedValue = (0, url_1.processParamsInUrl)(url, urlParams);
             url = processedValue.url;
         }
         this.processParamsAfter({
@@ -432,20 +422,13 @@ var AjaxBase = /** @class */ (function () {
                 _cancel = true;
             });
         }
-        // 启用加载效果
-        var loadingComponent = null;
-        if (loading && this.getLoading(options)) {
-            loadingComponent = this.getLoading(options);
-            loadingComponent.start();
-        }
-        var beforeSendPromise = this.beforeSend({ method: method, url: url, params: params, options: options });
+        var beforeSendPromise = this.beforeSend({ method: method, url: url, params: params, options: options, loadable: loading });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        return promise_1.promisify(beforeSendPromise)
+        return (0, promise_1.promisify)(beforeSendPromise)
             .then(function () {
             if (_cancel) {
                 reject(createError('Request aborted', Ajax.CODE.CANCEL));
-                if (loadingComponent)
-                    loadingComponent.finish();
+                _this.responseEnd(undefined, _opts, { success: false });
                 return;
             }
             if (options.onData) {
@@ -455,11 +438,9 @@ var AjaxBase = /** @class */ (function () {
             url = processedValue.url;
             var queryParams = processedValue.queryParams, requestBody = processedValue.requestBody;
             if (queryParams) {
-                url = url + "?" + queryParams;
+                url = "".concat(url, "?").concat(queryParams);
             }
             if (options.cache && _this._cache[url] !== undefined) {
-                if (loadingComponent)
-                    loadingComponent.finish();
                 _this.responseEnd(undefined, _opts, { success: true });
                 _this.onSuccess(undefined, {
                     response: _this._cache[url],
@@ -502,7 +483,7 @@ var AjaxBase = /** @class */ (function () {
                                 // eslint-disable-next-line no-console
                                 if (console && console[consoleMethod]) {
                                     // eslint-disable-next-line no-console
-                                    console[consoleMethod](method + " " + url + " Incorrect response");
+                                    console[consoleMethod]("".concat(method, " ").concat(url, " Incorrect response"));
                                 }
                             }
                         }
@@ -510,10 +491,6 @@ var AjaxBase = /** @class */ (function () {
                 }
                 if (this.readyState !== 4)
                     return;
-                // 关闭加载效果
-                if (loadingComponent) {
-                    loadingComponent.finish();
-                }
                 if (options && options.cancelToken) {
                     // 请求完成，删除缓存的 cancel
                     ajaxThis.removeCacheCancel(options.cancelToken);
@@ -547,7 +524,7 @@ var AjaxBase = /** @class */ (function () {
                         reject: reject,
                         xCorrelationID: _opts.xCorrelationID,
                     });
-                    res = transform_response_1.transformResponse({ response: res, options: options, xhr: xhr, statusField: statusField });
+                    res = (0, transform_response_1.transformResponse)({ response: res, options: options, xhr: xhr, statusField: statusField });
                     if (options.cache) {
                         ajaxThis._cache[url] = res;
                     }
@@ -584,12 +561,12 @@ var AjaxBase = /** @class */ (function () {
                         return;
                     }
                     var errorResponse = ajaxThis.processErrorResponse(this, _opts);
-                    promise_1.promisify(errorResponse).then(function () {
+                    (0, promise_1.promisify)(errorResponse).then(function () {
                         ajaxThis.onError(_this, _opts);
                     });
                 }
             };
-            xhr.open(method, url_1.addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
+            xhr.open(method, (0, url_1.addPrefixToUrl)(url, ajaxThis.prefix, options.prefix));
             // xhr.responseType = 'json';
             if (options.responseType) {
                 xhr.responseType = options.responseType;
@@ -646,11 +623,11 @@ var AjaxBase = /** @class */ (function () {
                     if (
                     // 重发的请求和前面的请求使用同样的 xCorrelationID，不需要生成新的 id
                     !_opts.xCorrelationID) {
-                        _opts.xCorrelationID = uuid_1.v4();
+                        _opts.xCorrelationID = (0, uuid_1.v4)();
                     }
                     xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
                 }
-                if (!isContentTypeExist && !form_1.isFormData(params) && (!options || options.encrypt !== 'all')) {
+                if (!isContentTypeExist && !(0, form_1.isFormData)(params) && (!options || options.encrypt !== 'all')) {
                     xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
                 }
                 if (!isCacheControlExist && browser_which_1.default.ie) {
@@ -681,7 +658,7 @@ var AjaxBase = /** @class */ (function () {
             .catch(function (e) {
             _this.responseEnd(undefined, _opts, { success: false });
             reject(e);
-            catch_1.catchAjaxError({
+            (0, catch_1.catchAjaxError)({
                 e: e,
                 method: method,
                 url: url,
@@ -733,7 +710,7 @@ var AjaxBase = /** @class */ (function () {
         var processedValue = this.getProcessedParams(method, url, params, _options);
         url = processedValue.url;
         params = processedValue.queryParams;
-        return params ? url + "?" + params : url;
+        return params ? "".concat(url, "?").concat(params) : url;
     };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     AjaxBase.prototype.getCache = function (url, params, options) {
@@ -756,7 +733,7 @@ var AjaxBase = /** @class */ (function () {
     };
     /** 生成 cancel token */
     AjaxBase.prototype.cancelToken = function () {
-        return new Date().getTime() + "_" + Math.random();
+        return "".concat(new Date().getTime(), "_").concat(Math.random());
     };
     /** cancel 请求 */
     AjaxBase.prototype.cancel = function (token) {

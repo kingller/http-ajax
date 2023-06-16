@@ -15,12 +15,12 @@ exports.splitUrlParams = exports.needFormatData = exports.processParamsInUrl = e
 var form_1 = require("./form");
 function addPrefixToUrl(url, globalPrefix, optionsPrefix) {
     if (typeof optionsPrefix === 'string') {
-        return "" + optionsPrefix + url;
+        return "".concat(optionsPrefix).concat(url);
     }
     if (/^https?:\/\//.test(url)) {
         return url;
     }
-    return "" + globalPrefix + url;
+    return "".concat(globalPrefix).concat(url);
 }
 exports.addPrefixToUrl = addPrefixToUrl;
 function getParamsInUrl(url) {
@@ -61,7 +61,7 @@ urlParams) {
         }
         var filledUrl = fillParamsInUrl(url, urlParams).url;
         if (queryStringInUrl) {
-            filledUrl = filledUrl + "?" + queryStringInUrl;
+            filledUrl = "".concat(filledUrl, "?").concat(queryStringInUrl);
         }
         return {
             url: filledUrl,
@@ -74,7 +74,7 @@ urlParams) {
 exports.processParamsInUrl = processParamsInUrl;
 function needFormatData(_a) {
     var params = _a.params, processData = _a.processData;
-    return processData !== false && !form_1.isFormData(params);
+    return processData !== false && !(0, form_1.isFormData)(params);
 }
 exports.needFormatData = needFormatData;
 function splitUrlParams(_a) {

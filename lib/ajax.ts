@@ -101,10 +101,10 @@ export class HttpAjax extends AjaxBase {
             'onError',
             'onSessionExpired',
             'onCryptoExpired',
-            'getLoading',
             'catchError',
             'clear',
             '_config',
+            '_loadingExtendAdded',
             '_cryptoExtendAdded',
             '_signatureExtendAdded',
         ];
