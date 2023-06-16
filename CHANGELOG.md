@@ -11,7 +11,7 @@
 
 # 6.0.0
 > 2023.06.16  
-1. <font color=orange>修改</font> `loading` 显示/隐藏改为使用 `loadingExtend`，需要用户添加该扩展
+1. <font color=orange>修改</font> 控制 `loading` 显示/隐藏改为使用 `loadingExtend`，需要用户添加该扩展
 ```
 import ajax, { Ajax } from 'http-ajax';
 import loadingExtend from 'http-ajax/dist/loading-extend';
