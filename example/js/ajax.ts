@@ -1,7 +1,7 @@
-import ajax, { Ajax } from '../../lib/index';
-import cryptoExtend from '../../lib//crypto-extend';
-import signatureExtend from '../../lib/signature-extend';
-import loadingExtend from '../../lib/loading-extend';
+import ajax, { Ajax } from 'http-ajax';
+import loadingExtend from 'http-ajax/dist/loading-extend';
+import cryptoExtend from 'http-ajax/dist/crypto-extend';
+import signatureExtend from 'http-ajax/dist/signature-extend';
 
 let refreshTokenPromise: Promise<any> = null;
 
