@@ -13,10 +13,13 @@ function loadingExtend(argsOptions) {
         var _a = this, beforeSend = _a.beforeSend, responseEnd = _a.responseEnd;
         var ajaxThis = this;
         function getLoading(options) {
-            if (options.loadingName) {
-                if (_getLoading) {
-                    return _getLoading({ loadingName: options.loadingName });
+            if (_getLoading) {
+                var customLoading = _getLoading({ loadingName: options.loadingName });
+                if (customLoading) {
+                    return customLoading;
                 }
+            }
+            if (options.loadingName) {
                 if (window[options.loadingName]) {
                     var loading = window[options.loadingName];
                     return loading;

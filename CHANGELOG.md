@@ -9,6 +9,11 @@
 # Next
 
 
+# 6.1.0
+> 2023.06.16  
+1. <font color=orange>修改</font> 请求不传 `loadingName` 时 `loadingExtend` 的 `getLoading` 也生效，以支持全部自定义显示 `loading`
+
+
 # 6.0.0
 > 2023.06.16  
 1. <font color=orange>修改</font> 控制 `loading` 显示/隐藏改为使用 `loadingExtend`，需要用户添加该扩展
