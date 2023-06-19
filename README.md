@@ -66,6 +66,14 @@ ajax.config({
             options: Ajax.IOptions; 
             resolve: Ajax.IResolve<T>; 
             reject: Ajax.IReject;
+            /** method */
+            method?: Ajax.IMethod;
+            /** url */
+            url?: string;
+            /** 请求参数 */
+            params?: Ajax.IParams | undefined;
+            /** 链路追踪 ID */
+            xCorrelationID?: string;
         }
     ): void => {
         // 处理成功回调
@@ -125,6 +133,8 @@ ajax.config({
         url: string;
         params: Ajax.IParams;
         options: Ajax.IOptions;
+        /** 是否显示 loading */
+        loading?: boolean;
     }): Ajax.IRequestResult | void => {
         let { options } = props;
         // 添加默认请求头
