@@ -16,7 +16,7 @@ export interface IOptionsBase {
         [name: string]: string;
     };
     /** 使用当前 loading 名称来显示 loading */
-    loadingName?: string;
+    loadingName?: string | symbol;
     /** 上下文，loading 也可以从 context.loading 里取 */
     context?: {
         [name: string]: any;
@@ -72,7 +72,8 @@ export interface IAjaxArgsOptions {
     url: string;
     params: IParams;
     options: IOptions;
-    loadable?: boolean;
+    /** 是否显示 loading */
+    loading?: boolean;
 }
 export interface IAjaxProcessDataOptions {
     method: IMethod;
@@ -106,12 +107,12 @@ export interface IProcessParamsAfterResult {
     params: IParams;
     paramsInOptions: IOptions['params'] | string;
 }
-export interface IProcessResponseOptions extends IAjaxArgsOptions {
+export type IProcessResponseOptions = {
     xhr: XMLHttpRequest;
     resolve: IResolve;
     reject: IReject;
     xCorrelationID: string;
-}
+} & Omit<IAjaxArgsOptions, 'loading'>;
 export interface IResult {
     result?: boolean;
     errorCode?: string | number;
@@ -141,6 +142,7 @@ export interface IRequestOptions {
     method: IMethod;
     url: string;
     params?: IParams;
+    /** 是否显示 loading */
     loading: boolean;
     resolve: IResolve;
     reject: IReject;
@@ -249,7 +251,8 @@ export interface IConfigOptions {
         url: string;
         params: IParams;
         options: IOptions;
-        loadable?: boolean;
+        /** 是否显示 loading */
+        loading?: boolean;
     }) => IRequestResult | void;
     /**
      * 数据处理
@@ -278,13 +281,14 @@ export interface IAjax {
         post: IRequest;
     };
     prefix: string;
-    $loading: string;
+    $loading: string | symbol;
     beforeSend: (props: {
         method: IMethod;
         url: string;
         params: IParams;
         options: IOptions;
-        loadable?: boolean;
+        /** 是否显示 loading */
+        loading?: boolean;
     }) => IRequestResult | void;
     processData: (params: IParams, props: {
         method: IMethod;
@@ -377,7 +381,7 @@ export interface IAjax {
         errorMsg: string;
         errorCode: string | number;
     } | any) => boolean;
-    setLoading: (loadingName: string) => void;
+    setLoading: (loadingName: string | symbol) => void;
     /** 配置 */
     config: (options?: IConfigOptions) => void;
     Ajax: () => IAjax;

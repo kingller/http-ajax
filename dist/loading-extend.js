@@ -13,15 +13,16 @@ function loadingExtend(argsOptions) {
         var _a = this, beforeSend = _a.beforeSend, responseEnd = _a.responseEnd;
         var ajaxThis = this;
         function getLoading(options) {
+            var loadingName = options.loadingName;
             if (_getLoading) {
-                var customLoading = _getLoading({ loadingName: options.loadingName });
+                var customLoading = _getLoading({ loadingName: loadingName });
                 if (customLoading) {
                     return customLoading;
                 }
             }
-            if (options.loadingName) {
-                if (window[options.loadingName]) {
-                    var loading = window[options.loadingName];
+            if (loadingName) {
+                if (window[loadingName]) {
+                    var loading = window[loadingName];
                     return loading;
                 }
             }
@@ -33,20 +34,17 @@ function loadingExtend(argsOptions) {
         }
         // 启用加载效果
         this.beforeSend = function (props) {
-            var loadable = props.loadable;
-            var promise;
+            var loading = props.loading;
+            if (loading) {
+                var options = props.options;
+                var loadingComponent = getLoading(options);
+                if (loadingComponent) {
+                    loadingComponent.start();
+                }
+            }
             if (beforeSend) {
-                promise = beforeSend(props);
+                return beforeSend(props);
             }
-            if (!loadable) {
-                return promise;
-            }
-            var options = props.options;
-            var loadingComponent = getLoading(options);
-            if (loadingComponent) {
-                loadingComponent.start();
-            }
-            return promise;
         };
         //关闭加载效果
         this.responseEnd = function (xhr, _opts, props) {

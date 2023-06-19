@@ -18,15 +18,16 @@ function loadingExtend(argsOptions?: {
         const { beforeSend, responseEnd } = this as IAjax;
         const ajaxThis = this;
         function getLoading(options: IOptions): ILoading | void {
+            const { loadingName } = options;
             if (_getLoading) {
-                const customLoading = _getLoading({ loadingName: options.loadingName });
+                const customLoading = _getLoading({ loadingName });
                 if (customLoading) {
                     return customLoading;
                 }
             }
-            if (options.loadingName) {
-                if ((window as object)[options.loadingName]) {
-                    const loading = (window as object)[options.loadingName] as ILoading;
+            if (loadingName) {
+                if ((window as object)[loadingName]) {
+                    const loading = (window as object)[loadingName] as ILoading;
                     return loading;
                 }
             }
@@ -39,20 +40,17 @@ function loadingExtend(argsOptions?: {
 
         // 启用加载效果
         (this as IAjax).beforeSend = (props: IAjaxArgsOptions): IRequestResult | void => {
-            const { loadable } = props;
-            let promise: IRequestResult | void;
+            const { loading } = props;
+            if (loading) {
+                const { options } = props;
+                const loadingComponent = getLoading(options);
+                if (loadingComponent) {
+                    loadingComponent.start();
+                }
+            }
             if (beforeSend) {
-                promise = beforeSend(props);
+                return beforeSend(props);
             }
-            if (!loadable) {
-                return promise;
-            }
-            const { options } = props;
-            const loadingComponent = getLoading(options);
-            if (loadingComponent) {
-                loadingComponent.start();
-            }
-            return promise;
         };
 
         //关闭加载效果

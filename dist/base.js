@@ -422,7 +422,7 @@ var AjaxBase = /** @class */ (function () {
                 _cancel = true;
             });
         }
-        var beforeSendPromise = this.beforeSend({ method: method, url: url, params: params, options: options, loadable: loading });
+        var beforeSendPromise = this.beforeSend({ method: method, url: url, params: params, options: options, loading: loading });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return (0, promise_1.promisify)(beforeSendPromise)
             .then(function () {

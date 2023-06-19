@@ -108,7 +108,7 @@ class AjaxBase {
 
     public prefix = '/api';
 
-    public $loading = '$loading';
+    public $loading: string | symbol = '$loading';
 
     /** 请求发送前 */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -201,7 +201,7 @@ class AjaxBase {
         }
     }
 
-    public setLoading(loadingName: string): void {
+    public setLoading(loadingName: string | symbol): void {
         this.$loading = loadingName;
     }
 
@@ -535,7 +535,7 @@ class AjaxBase {
             });
         }
 
-        const beforeSendPromise = this.beforeSend({ method, url, params, options, loadable: loading });
+        const beforeSendPromise = this.beforeSend({ method, url, params, options, loading });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return promisify(beforeSendPromise)
             .then((): void => {
@@ -935,7 +935,8 @@ class AjaxBase {
                 url: string;
                 params: Ajax.IParams;
                 options: Ajax.IOptions;
-                loadable?: boolean;
+                /** 是否显示 loading */
+                loading: boolean;
             }) => Ajax.IRequestResult | void;
             /**
              * 数据处理

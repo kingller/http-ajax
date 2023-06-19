@@ -9,6 +9,12 @@
 # Next
 
 
+# 6.2.0
+> 2023.06.19  
+1. <font color=blue>增强</font> `loadingName` 支持 `string | symbol` 类型
+2. <font color=orange>修改</font> `beforeSend` 参数属性名 `loadable` 改为 `loading`，统一命名
+
+
 # 6.1.0
 > 2023.06.16  
 1. <font color=orange>修改</font> 请求不传 `loadingName` 时 `loadingExtend` 的 `getLoading` 也生效，以支持全部自定义显示 `loading`

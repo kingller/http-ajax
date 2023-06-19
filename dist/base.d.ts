@@ -17,7 +17,7 @@ declare class AjaxBase {
         del: <T_3 = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T_3>;
     };
     prefix: string;
-    $loading: string;
+    $loading: string | symbol;
     /** 请求发送前 */
     beforeSend: (props: Ajax.IAjaxArgsOptions) => Ajax.IRequestResult | void;
     /** 数据处理 */
@@ -50,7 +50,7 @@ declare class AjaxBase {
     onError<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void;
     /** 捕获错误 */
     catchError(props: Ajax.ICatchErrorOptions): void;
-    setLoading(loadingName: string): void;
+    setLoading(loadingName: string | symbol): void;
     /** 将参数拼成 key1=val1&key2=val2 的格式 */
     private fillQueryParams;
     readonly stringifyParams: ({ params, paramsInOptions, method, encodeValue, cache, processData, }: Ajax.IStringifyParamsOptions) => {
@@ -176,7 +176,8 @@ declare class AjaxBase {
             url: string;
             params: Ajax.IParams;
             options: Ajax.IOptions;
-            loadable?: boolean;
+            /** 是否显示 loading */
+            loading: boolean;
         }) => Ajax.IRequestResult | void;
         /**
          * 数据处理

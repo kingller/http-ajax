@@ -21,7 +21,7 @@ export interface IOptionsBase {
         [name: string]: string;
     };
     /** 使用当前 loading 名称来显示 loading */
-    loadingName?: string;
+    loadingName?: string | symbol;
     /** 上下文，loading 也可以从 context.loading 里取 */
     context?: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,7 +100,8 @@ export interface IAjaxArgsOptions {
     url: string;
     params: IParams;
     options: IOptions;
-    loadable?: boolean;
+    /** 是否显示 loading */
+    loading?: boolean;
 }
 
 export interface IAjaxProcessDataOptions {
@@ -138,12 +139,12 @@ export interface IProcessParamsAfterResult {
     paramsInOptions: IOptions['params'] | string;
 }
 
-export interface IProcessResponseOptions extends IAjaxArgsOptions {
+export type IProcessResponseOptions = {
     xhr: XMLHttpRequest;
     resolve: IResolve;
     reject: IReject;
     xCorrelationID: string;
-}
+} & Omit<IAjaxArgsOptions, 'loading'>;
 
 // 返回结果
 export interface IResult {
@@ -193,6 +194,7 @@ export interface IRequestOptions {
     method: IMethod;
     url: string;
     params?: IParams;
+    /** 是否显示 loading */
     loading: boolean;
     resolve: IResolve;
     reject: IReject;
@@ -310,7 +312,8 @@ export interface IConfigOptions {
         url: string;
         params: IParams;
         options: IOptions;
-        loadable?: boolean;
+        /** 是否显示 loading */
+        loading?: boolean;
     }) => IRequestResult | void;
     /**
      * 数据处理
@@ -342,13 +345,14 @@ export interface IAjax {
         post: IRequest;
     };
     prefix: string;
-    $loading: string;
+    $loading: string | symbol;
     beforeSend: (props: {
         method: IMethod;
         url: string;
         params: IParams;
         options: IOptions;
-        loadable?: boolean;
+        /** 是否显示 loading */
+        loading?: boolean;
     }) => IRequestResult | void;
     processData: (
         params: IParams,
@@ -462,7 +466,7 @@ export interface IAjax {
     cancel: (token: string) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     isCancel: (error: { errorMsg: string; errorCode: string | number } | any) => boolean;
-    setLoading: (loadingName: string) => void;
+    setLoading: (loadingName: string | symbol) => void;
     /** 配置 */
     config: (options?: IConfigOptions) => void;
     Ajax: () => IAjax;
