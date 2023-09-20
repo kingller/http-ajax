@@ -134,10 +134,7 @@ export interface IProcessParamsAfterOptions extends IAjaxProcessDataOptions {
     processData?: boolean;
 }
 
-export interface IProcessParamsAfterResult {
-    params: IParams;
-    paramsInOptions: IOptions['params'] | string;
-}
+export type IProcessParamsAfterResult = void | Promise<void>;
 
 export type IProcessResponseOptions = {
     xhr: XMLHttpRequest;
@@ -507,6 +504,11 @@ export interface IOptions {
 
 export interface ISignatureExtend {
     (): () => void;
+}
+
+export interface IOptions {
+    /** 文件是否要签名 */
+    isSignFile?: (file: File) => boolean;
 }
 
 // ----- signature end ------- //

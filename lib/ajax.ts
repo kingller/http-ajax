@@ -106,7 +106,7 @@ export class HttpAjax extends AjaxBase {
             '_config',
             '_loadingExtendAdded',
             '_cryptoExtendAdded',
-            '_signatureExtendAdded',
+            '_snExtendAdded',
         ];
         for (const field of cloneFields) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

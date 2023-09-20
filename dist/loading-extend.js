@@ -46,7 +46,7 @@ function loadingExtend(argsOptions) {
                 return beforeSend(props);
             }
         };
-        //关闭加载效果
+        // 关闭加载效果
         this.responseEnd = function (xhr, _opts, props) {
             responseEnd(xhr, _opts, props);
             var options = _opts.options, loading = _opts.loading;

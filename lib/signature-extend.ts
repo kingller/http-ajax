@@ -1,15 +1,11 @@
 import _ from 'lodash';
-import Crypto from 'client-crypto';
 import { v4 as uuid } from 'uuid';
 import { METHODS } from './interface';
-import type {
-    IAjax,
-    IProcessParamsAfterOptions,
-    IProcessParamsAfterResult,
-    IParams,
-    IMethod,
-    IOptions,
-} from './interface';
+import type { IAjax, IProcessParamsAfterOptions, IParams, IMethod, IOptions } from './interface';
+import { isFormData } from './utils/form';
+import SHA256 from './utils/sha256';
+import getNonce from './utils/nonce';
+import './polyfill/form-data';
 
 /**
  * 签名扩展。
@@ -18,28 +14,52 @@ import type {
  * timestamp（签名参数）：UTC 时间（用于校验是否已过期）；
  * app-nonce（签名参数）：只使用一次标识码（用于校验是否已发送过，存入 redis 几分钟后过期）。
  */
-function signatureExtend(): () => void {
-    return function signature(): void {
+function snExtend(): () => void {
+    return function sn(): void {
         const { processParamsAfter } = this as IAjax;
+
+        const getKey = (splits: string[]): string => {
+            const keyStr = splits.join('');
+            return window.atob(keyStr);
+        };
 
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码
-        const appNonceField = ['app', ['non', 'ce'].join('')].join('-');
+        const appNonceField = getKey(['YX', 'Bw', 'LW', '5v', 'bm', 'Nl']);
         // timestamp 时间
-        const timestampField = ['time', 'sta', 'mp'].join('');
+        const timestampField = getKey(['dGl', 'tZX', 'N0Y', 'W1w']);
         // sign 签名
-        const signField = ['si', 'gn'].join('');
+        const signField = getKey(['c2l', 'nbg', '=', '=']);
+        // file-sum 文件签名
+        const fileSumField = getKey(['Zml', 'sZS', '1zd', 'W0', '=']);
 
         // 校验该扩展是否已添加过
-        if (this._signatureExtendAdded) {
+        if (this._snExtendAdded) {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-            console && console.error('Error: `signatureExtend` can only be added to ajax once!');
+            console && console.error('Error: `snExtend` can only be added to ajax once!');
         }
 
         // 添加标志符用来校验该扩展是否已添加
-        this._signatureExtendAdded = true;
+        this._snExtendAdded = true;
 
-        const signData = ({
+        const readFile = (file: File) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+
+                reader.onload = function () {
+                    resolve(reader.result); // This is the file content as a data URL
+                };
+
+                reader.onerror = function (this: FileReader, ev: ProgressEvent<FileReader>) {
+                    reject(ev);
+                    return null;
+                };
+
+                reader.readAsDataURL(file); // Read file as data URL (string)
+            });
+        };
+
+        const signData = async ({
             params,
             paramsInOptions,
             method,
@@ -51,8 +71,9 @@ function signatureExtend(): () => void {
             method: IMethod;
             options: IOptions;
             processData?: boolean;
-        }): void => {
-            let signatureStr = '';
+        }): Promise<void> => {
+            let toSnStr = '';
+            let fileSum = '';
             const { requestBody, queryParams } = (this as IAjax).stringifyParams({
                 params,
                 paramsInOptions,
@@ -63,34 +84,64 @@ function signatureExtend(): () => void {
             });
             if (method === METHODS.get) {
                 if (queryParams) {
-                    signatureStr = queryParams;
+                    toSnStr = queryParams;
                 }
             } else {
                 if (requestBody && typeof requestBody === 'string') {
-                    signatureStr = requestBody;
+                    toSnStr = requestBody;
+                } else {
+                    const formData: string[] = [];
+                    if (isFormData(requestBody)) {
+                        const formDataEntries: [key: string, value: string | File][] = [];
+                        (requestBody as FormData).forEach(async (value: FormDataEntryValue, key: string) => {
+                            formDataEntries.push([key, value]);
+                        });
+                        // isSignFile
+                        const isSignFileField = getKey(['aXNT', 'aWdu', 'Rm', 'ls', 'ZQ', '=', '=']);
+                        for await (const [key, value] of formDataEntries) {
+                            if (value instanceof File) {
+                                if (!options[isSignFileField] || options[isSignFileField](value)) {
+                                    const fileDataURL = await readFile(value);
+                                    formData.push(`${key}=${fileDataURL}`);
+                                }
+                            } else {
+                                formData.push(`${key}=${value}`);
+                            }
+                        }
+                        formData.sort();
+                        toSnStr = formData.join('&');
+                        fileSum = SHA256(toSnStr);
+                        toSnStr = fileSum;
+                    }
                 }
             }
 
             const timestamp = new Date().getTime();
             const appNonce = uuid();
-            const end = appNonce.length - 1;
+
+            const headers: {
+                [key: string]: string | number;
+            } = {
+                [signField]: SHA256(`${toSnStr}${timestamp}${getNonce(appNonce)}`),
+                [timestampField]: timestamp,
+                [appNonceField]: appNonce,
+            };
+
+            if (fileSum) {
+                headers[fileSumField] = fileSum;
+            }
 
             _.merge(options, {
-                headers: {
-                    [signField]: Crypto.SHA256(`${signatureStr}${timestamp}${appNonce.substring(2, end)}`),
-                    [timestampField]: timestamp,
-                    [appNonceField]: appNonce,
-                },
+                headers,
             });
         };
 
-        (this as IAjax).processParamsAfter = (props: IProcessParamsAfterOptions): IProcessParamsAfterResult => {
-            const { params, paramsInOptions } = processParamsAfter(props);
-            const { method, options, processData } = props;
-            signData({ params, paramsInOptions, method, options, processData });
-            return { params, paramsInOptions };
+        (this as IAjax).processParamsAfter = async (props: IProcessParamsAfterOptions): Promise<void> => {
+            await processParamsAfter(props);
+            const { params, paramsInOptions, method, options, processData } = props;
+            await signData({ params, paramsInOptions, method, options, processData });
         };
     };
 }
 
-export default signatureExtend;
+export default snExtend;

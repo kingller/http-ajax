@@ -25,7 +25,7 @@ declare class AjaxBase {
     /** 参数处理 */
     processParams: ({ urlParams, params, paramsInOptions, }: Ajax.IProcessParamsOptions) => Ajax.IProcessParamsResult;
     /** 去除 URL 中:params 格式参数后参数处理 */
-    processParamsAfter: ({ params, paramsInOptions, }: Ajax.IProcessParamsAfterOptions) => Ajax.IProcessParamsAfterResult;
+    processParamsAfter: (props: Ajax.IProcessParamsAfterOptions) => void | Promise<void>;
     processResponse: (response: Ajax.IResult | null, props: Ajax.IProcessResponseOptions) => Ajax.IResult;
     /** 私有变量，请勿使用 */
     private _cache;

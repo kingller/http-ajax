@@ -55,7 +55,7 @@ function cryptoExtend(): () => void {
             console && console.error('Error: `cryptoExtend` can only be added to ajax once!');
         } else {
             // 校验加密扩展必须在签名扩展前添加
-            if (this._signatureExtendAdded) {
+            if (this._snExtendAdded) {
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                 console && console.warn('Warning: `cryptoExtend` should be added to ajax before `signatureExtend`!');
             }

@@ -103,10 +103,7 @@ export interface IProcessParamsAfterOptions extends IAjaxProcessDataOptions {
     /** 为 false 时不格式化请求参数 */
     processData?: boolean;
 }
-export interface IProcessParamsAfterResult {
-    params: IParams;
-    paramsInOptions: IOptions['params'] | string;
-}
+export type IProcessParamsAfterResult = void | Promise<void>;
 export type IProcessResponseOptions = {
     xhr: XMLHttpRequest;
     resolve: IResolve;
@@ -409,6 +406,10 @@ export interface IOptions {
 }
 export interface ISignatureExtend {
     (): () => void;
+}
+export interface IOptions {
+    /** 文件是否要签名 */
+    isSignFile?: (file: File) => boolean;
 }
 export interface ILoading {
     start: () => void;

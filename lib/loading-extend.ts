@@ -53,7 +53,7 @@ function loadingExtend(argsOptions?: {
             }
         };
 
-        //关闭加载效果
+        // 关闭加载效果
         (this as IAjax).responseEnd = (
             xhr: XMLHttpRequest,
             _opts: IRequestOptions,

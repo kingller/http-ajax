@@ -129,12 +129,7 @@ class AjaxBase {
     };
 
     /** 去除 URL 中:params 格式参数后参数处理 */
-    public processParamsAfter = function ({
-        params,
-        paramsInOptions,
-    }: Ajax.IProcessParamsAfterOptions): Ajax.IProcessParamsAfterResult {
-        return { params, paramsInOptions };
-    };
+    public processParamsAfter = function (props: Ajax.IProcessParamsAfterOptions): void | Promise<void> {};
 
     public processResponse = function (
         response: Ajax.IResult | null,
@@ -246,7 +241,7 @@ class AjaxBase {
         requestBody: string | Ajax.IParams | undefined;
         queryParams: string;
     } => {
-        let requestBody: string | Ajax.IParams = undefined;
+        let requestBody: string | Ajax.IParams;
         let queryParamsArray: string[] = [];
         const isNeedFormat =
             // 如果调用方已经将参数序列化成字符串，直接返回
@@ -317,6 +312,10 @@ class AjaxBase {
         url: string;
         requestBody: Ajax.IParams | string;
         queryParams: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        urlParams: { [name: string]: any };
+        params: Ajax.IParams;
+        paramsInOptions: Ajax.IOptions['params'] | string;
     } {
         /* eslint-enable @typescript-eslint/indent */
         if (options.processData !== false) {
@@ -348,15 +347,6 @@ class AjaxBase {
             const processedValue = processParamsInUrl(url, urlParams);
             url = processedValue.url;
         }
-        this.processParamsAfter({
-            params,
-            paramsInOptions,
-            method,
-            url,
-            options,
-            reject,
-            processData: options.processData,
-        });
         const { requestBody, queryParams } = this.stringifyParams({
             params,
             paramsInOptions,
@@ -368,6 +358,9 @@ class AjaxBase {
             url,
             requestBody,
             queryParams,
+            params,
+            urlParams,
+            paramsInOptions,
         };
     }
 
@@ -538,8 +531,9 @@ class AjaxBase {
         const beforeSendPromise = this.beforeSend({ method, url, params, options, loading });
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return promisify(beforeSendPromise)
-            .then((): void => {
+            .then((): void | Promise<void> => {
                 if (_cancel) {
+                    // aborted before send
                     reject(createError('Request aborted', Ajax.CODE.CANCEL));
                     this.responseEnd(undefined, _opts, { success: false });
                     return;
@@ -548,223 +542,244 @@ class AjaxBase {
                 if (options.onData) {
                     options.json = false;
                 }
+
                 const processedValue = this.getProcessedParams(method, url, params, options, reject);
-                url = processedValue.url;
-                const { queryParams, requestBody } = processedValue;
-                if (queryParams) {
-                    url = `${url}?${queryParams}`;
-                }
-                if (options.cache && this._cache[url] !== undefined) {
-                    this.responseEnd(undefined, _opts, { success: true });
-                    this.onSuccess<T>(undefined, {
-                        response: this._cache[url],
-                        options,
-                        resolve,
-                        reject,
-                        method: _opts.method,
-                        url: _opts.url,
-                        params: _opts.params,
-                    });
-                    return;
-                }
-                const xhr = new XMLHttpRequest();
-                let chunked: string[] = [];
-                const ajaxThis = this;
-                xhr.onreadystatechange = function (): void {
-                    if (options.onData) {
-                        if (this.readyState === 3 || this.readyState === 4) {
-                            // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
-                            if (this.response) {
-                                let chunks: string[] = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
-                                if (chunks) {
-                                    chunks = chunks.map((item: string): string => item.replace(/<\/?chunk>/g, ''));
-                                    // 取出新增的数据
-                                    const data: string[] = chunks.slice(chunked.length);
-                                    data.forEach((item: string): void => {
-                                        try {
-                                            options.onData(JSON.parse(item));
-                                        } catch (e) {
-                                            options.onData(item);
-                                        }
-                                    });
-                                    chunked = chunks;
-                                } else {
-                                    const consoleMethod: 'error' | 'warn' = this.readyState === 4 ? 'error' : 'warn';
-                                    // eslint-disable-next-line no-console
-                                    if (console && console[consoleMethod]) {
-                                        // eslint-disable-next-line no-console
-                                        console[consoleMethod](`${method} ${url} Incorrect response`);
-                                    }
-                                }
-                            }
-                        }
+
+                const processParamsAfterPromise = this.processParamsAfter({
+                    params: processedValue.params,
+                    paramsInOptions: processedValue.paramsInOptions,
+                    method,
+                    url,
+                    options,
+                    reject,
+                    processData: options.processData,
+                });
+                return promisify(processParamsAfterPromise).then((): void => {
+                    if (_cancel) {
+                        // aborted before send
+                        reject(createError('Request aborted', Ajax.CODE.CANCEL));
+                        this.responseEnd(undefined, _opts, { success: false });
+                        return;
                     }
 
-                    if (this.readyState !== 4) return;
-
-                    if (options && options.cancelToken) {
-                        // 请求完成，删除缓存的 cancel
-                        ajaxThis.removeCacheCancel(options.cancelToken);
+                    url = processedValue.url;
+                    const { queryParams, requestBody } = processedValue;
+                    if (queryParams) {
+                        url = `${url}?${queryParams}`;
                     }
-
-                    if (this.status === 200 || this.status === 201) {
-                        let res: Ajax.IResult;
-                        const { statusField } = ajaxThis._config;
-                        if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
-                            res = {
-                                [statusField]: true,
-                                data: this.response || this.responseText,
-                            };
-                        } else {
-                            // IE9 下 responseType 为 json 时，response 的值为 undefined，返回值需去 responseText 取
-                            // 其它浏览器 responseType 为 json 时，取 response
-                            if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
-                                res = this.response;
-                            } else {
-                                res = JSON.parse(this.response || this.responseText || '{}');
-                            }
-                        }
-                        res = ajaxThis.processResponse(res, {
-                            xhr,
-                            method,
-                            url,
-                            params: _opts.params,
+                    if (options.cache && this._cache[url] !== undefined) {
+                        this.responseEnd(undefined, _opts, { success: true });
+                        this.onSuccess<T>(undefined, {
+                            response: this._cache[url],
                             options,
                             resolve,
                             reject,
-                            xCorrelationID: _opts.xCorrelationID,
-                        });
-                        res = transformResponse({ response: res, options, xhr, statusField });
-                        if (options.cache) {
-                            ajaxThis._cache[url] = res;
-                        }
-                        ajaxThis.responseEnd(xhr, _opts, { success: true });
-                        ajaxThis.onSuccess<T>(xhr, {
-                            response: res,
                             method: _opts.method,
                             url: _opts.url,
                             params: _opts.params,
-                            options,
-                            resolve,
-                            reject,
-                            xCorrelationID: _opts.xCorrelationID,
                         });
-                    } else if (this.status === 204) {
-                        ajaxThis.processResponse(null, {
-                            xhr,
-                            method,
-                            url,
-                            params: _opts.params,
-                            options,
-                            resolve,
-                            reject,
-                            xCorrelationID: _opts.xCorrelationID,
-                        });
-                        ajaxThis.responseEnd(xhr, _opts, { success: true });
-                        resolve(null);
-                    } else {
-                        ajaxThis.responseEnd(xhr, _opts, { success: false });
-                        // @ts-ignore
-                        if (this.aborted) {
-                            return;
-                        }
-                        const errorResponse = ajaxThis.processErrorResponse<T>(this, _opts);
-                        promisify(errorResponse).then(() => {
-                            ajaxThis.onError<T>(this, _opts);
-                        });
+                        return;
                     }
-                };
-                xhr.open(method, addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
-                // xhr.responseType = 'json';
-                if (options.responseType) {
-                    xhr.responseType = options.responseType;
-                }
-                if ((!options.headers || typeof options.headers.token === 'undefined') && !options.simple) {
-                    let token = '';
-                    try {
-                        token = window.localStorage.getItem('token') || '';
-                    } catch (e) {
-                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                        console && console.error('Failed to get token from localStorage');
-                    }
-                    if (token) {
-                        xhr.setRequestHeader('token', token);
-                    }
-                }
-                let isContentTypeExist = false;
-                let isCacheControlExist = false;
-                let isXCorrelationIDExist = false;
-                if (options.headers) {
-                    for (const k of Object.keys(options.headers)) {
-                        const v = options.headers[k];
-                        const lowerCaseKey = k.toLowerCase();
-                        if (lowerCaseKey === 'content-type') {
-                            isContentTypeExist = true;
-                            // 支持不设置 Content-Type
-                            if (v) {
-                                xhr.setRequestHeader(k, v);
-                            }
-                        } else {
-                            if (lowerCaseKey === 'cache-control') {
-                                isCacheControlExist = true;
-                            } else {
-                                if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
-                                    if (lowerCaseKey === 'x-correlation-id') {
-                                        isXCorrelationIDExist = true;
-                                        _opts.xCorrelationID = v;
-                                    }
-                                    if (!v) {
-                                        continue;
+                    const xhr = new XMLHttpRequest();
+                    let chunked: string[] = [];
+                    const ajaxThis = this;
+                    xhr.onreadystatechange = function (): void {
+                        if (options.onData) {
+                            if (this.readyState === 3 || this.readyState === 4) {
+                                // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
+                                if (this.response) {
+                                    let chunks: string[] = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
+                                    if (chunks) {
+                                        chunks = chunks.map((item: string): string => item.replace(/<\/?chunk>/g, ''));
+                                        // 取出新增的数据
+                                        const data: string[] = chunks.slice(chunked.length);
+                                        data.forEach((item: string): void => {
+                                            try {
+                                                options.onData(JSON.parse(item));
+                                            } catch (e) {
+                                                options.onData(item);
+                                            }
+                                        });
+                                        chunked = chunks;
+                                    } else {
+                                        const consoleMethod: 'error' | 'warn' =
+                                            this.readyState === 4 ? 'error' : 'warn';
+                                        // eslint-disable-next-line no-console
+                                        if (console && console[consoleMethod]) {
+                                            // eslint-disable-next-line no-console
+                                            console[consoleMethod](`${method} ${url} Incorrect response`);
+                                        }
                                     }
                                 }
                             }
-                            xhr.setRequestHeader(k, v);
+                        }
+
+                        if (this.readyState !== 4) return;
+
+                        if (options && options.cancelToken) {
+                            // 请求完成，删除缓存的 cancel
+                            ajaxThis.removeCacheCancel(options.cancelToken);
+                        }
+
+                        if (this.status === 200 || this.status === 201) {
+                            let res: Ajax.IResult;
+                            const { statusField } = ajaxThis._config;
+                            if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
+                                res = {
+                                    [statusField]: true,
+                                    data: this.response || this.responseText,
+                                };
+                            } else {
+                                // IE9 下 responseType 为 json 时，response 的值为 undefined，返回值需去 responseText 取
+                                // 其它浏览器 responseType 为 json 时，取 response
+                                if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
+                                    res = this.response;
+                                } else {
+                                    res = JSON.parse(this.response || this.responseText || '{}');
+                                }
+                            }
+                            res = ajaxThis.processResponse(res, {
+                                xhr,
+                                method,
+                                url,
+                                params: _opts.params,
+                                options,
+                                resolve,
+                                reject,
+                                xCorrelationID: _opts.xCorrelationID,
+                            });
+                            res = transformResponse({ response: res, options, xhr, statusField });
+                            if (options.cache) {
+                                ajaxThis._cache[url] = res;
+                            }
+                            ajaxThis.responseEnd(xhr, _opts, { success: true });
+                            ajaxThis.onSuccess<T>(xhr, {
+                                response: res,
+                                method: _opts.method,
+                                url: _opts.url,
+                                params: _opts.params,
+                                options,
+                                resolve,
+                                reject,
+                                xCorrelationID: _opts.xCorrelationID,
+                            });
+                        } else if (this.status === 204) {
+                            ajaxThis.processResponse(null, {
+                                xhr,
+                                method,
+                                url,
+                                params: _opts.params,
+                                options,
+                                resolve,
+                                reject,
+                                xCorrelationID: _opts.xCorrelationID,
+                            });
+                            ajaxThis.responseEnd(xhr, _opts, { success: true });
+                            resolve(null);
+                        } else {
+                            ajaxThis.responseEnd(xhr, _opts, { success: false });
+                            // @ts-ignore
+                            if (this.aborted) {
+                                return;
+                            }
+                            const errorResponse = ajaxThis.processErrorResponse<T>(this, _opts);
+                            promisify(errorResponse).then(() => {
+                                ajaxThis.onError<T>(this, _opts);
+                            });
+                        }
+                    };
+                    xhr.open(method, addPrefixToUrl(url, ajaxThis.prefix, options.prefix));
+                    // xhr.responseType = 'json';
+                    if (options.responseType) {
+                        xhr.responseType = options.responseType;
+                    }
+                    if ((!options.headers || typeof options.headers.token === 'undefined') && !options.simple) {
+                        let token = '';
+                        try {
+                            token = window.localStorage.getItem('token') || '';
+                        } catch (e) {
+                            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                            console && console.error('Failed to get token from localStorage');
+                        }
+                        if (token) {
+                            xhr.setRequestHeader('token', token);
                         }
                     }
-                }
-                if (!options.simple) {
-                    if (!isXCorrelationIDExist) {
-                        if (
-                            // 重发的请求和前面的请求使用同样的 xCorrelationID，不需要生成新的 id
-                            !_opts.xCorrelationID
-                        ) {
-                            _opts.xCorrelationID = uuid();
+                    let isContentTypeExist = false;
+                    let isCacheControlExist = false;
+                    let isXCorrelationIDExist = false;
+                    if (options.headers) {
+                        for (const k of Object.keys(options.headers)) {
+                            const v = options.headers[k];
+                            const lowerCaseKey = k.toLowerCase();
+                            if (lowerCaseKey === 'content-type') {
+                                isContentTypeExist = true;
+                                // 支持不设置 Content-Type
+                                if (v) {
+                                    xhr.setRequestHeader(k, v);
+                                }
+                            } else {
+                                if (lowerCaseKey === 'cache-control') {
+                                    isCacheControlExist = true;
+                                } else {
+                                    if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
+                                        if (lowerCaseKey === 'x-correlation-id') {
+                                            isXCorrelationIDExist = true;
+                                            _opts.xCorrelationID = v;
+                                        }
+                                        if (!v) {
+                                            continue;
+                                        }
+                                    }
+                                }
+                                xhr.setRequestHeader(k, v);
+                            }
                         }
-                        xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
                     }
-                    if (!isContentTypeExist && !isFormData(params) && (!options || options.encrypt !== 'all')) {
-                        xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
-                    }
-                    if (!isCacheControlExist && browser.ie) {
-                        xhr.setRequestHeader('Cache-Control', 'no-cache');
-                        xhr.setRequestHeader('Pragma', 'no-cache');
-                    }
-                }
-
-                if (options.onProgress) {
-                    xhr.upload.onprogress = options.onProgress;
-                }
-
-                if (typeof options.timeout === 'number') {
-                    xhr.timeout = options.timeout;
-                }
-
-                // prettier-ignore
-                xhr.send(
-                    requestBody as Document | Blob | BufferSource | FormData | URLSearchParams | string | null
-                );
-
-                if (cancelExecutor) {
-                    cancelExecutor(function (): void {
-                        if (xhr.readyState === XMLHttpRequest.DONE) {
-                            return;
+                    if (!options.simple) {
+                        if (!isXCorrelationIDExist) {
+                            if (
+                                // 重发的请求和前面的请求使用同样的 xCorrelationID，不需要生成新的 id
+                                !_opts.xCorrelationID
+                            ) {
+                                _opts.xCorrelationID = uuid();
+                            }
+                            xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
                         }
-                        reject(createError('Request aborted', Ajax.CODE.CANCEL, xhr));
-                        // @ts-ignore
-                        xhr.aborted = true;
-                        xhr.abort();
-                    });
-                }
+                        if (!isContentTypeExist && !isFormData(params) && (!options || options.encrypt !== 'all')) {
+                            xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+                        }
+                        if (!isCacheControlExist && browser.ie) {
+                            xhr.setRequestHeader('Cache-Control', 'no-cache');
+                            xhr.setRequestHeader('Pragma', 'no-cache');
+                        }
+                    }
+
+                    if (options.onProgress) {
+                        xhr.upload.onprogress = options.onProgress;
+                    }
+
+                    if (typeof options.timeout === 'number') {
+                        xhr.timeout = options.timeout;
+                    }
+
+                    // prettier-ignore
+                    xhr.send(
+                        requestBody as Document | Blob | BufferSource | FormData | URLSearchParams | string | null
+                    );
+
+                    if (cancelExecutor) {
+                        cancelExecutor(function (): void {
+                            if (xhr.readyState === XMLHttpRequest.DONE) {
+                                return;
+                            }
+                            reject(createError('Request aborted', Ajax.CODE.CANCEL, xhr));
+                            // @ts-ignore
+                            xhr.aborted = true;
+                            xhr.abort();
+                        });
+                    }
+                });
             })
             .catch((e: Error): void => {
                 this.responseEnd(undefined, _opts, { success: false });

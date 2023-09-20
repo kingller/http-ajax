@@ -130,10 +130,7 @@ var AjaxBase = /** @class */ (function () {
             return { urlParams: urlParams, params: params, paramsInOptions: paramsInOptions };
         };
         /** 去除 URL 中:params 格式参数后参数处理 */
-        this.processParamsAfter = function (_a) {
-            var params = _a.params, paramsInOptions = _a.paramsInOptions;
-            return { params: params, paramsInOptions: paramsInOptions };
-        };
+        this.processParamsAfter = function (props) { };
         this.processResponse = function (response, props) {
             return response;
         };
@@ -169,7 +166,7 @@ var AjaxBase = /** @class */ (function () {
         };
         this.stringifyParams = function (_a) {
             var params = _a.params, paramsInOptions = _a.paramsInOptions, method = _a.method, encodeValue = _a.encodeValue, cache = _a.cache, processData = _a.processData;
-            var requestBody = undefined;
+            var requestBody;
             var queryParamsArray = [];
             var isNeedFormat = 
             // 如果调用方已经将参数序列化成字符串，直接返回
@@ -331,15 +328,6 @@ var AjaxBase = /** @class */ (function () {
             var processedValue = (0, url_1.processParamsInUrl)(url, urlParams);
             url = processedValue.url;
         }
-        this.processParamsAfter({
-            params: params,
-            paramsInOptions: paramsInOptions,
-            method: method,
-            url: url,
-            options: options,
-            reject: reject,
-            processData: options.processData,
-        });
         var _a = this.stringifyParams({
             params: params,
             paramsInOptions: paramsInOptions,
@@ -351,6 +339,9 @@ var AjaxBase = /** @class */ (function () {
             url: url,
             requestBody: requestBody,
             queryParams: queryParams,
+            params: params,
+            urlParams: urlParams,
+            paramsInOptions: paramsInOptions,
         };
     };
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -427,6 +418,7 @@ var AjaxBase = /** @class */ (function () {
         return (0, promise_1.promisify)(beforeSendPromise)
             .then(function () {
             if (_cancel) {
+                // aborted before send
                 reject(createError('Request aborted', Ajax.CODE.CANCEL));
                 _this.responseEnd(undefined, _opts, { success: false });
                 return;
@@ -435,225 +427,242 @@ var AjaxBase = /** @class */ (function () {
                 options.json = false;
             }
             var processedValue = _this.getProcessedParams(method, url, params, options, reject);
-            url = processedValue.url;
-            var queryParams = processedValue.queryParams, requestBody = processedValue.requestBody;
-            if (queryParams) {
-                url = "".concat(url, "?").concat(queryParams);
-            }
-            if (options.cache && _this._cache[url] !== undefined) {
-                _this.responseEnd(undefined, _opts, { success: true });
-                _this.onSuccess(undefined, {
-                    response: _this._cache[url],
-                    options: options,
-                    resolve: resolve,
-                    reject: reject,
-                    method: _opts.method,
-                    url: _opts.url,
-                    params: _opts.params,
-                });
-                return;
-            }
-            var xhr = new XMLHttpRequest();
-            var chunked = [];
-            var ajaxThis = _this;
-            xhr.onreadystatechange = function () {
-                var _a;
-                var _this = this;
-                if (options.onData) {
-                    if (this.readyState === 3 || this.readyState === 4) {
-                        // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
-                        if (this.response) {
-                            var chunks = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
-                            if (chunks) {
-                                chunks = chunks.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
-                                // 取出新增的数据
-                                var data = chunks.slice(chunked.length);
-                                data.forEach(function (item) {
-                                    try {
-                                        options.onData(JSON.parse(item));
-                                    }
-                                    catch (e) {
-                                        options.onData(item);
-                                    }
-                                });
-                                chunked = chunks;
-                            }
-                            else {
-                                var consoleMethod = this.readyState === 4 ? 'error' : 'warn';
-                                // eslint-disable-next-line no-console
-                                if (console && console[consoleMethod]) {
-                                    // eslint-disable-next-line no-console
-                                    console[consoleMethod]("".concat(method, " ").concat(url, " Incorrect response"));
-                                }
-                            }
-                        }
-                    }
-                }
-                if (this.readyState !== 4)
+            var processParamsAfterPromise = _this.processParamsAfter({
+                params: processedValue.params,
+                paramsInOptions: processedValue.paramsInOptions,
+                method: method,
+                url: url,
+                options: options,
+                reject: reject,
+                processData: options.processData,
+            });
+            return (0, promise_1.promisify)(processParamsAfterPromise).then(function () {
+                if (_cancel) {
+                    // aborted before send
+                    reject(createError('Request aborted', Ajax.CODE.CANCEL));
+                    _this.responseEnd(undefined, _opts, { success: false });
                     return;
-                if (options && options.cancelToken) {
-                    // 请求完成，删除缓存的 cancel
-                    ajaxThis.removeCacheCancel(options.cancelToken);
                 }
-                if (this.status === 200 || this.status === 201) {
-                    var res = void 0;
-                    var statusField = ajaxThis._config.statusField;
-                    if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
-                        res = (_a = {},
-                            _a[statusField] = true,
-                            _a.data = this.response || this.responseText,
-                            _a);
-                    }
-                    else {
-                        // IE9 下 responseType 为 json 时，response 的值为 undefined，返回值需去 responseText 取
-                        // 其它浏览器 responseType 为 json 时，取 response
-                        if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
-                            res = this.response;
-                        }
-                        else {
-                            res = JSON.parse(this.response || this.responseText || '{}');
-                        }
-                    }
-                    res = ajaxThis.processResponse(res, {
-                        xhr: xhr,
-                        method: method,
-                        url: url,
-                        params: _opts.params,
+                url = processedValue.url;
+                var queryParams = processedValue.queryParams, requestBody = processedValue.requestBody;
+                if (queryParams) {
+                    url = "".concat(url, "?").concat(queryParams);
+                }
+                if (options.cache && _this._cache[url] !== undefined) {
+                    _this.responseEnd(undefined, _opts, { success: true });
+                    _this.onSuccess(undefined, {
+                        response: _this._cache[url],
                         options: options,
                         resolve: resolve,
                         reject: reject,
-                        xCorrelationID: _opts.xCorrelationID,
-                    });
-                    res = (0, transform_response_1.transformResponse)({ response: res, options: options, xhr: xhr, statusField: statusField });
-                    if (options.cache) {
-                        ajaxThis._cache[url] = res;
-                    }
-                    ajaxThis.responseEnd(xhr, _opts, { success: true });
-                    ajaxThis.onSuccess(xhr, {
-                        response: res,
                         method: _opts.method,
                         url: _opts.url,
                         params: _opts.params,
-                        options: options,
-                        resolve: resolve,
-                        reject: reject,
-                        xCorrelationID: _opts.xCorrelationID,
                     });
+                    return;
                 }
-                else if (this.status === 204) {
-                    ajaxThis.processResponse(null, {
-                        xhr: xhr,
-                        method: method,
-                        url: url,
-                        params: _opts.params,
-                        options: options,
-                        resolve: resolve,
-                        reject: reject,
-                        xCorrelationID: _opts.xCorrelationID,
-                    });
-                    ajaxThis.responseEnd(xhr, _opts, { success: true });
-                    resolve(null);
-                }
-                else {
-                    ajaxThis.responseEnd(xhr, _opts, { success: false });
-                    // @ts-ignore
-                    if (this.aborted) {
-                        return;
-                    }
-                    var errorResponse = ajaxThis.processErrorResponse(this, _opts);
-                    (0, promise_1.promisify)(errorResponse).then(function () {
-                        ajaxThis.onError(_this, _opts);
-                    });
-                }
-            };
-            xhr.open(method, (0, url_1.addPrefixToUrl)(url, ajaxThis.prefix, options.prefix));
-            // xhr.responseType = 'json';
-            if (options.responseType) {
-                xhr.responseType = options.responseType;
-            }
-            if ((!options.headers || typeof options.headers.token === 'undefined') && !options.simple) {
-                var token = '';
-                try {
-                    token = window.localStorage.getItem('token') || '';
-                }
-                catch (e) {
-                    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-                    console && console.error('Failed to get token from localStorage');
-                }
-                if (token) {
-                    xhr.setRequestHeader('token', token);
-                }
-            }
-            var isContentTypeExist = false;
-            var isCacheControlExist = false;
-            var isXCorrelationIDExist = false;
-            if (options.headers) {
-                for (var _i = 0, _a = Object.keys(options.headers); _i < _a.length; _i++) {
-                    var k = _a[_i];
-                    var v = options.headers[k];
-                    var lowerCaseKey = k.toLowerCase();
-                    if (lowerCaseKey === 'content-type') {
-                        isContentTypeExist = true;
-                        // 支持不设置 Content-Type
-                        if (v) {
-                            xhr.setRequestHeader(k, v);
-                        }
-                    }
-                    else {
-                        if (lowerCaseKey === 'cache-control') {
-                            isCacheControlExist = true;
-                        }
-                        else {
-                            if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
-                                if (lowerCaseKey === 'x-correlation-id') {
-                                    isXCorrelationIDExist = true;
-                                    _opts.xCorrelationID = v;
+                var xhr = new XMLHttpRequest();
+                var chunked = [];
+                var ajaxThis = _this;
+                xhr.onreadystatechange = function () {
+                    var _a;
+                    var _this = this;
+                    if (options.onData) {
+                        if (this.readyState === 3 || this.readyState === 4) {
+                            // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
+                            if (this.response) {
+                                var chunks = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
+                                if (chunks) {
+                                    chunks = chunks.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
+                                    // 取出新增的数据
+                                    var data = chunks.slice(chunked.length);
+                                    data.forEach(function (item) {
+                                        try {
+                                            options.onData(JSON.parse(item));
+                                        }
+                                        catch (e) {
+                                            options.onData(item);
+                                        }
+                                    });
+                                    chunked = chunks;
                                 }
-                                if (!v) {
-                                    continue;
+                                else {
+                                    var consoleMethod = this.readyState === 4 ? 'error' : 'warn';
+                                    // eslint-disable-next-line no-console
+                                    if (console && console[consoleMethod]) {
+                                        // eslint-disable-next-line no-console
+                                        console[consoleMethod]("".concat(method, " ").concat(url, " Incorrect response"));
+                                    }
                                 }
                             }
                         }
-                        xhr.setRequestHeader(k, v);
                     }
-                }
-            }
-            if (!options.simple) {
-                if (!isXCorrelationIDExist) {
-                    if (
-                    // 重发的请求和前面的请求使用同样的 xCorrelationID，不需要生成新的 id
-                    !_opts.xCorrelationID) {
-                        _opts.xCorrelationID = (0, uuid_1.v4)();
-                    }
-                    xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
-                }
-                if (!isContentTypeExist && !(0, form_1.isFormData)(params) && (!options || options.encrypt !== 'all')) {
-                    xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
-                }
-                if (!isCacheControlExist && browser_which_1.default.ie) {
-                    xhr.setRequestHeader('Cache-Control', 'no-cache');
-                    xhr.setRequestHeader('Pragma', 'no-cache');
-                }
-            }
-            if (options.onProgress) {
-                xhr.upload.onprogress = options.onProgress;
-            }
-            if (typeof options.timeout === 'number') {
-                xhr.timeout = options.timeout;
-            }
-            // prettier-ignore
-            xhr.send(requestBody);
-            if (cancelExecutor) {
-                cancelExecutor(function () {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (this.readyState !== 4)
                         return;
+                    if (options && options.cancelToken) {
+                        // 请求完成，删除缓存的 cancel
+                        ajaxThis.removeCacheCancel(options.cancelToken);
                     }
-                    reject(createError('Request aborted', Ajax.CODE.CANCEL, xhr));
-                    // @ts-ignore
-                    xhr.aborted = true;
-                    xhr.abort();
-                });
-            }
+                    if (this.status === 200 || this.status === 201) {
+                        var res = void 0;
+                        var statusField = ajaxThis._config.statusField;
+                        if ((xhr.responseType && xhr.responseType !== 'json') || options.json === false) {
+                            res = (_a = {},
+                                _a[statusField] = true,
+                                _a.data = this.response || this.responseText,
+                                _a);
+                        }
+                        else {
+                            // IE9 下 responseType 为 json 时，response 的值为 undefined，返回值需去 responseText 取
+                            // 其它浏览器 responseType 为 json 时，取 response
+                            if (xhr.responseType === 'json' && typeof this.response !== 'undefined') {
+                                res = this.response;
+                            }
+                            else {
+                                res = JSON.parse(this.response || this.responseText || '{}');
+                            }
+                        }
+                        res = ajaxThis.processResponse(res, {
+                            xhr: xhr,
+                            method: method,
+                            url: url,
+                            params: _opts.params,
+                            options: options,
+                            resolve: resolve,
+                            reject: reject,
+                            xCorrelationID: _opts.xCorrelationID,
+                        });
+                        res = (0, transform_response_1.transformResponse)({ response: res, options: options, xhr: xhr, statusField: statusField });
+                        if (options.cache) {
+                            ajaxThis._cache[url] = res;
+                        }
+                        ajaxThis.responseEnd(xhr, _opts, { success: true });
+                        ajaxThis.onSuccess(xhr, {
+                            response: res,
+                            method: _opts.method,
+                            url: _opts.url,
+                            params: _opts.params,
+                            options: options,
+                            resolve: resolve,
+                            reject: reject,
+                            xCorrelationID: _opts.xCorrelationID,
+                        });
+                    }
+                    else if (this.status === 204) {
+                        ajaxThis.processResponse(null, {
+                            xhr: xhr,
+                            method: method,
+                            url: url,
+                            params: _opts.params,
+                            options: options,
+                            resolve: resolve,
+                            reject: reject,
+                            xCorrelationID: _opts.xCorrelationID,
+                        });
+                        ajaxThis.responseEnd(xhr, _opts, { success: true });
+                        resolve(null);
+                    }
+                    else {
+                        ajaxThis.responseEnd(xhr, _opts, { success: false });
+                        // @ts-ignore
+                        if (this.aborted) {
+                            return;
+                        }
+                        var errorResponse = ajaxThis.processErrorResponse(this, _opts);
+                        (0, promise_1.promisify)(errorResponse).then(function () {
+                            ajaxThis.onError(_this, _opts);
+                        });
+                    }
+                };
+                xhr.open(method, (0, url_1.addPrefixToUrl)(url, ajaxThis.prefix, options.prefix));
+                // xhr.responseType = 'json';
+                if (options.responseType) {
+                    xhr.responseType = options.responseType;
+                }
+                if ((!options.headers || typeof options.headers.token === 'undefined') && !options.simple) {
+                    var token = '';
+                    try {
+                        token = window.localStorage.getItem('token') || '';
+                    }
+                    catch (e) {
+                        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                        console && console.error('Failed to get token from localStorage');
+                    }
+                    if (token) {
+                        xhr.setRequestHeader('token', token);
+                    }
+                }
+                var isContentTypeExist = false;
+                var isCacheControlExist = false;
+                var isXCorrelationIDExist = false;
+                if (options.headers) {
+                    for (var _i = 0, _a = Object.keys(options.headers); _i < _a.length; _i++) {
+                        var k = _a[_i];
+                        var v = options.headers[k];
+                        var lowerCaseKey = k.toLowerCase();
+                        if (lowerCaseKey === 'content-type') {
+                            isContentTypeExist = true;
+                            // 支持不设置 Content-Type
+                            if (v) {
+                                xhr.setRequestHeader(k, v);
+                            }
+                        }
+                        else {
+                            if (lowerCaseKey === 'cache-control') {
+                                isCacheControlExist = true;
+                            }
+                            else {
+                                if (lowerCaseKey === 'x-correlation-id' || k === 'token') {
+                                    if (lowerCaseKey === 'x-correlation-id') {
+                                        isXCorrelationIDExist = true;
+                                        _opts.xCorrelationID = v;
+                                    }
+                                    if (!v) {
+                                        continue;
+                                    }
+                                }
+                            }
+                            xhr.setRequestHeader(k, v);
+                        }
+                    }
+                }
+                if (!options.simple) {
+                    if (!isXCorrelationIDExist) {
+                        if (
+                        // 重发的请求和前面的请求使用同样的 xCorrelationID，不需要生成新的 id
+                        !_opts.xCorrelationID) {
+                            _opts.xCorrelationID = (0, uuid_1.v4)();
+                        }
+                        xhr.setRequestHeader('X-Correlation-ID', _opts.xCorrelationID);
+                    }
+                    if (!isContentTypeExist && !(0, form_1.isFormData)(params) && (!options || options.encrypt !== 'all')) {
+                        xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
+                    }
+                    if (!isCacheControlExist && browser_which_1.default.ie) {
+                        xhr.setRequestHeader('Cache-Control', 'no-cache');
+                        xhr.setRequestHeader('Pragma', 'no-cache');
+                    }
+                }
+                if (options.onProgress) {
+                    xhr.upload.onprogress = options.onProgress;
+                }
+                if (typeof options.timeout === 'number') {
+                    xhr.timeout = options.timeout;
+                }
+                // prettier-ignore
+                xhr.send(requestBody);
+                if (cancelExecutor) {
+                    cancelExecutor(function () {
+                        if (xhr.readyState === XMLHttpRequest.DONE) {
+                            return;
+                        }
+                        reject(createError('Request aborted', Ajax.CODE.CANCEL, xhr));
+                        // @ts-ignore
+                        xhr.aborted = true;
+                        xhr.abort();
+                    });
+                }
+            });
         })
             .catch(function (e) {
             _this.responseEnd(undefined, _opts, { success: false });
