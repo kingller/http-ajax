@@ -7,8 +7,12 @@
 
 
 # Next
+
+
+# 7.0.0
+> 2023.09.21  
 1. <font color=orange>修改</font> `processParamsAfter` 支持异步函数，修改至 `stringifyParams` 后执行
-2. <font color=green>新增</font> 文件签名，并添加至请求头 `file-sum`
+2. <font color=green>新增</font> 对文件进行签名，并添加至请求头 `file-sum`
 3. <font color=green>新增</font> `options` 增加参数 `isSignFile` 用来设置是否要对文件进行签名
 
 
