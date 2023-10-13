@@ -53,7 +53,6 @@ function readFile(file) {
         reader.readAsArrayBuffer(file); // Read file as ArrayBuffer
     });
 }
-;
 function signFile(file) {
     return __awaiter(this, void 0, void 0, function () {
         var chunkSize, data;

@@ -125,7 +125,6 @@ function snExtend() {
                                 });
                             }); });
                             isSignFileField = getKey(['aXNT', 'aWdu', 'Rm', 'ls', 'ZQ', '=', '=']);
-                            console.time('signFile');
                             _h.label = 3;
                         case 3:
                             _h.trys.push([3, 14, 15, 20]);
@@ -176,11 +175,8 @@ function snExtend() {
                         case 20:
                             formData.sort();
                             toSnStr = formData.join('&');
-                            console.log('toSnStr', toSnStr);
                             fileSum = (0, sha256_1.default)(toSnStr);
-                            console.log('fileSum', fileSum);
                             toSnStr = fileSum;
-                            console.timeEnd('signFile');
                             _h.label = 21;
                         case 21:
                             timestamp = new Date().getTime();
