@@ -9,6 +9,11 @@
 # Next
 
 
+# 7.0.1
+> 2023.10.13  
+1. <font color=red>修复</font> 对大文件进行签名时报错，改为将文件读成 `ArrayBuffer`，并只对前 `10M` 文件内容进行签名
+
+
 # 7.0.0
 > 2023.09.21  
 1. <font color=orange>修改</font> `processParamsAfter` 支持异步函数，修改至 `stringifyParams` 后执行

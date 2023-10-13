@@ -52,6 +52,7 @@ var interface_1 = require("./interface");
 var form_1 = require("./utils/form");
 var sha256_1 = __importDefault(require("./utils/sha256"));
 var nonce_1 = __importDefault(require("./utils/nonce"));
+var sign_file_1 = __importDefault(require("./utils/sign-file"));
 require("./polyfill/form-data");
 /**
  * 签名扩展。
@@ -84,23 +85,10 @@ function snExtend() {
         }
         // 添加标志符用来校验该扩展是否已添加
         this._snExtendAdded = true;
-        var readFile = function (file) {
-            return new Promise(function (resolve, reject) {
-                var reader = new FileReader();
-                reader.onload = function () {
-                    resolve(reader.result); // This is the file content as a data URL
-                };
-                reader.onerror = function (ev) {
-                    reject(ev);
-                    return null;
-                };
-                reader.readAsDataURL(file); // Read file as data URL (string)
-            });
-        };
         var signData = function (_a) {
             var params = _a.params, paramsInOptions = _a.paramsInOptions, method = _a.method, options = _a.options, processData = _a.processData;
             return __awaiter(_this, void 0, void 0, function () {
-                var toSnStr, fileSum, _b, requestBody, queryParams, formData, formDataEntries_2, isSignFileField, _c, formDataEntries_1, formDataEntries_1_1, key, value, fileDataURL, e_1_1, timestamp, appNonce, headers;
+                var toSnStr, fileSum, _b, requestBody, queryParams, formData, formDataEntries_2, isSignFileField, _c, formDataEntries_1, formDataEntries_1_1, key, value, fileHash, e_1_1, timestamp, appNonce, headers;
                 var _d;
                 var _this = this;
                 var _e, e_1, _f, _g;
@@ -137,6 +125,7 @@ function snExtend() {
                                 });
                             }); });
                             isSignFileField = getKey(['aXNT', 'aWdu', 'Rm', 'ls', 'ZQ', '=', '=']);
+                            console.time('signFile');
                             _h.label = 3;
                         case 3:
                             _h.trys.push([3, 14, 15, 20]);
@@ -153,10 +142,10 @@ function snExtend() {
                             key = _g[0], value = _g[1];
                             if (!(value instanceof File)) return [3 /*break*/, 9];
                             if (!(!options[isSignFileField] || options[isSignFileField](value))) return [3 /*break*/, 8];
-                            return [4 /*yield*/, readFile(value)];
+                            return [4 /*yield*/, (0, sign_file_1.default)(value)];
                         case 7:
-                            fileDataURL = _h.sent();
-                            formData.push("".concat(key, "=").concat(fileDataURL));
+                            fileHash = _h.sent();
+                            formData.push("".concat(key, "=").concat(fileHash, ",").concat(value.size));
                             _h.label = 8;
                         case 8: return [3 /*break*/, 10];
                         case 9:
@@ -187,8 +176,11 @@ function snExtend() {
                         case 20:
                             formData.sort();
                             toSnStr = formData.join('&');
+                            console.log('toSnStr', toSnStr);
                             fileSum = (0, sha256_1.default)(toSnStr);
+                            console.log('fileSum', fileSum);
                             toSnStr = fileSum;
+                            console.timeEnd('signFile');
                             _h.label = 21;
                         case 21:
                             timestamp = new Date().getTime();

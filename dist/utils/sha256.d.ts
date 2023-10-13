@@ -1,1 +1,1 @@
-export default function SHA256(message: string): string;
+export default function SHA256(message: string | ArrayBuffer): string;

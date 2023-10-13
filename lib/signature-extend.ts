@@ -5,6 +5,7 @@ import type { IAjax, IProcessParamsAfterOptions, IParams, IMethod, IOptions } fr
 import { isFormData } from './utils/form';
 import SHA256 from './utils/sha256';
 import getNonce from './utils/nonce';
+import signFile from './utils/sign-file';
 import './polyfill/form-data';
 
 /**
@@ -41,23 +42,6 @@ function snExtend(): () => void {
 
         // 添加标志符用来校验该扩展是否已添加
         this._snExtendAdded = true;
-
-        const readFile = (file: File) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-
-                reader.onload = function () {
-                    resolve(reader.result); // This is the file content as a data URL
-                };
-
-                reader.onerror = function (this: FileReader, ev: ProgressEvent<FileReader>) {
-                    reject(ev);
-                    return null;
-                };
-
-                reader.readAsDataURL(file); // Read file as data URL (string)
-            });
-        };
 
         const signData = async ({
             params,
@@ -101,8 +85,8 @@ function snExtend(): () => void {
                         for await (const [key, value] of formDataEntries) {
                             if (value instanceof File) {
                                 if (!options[isSignFileField] || options[isSignFileField](value)) {
-                                    const fileDataURL = await readFile(value);
-                                    formData.push(`${key}=${fileDataURL}`);
+                                    const fileHash = await signFile(value);
+                                    formData.push(`${key}=${fileHash},${value.size}`);
                                 }
                             } else {
                                 formData.push(`${key}=${value}`);
