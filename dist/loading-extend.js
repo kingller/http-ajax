@@ -13,9 +13,12 @@ function loadingExtend(argsOptions) {
         var _a = this, beforeSend = _a.beforeSend, responseEnd = _a.responseEnd;
         var ajaxThis = this;
         function getLoading(options) {
+            if (options.context && options.context.loading) {
+                return options.context.loading;
+            }
             var loadingName = options.loadingName;
             if (_getLoading) {
-                var customLoading = _getLoading({ loadingName: loadingName });
+                var customLoading = _getLoading({ loadingName: loadingName || ajaxThis.$loading });
                 if (customLoading) {
                     return customLoading;
                 }
@@ -25,9 +28,6 @@ function loadingExtend(argsOptions) {
                     var loading = window[loadingName];
                     return loading;
                 }
-            }
-            if (options.context && options.context.loading) {
-                return options.context.loading;
             }
             // @ts-ignore
             return window[ajaxThis.$loading];

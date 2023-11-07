@@ -9,6 +9,11 @@
 # Next
 
 
+# 7.1.0
+> 2023.11.07  
+1. <font color=orange>修改</font> 请求不传 `loadingName` 时 `loadingExtend` 的 `getLoading` 使用全局 `$loading` 作为参数
+
+
 # 7.0.1
 > 2023.10.13  
 1. <font color=red>修复</font> 对大文件进行签名时报错，改为将文件读成 `ArrayBuffer`，并只对前 `10M` 文件内容进行签名

@@ -18,9 +18,12 @@ function loadingExtend(argsOptions?: {
         const { beforeSend, responseEnd } = this as IAjax;
         const ajaxThis = this;
         function getLoading(options: IOptions): ILoading | void {
+            if (options.context && options.context.loading) {
+                return options.context.loading;
+            }
             const { loadingName } = options;
             if (_getLoading) {
-                const customLoading = _getLoading({ loadingName });
+                const customLoading = _getLoading({ loadingName: loadingName || ajaxThis.$loading });
                 if (customLoading) {
                     return customLoading;
                 }
@@ -30,9 +33,6 @@ function loadingExtend(argsOptions?: {
                     const loading = (window as object)[loadingName] as ILoading;
                     return loading;
                 }
-            }
-            if (options.context && options.context.loading) {
-                return options.context.loading;
             }
             // @ts-ignore
             return window[ajaxThis.$loading];
