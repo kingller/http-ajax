@@ -9,6 +9,11 @@
 # Next
 
 
+# 8.0.0
+> 2024.01.05  
+1. <font color=orange>修改</font> `ajax.config` 配置 `beforeSend`、`processData`、`responseEnd` 不再覆盖原方法，传入后仍会执行原方法
+
+
 # 7.2.0
 > 2024.01.05  
 1. <font color=green>新增</font> `processError` 自定义错误处理，返回 false 则不再往下执行

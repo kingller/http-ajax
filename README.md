@@ -38,8 +38,6 @@ import cryptoExtend from 'http-ajax/dist/crypto-extend';
 import signatureExtend from 'http-ajax/dist/signature-extend';
 import _ from 'lodash';
 
-const { beforeSend, processData } = ajax;
-
 ajax.config({
     /**
      * url前缀
@@ -144,7 +142,6 @@ ajax.config({
                 dataFrom: 0,
             },
         });
-        return beforeSend(props);
     },
     /**
      * 数据处理
@@ -152,7 +149,7 @@ ajax.config({
     processData: (params: Ajax.IParams, props: { method: Ajax.IMethod; url: string; options: Ajax.IOptions }): Ajax.IParams => {
         // 自定义处理 params，比如 trim
         // ...
-        return processData(params, props);
+        return params;
     },
     /** 捕获错误 */
     catchError: (props: Ajax.ICatchErrorOptions): void => {

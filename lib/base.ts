@@ -991,7 +991,30 @@ class AjaxBase {
                         }
                     } else {
                         if (typeof value === 'function') {
-                            this[key as keyof Ajax.IConfigOptions] = value;
+                            if (key === 'beforeSend') {
+                                const { beforeSend } = this;
+                                this[key as 'beforeSend'] = function (
+                                    props: Ajax.IAjaxArgsOptions
+                                ): Ajax.IRequestResult | void {
+                                    return promisify((value as Ajax.IAjax['beforeSend'])(props)).then(function () {
+                                        return beforeSend(props);
+                                    });
+                                };
+                            } else if (key === 'processData') {
+                                const { processData } = this;
+                                this[key as 'processData'] = function (params, props): Ajax.IParams {
+                                    const processedParams = (value as Ajax.IAjax['processData'])(params, props);
+                                    return processData(processedParams, props);
+                                };
+                            } else if (key === 'responseEnd') {
+                                const { responseEnd } = this;
+                                this[key as 'responseEnd'] = function (xhr, _opts, props) {
+                                    (value as Ajax.IAjax['responseEnd'])(xhr, _opts, props);
+                                    responseEnd(xhr, _opts, props);
+                                };
+                            } else {
+                                this[key as keyof Ajax.IConfigOptions] = value;
+                            }
                         }
                     }
                 } else {

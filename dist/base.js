@@ -227,9 +227,9 @@ var AjaxBase = /** @class */ (function () {
             if (typeof options.noCache !== 'undefined') {
                 console.warn('http-ajax: `noCache` will be deprecated');
             }
-            for (var key in options) {
+            var _loop_1 = function (key) {
                 if (Object.prototype.hasOwnProperty.call(options, key)) {
-                    var value = options[key];
+                    var value_1 = options[key];
                     if (key === 'prefix' ||
                         key === 'onSuccess' ||
                         key === 'onError' ||
@@ -240,20 +240,47 @@ var AjaxBase = /** @class */ (function () {
                         key === 'processError' ||
                         key === 'catchError') {
                         if (key === 'prefix') {
-                            if (typeof value === 'string') {
-                                _this.prefix = value;
+                            if (typeof value_1 === 'string') {
+                                _this.prefix = value_1;
                             }
                         }
                         else {
-                            if (typeof value === 'function') {
-                                _this[key] = value;
+                            if (typeof value_1 === 'function') {
+                                if (key === 'beforeSend') {
+                                    var beforeSend_1 = _this.beforeSend;
+                                    _this[key] = function (props) {
+                                        return (0, promise_1.promisify)(value_1(props)).then(function () {
+                                            return beforeSend_1(props);
+                                        });
+                                    };
+                                }
+                                else if (key === 'processData') {
+                                    var processData_1 = _this.processData;
+                                    _this[key] = function (params, props) {
+                                        var processedParams = value_1(params, props);
+                                        return processData_1(processedParams, props);
+                                    };
+                                }
+                                else if (key === 'responseEnd') {
+                                    var responseEnd_1 = _this.responseEnd;
+                                    _this[key] = function (xhr, _opts, props) {
+                                        value_1(xhr, _opts, props);
+                                        responseEnd_1(xhr, _opts, props);
+                                    };
+                                }
+                                else {
+                                    _this[key] = value_1;
+                                }
                             }
                         }
                     }
                     else {
-                        _this._config[key] = value;
+                        _this._config[key] = value_1;
                     }
                 }
+            };
+            for (var key in options) {
+                _loop_1(key);
             }
         };
     }
