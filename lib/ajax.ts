@@ -53,6 +53,9 @@ export class HttpAjax extends AjaxBase {
         }
     }
 
+    /** 自定义错误处理（返回 false 则不再往下执行） */
+    public processError(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | boolean {}
+
     /** 添加默认AJAX错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public onError<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void {
@@ -71,6 +74,10 @@ export class HttpAjax extends AjaxBase {
             xCorrelationID: _opts.xCorrelationID,
             xhr,
         });
+        if (this.processError(xhr, _opts) === false) {
+            _opts.reject(xhr);
+            return;
+        }
         if (xhr.status === 401 || xhr.status === 406) {
             this.onSessionExpired<T>(error, _opts);
         } else {
@@ -95,6 +102,7 @@ export class HttpAjax extends AjaxBase {
             'processParams',
             'processParamsAfter',
             'processResponse',
+            'processError',
             'processErrorResponse',
             'responseEnd',
             'onSuccess',

@@ -237,6 +237,7 @@ var AjaxBase = /** @class */ (function () {
                         key === 'beforeSend' ||
                         key === 'processData' ||
                         key === 'responseEnd' ||
+                        key === 'processError' ||
                         key === 'catchError') {
                         if (key === 'prefix') {
                             if (typeof value === 'string') {

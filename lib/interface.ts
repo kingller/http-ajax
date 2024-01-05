@@ -382,12 +382,17 @@ export interface IAjax {
     ) => void;
     /** 请求结束 */
     responseEnd?: (xhr?: XMLHttpRequest, _opts?: IRequestOptions, props?: { success: boolean }) => void;
-    /** 添加默认 AJAX 错误处理程序（请勿使用，内部扩展插件使用，外部请使用 onError） */
+    /**
+     * 添加默认 AJAX 错误处理程序（请勿使用，内部扩展插件使用，外部请使用 onError）
+     * @private
+     */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     processErrorResponse: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void | Promise<void>;
     /** 添加默认 AJAX 错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onError: <T = any>(xhr: XMLHttpRequest, _opts: IRequestOptions) => void;
+    /** 自定义错误处理（返回 false 则不再往下执行） */
+    processError: (xhr: XMLHttpRequest, _opts: IRequestOptions) => void | boolean;
     /** 捕获错误 */
     catchError: (props: {
         /** 错误消息 */

@@ -9,6 +9,11 @@
 # Next
 
 
+# 7.2.0
+> 2024.01.05  
+1. <font color=green>新增</font> `processError` 自定义错误处理，返回 false 则不再往下执行
+
+
 # 7.1.0
 > 2023.11.07  
 1. <font color=orange>修改</font> 请求不传 `loadingName` 时 `loadingExtend` 的 `getLoading` 使用全局 `$loading` 作为参数

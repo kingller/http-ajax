@@ -41,6 +41,7 @@ var HttpAjax = /** @class */ (function (_super) {
                 'processParams',
                 'processParamsAfter',
                 'processResponse',
+                'processError',
                 'processErrorResponse',
                 'responseEnd',
                 'onSuccess',
@@ -95,6 +96,8 @@ var HttpAjax = /** @class */ (function (_super) {
             resolve((0, response_data_1.getResponseData)({ response: response, statusField: statusField }));
         }
     };
+    /** 自定义错误处理（返回 false 则不再往下执行） */
+    HttpAjax.prototype.processError = function (xhr, _opts) { };
     /** 添加默认AJAX错误处理程序 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     HttpAjax.prototype.onError = function (xhr, _opts) {
@@ -113,6 +116,10 @@ var HttpAjax = /** @class */ (function (_super) {
             xCorrelationID: _opts.xCorrelationID,
             xhr: xhr,
         });
+        if (this.processError(xhr, _opts) === false) {
+            _opts.reject(xhr);
+            return;
+        }
         if (xhr.status === 401 || xhr.status === 406) {
             this.onSessionExpired(error, _opts);
         }

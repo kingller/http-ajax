@@ -962,6 +962,8 @@ class AjaxBase {
             ) => Ajax.IParams;
             /** 请求结束 */
             responseEnd?: (xhr?: XMLHttpRequest, _opts?: Ajax.IRequestOptions, props?: { success: boolean }) => void;
+            /** 自定义错误处理（返回 false 则不再往下执行。重写了 onError 的话不再使用） */
+            processError?: (xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions) => void | boolean;
             /** 捕获错误 */
             catchError?: (props: Ajax.ICatchErrorOptions) => void;
         } = {}
@@ -980,6 +982,7 @@ class AjaxBase {
                     key === 'beforeSend' ||
                     key === 'processData' ||
                     key === 'responseEnd' ||
+                    key === 'processError' ||
                     key === 'catchError'
                 ) {
                     if (key === 'prefix') {

@@ -15,6 +15,8 @@ export declare class HttpAjax extends AjaxBase {
         /** 链路追踪ID */
         xCorrelationID?: string;
     }): void;
+    /** 自定义错误处理（返回 false 则不再往下执行） */
+    processError(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void | boolean;
     /** 添加默认AJAX错误处理程序 */
     onError<T = any>(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions): void;
     HttpAjax: typeof HttpAjax;
