@@ -8,6 +8,10 @@
 
 # Next
 
+# 8.1.0
+> 2024.08.15  
+1. <font color=green>新增</font> `clearCacheByUrl` 用来清除指定 `url` 的缓存
+
 
 # 8.0.0
 > 2024.01.05  
