@@ -762,6 +762,17 @@ var AjaxBase = /** @class */ (function () {
         var key = this.getCacheKey(url, params, options);
         delete this._cache[key];
     };
+    AjaxBase.prototype.clearCacheByUrl = function (url) {
+        var keys = Object.keys(this._cache);
+        // 匹配 url 或者以 url? 开头的key
+        var urlPattern = new RegExp("^".concat(url, "(\\?|$)"));
+        for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
+            var key = keys_1[_i];
+            if (urlPattern.test(key)) {
+                delete this._cache[key];
+            }
+        }
+    };
     AjaxBase.prototype.clearCache = function () {
         this._cache = {};
     };
