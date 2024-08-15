@@ -877,6 +877,18 @@ class AjaxBase {
         delete this._cache[key];
     }
 
+    public clearCacheByUrl(url: string): void {
+        const keys = Object.keys(this._cache);
+        // 匹配 url 或者以 url? 开头的key
+        const urlPattern = new RegExp(`^${url}(\\?|$)`);
+
+        for (const key of keys) {
+            if (urlPattern.test(key)) {
+                delete this._cache[key];
+            }
+        }
+    }
+
     public clearCache(): void {
         this._cache = {};
     }

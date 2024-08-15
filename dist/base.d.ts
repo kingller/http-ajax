@@ -131,6 +131,7 @@ declare class AjaxBase {
         [name: string]: any;
     };
     removeCache(url: string, params: Ajax.IParams | undefined, options?: Ajax.IOptions): void;
+    clearCacheByUrl(url: string): void;
     clearCache(): void;
     clear(): void;
     /** 生成 cancel token */
