@@ -79,7 +79,7 @@ function cryptoExtend() {
                 // 生成 AES 秘钥
                 var newSecretKey = client_crypto_1.default.AES.createKey();
                 // 使用 RSA 公钥加密秘钥
-                var encryptedSecretKey = client_crypto_1.default.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
+                var encryptedSecretKey = client_crypto_1.default.RSA.encryptOAEP(newSecretKey, publicKeyResponse.publicKey);
                 // 将加密后的秘钥传输给服务器端
                 secretKeyPromise = new Promise(function (resolve, reject) {
                     _this

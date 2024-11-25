@@ -8,6 +8,12 @@
 
 # Next
 
+
+# 9.0.0
+> 2024.11.25  
+1. <font color=orange>修改</font> 加解密扩展中用来传输 `AES` 密钥的 `RSA` 加密从 `pkcs1` 填充模式改为 `OAEP` 填充模式结合 `SHA256` 哈希算法，因为 `nodejs` 从 `18.20` 开始不再支持 `pkcs1` 填充模式。
+
+
 # 8.1.0
 > 2024.08.15  
 1. <font color=green>新增</font> `clearCacheByUrl` 用来清除指定 `url` 的缓存

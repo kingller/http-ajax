@@ -1,6 +1,6 @@
 {
     "name": "http-ajax",
-    "version": "8.1.0",
+    "version": "9.0.0",
     "description": "Promise based HTTP client for the browser",
     "keywords": [
         "ajax",
@@ -52,7 +52,7 @@
     },
     "dependencies": {
         "browser-which": "^1.1.0",
-        "client-crypto": "~1.4.0",
+        "client-crypto": "~1.5.0",
         "lodash": "^4.17.21",
         "uuid": "^8.3.2"
     },
@@ -60,7 +60,7 @@
         "@babel/polyfill": "^7.8.7",
         "@types/lodash": "^4.14.157",
         "@types/uuid": "^8.3.4",
-        "eslint-config-pandora-typescript": "^2.5.1",
+        "eslint-config-pandora-typescript": "^2.5.3",
         "husky": "^4.2.5",
         "lint-staged": "^10.2.11",
         "prettier": "^3.0.3",

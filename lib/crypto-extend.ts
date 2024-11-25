@@ -97,7 +97,7 @@ function cryptoExtend(): () => void {
                 // 生成 AES 秘钥
                 const newSecretKey = Crypto.AES.createKey();
                 // 使用 RSA 公钥加密秘钥
-                const encryptedSecretKey = Crypto.RSA.encrypt(newSecretKey, publicKeyResponse.publicKey);
+                const encryptedSecretKey = Crypto.RSA.encryptOAEP(newSecretKey, publicKeyResponse.publicKey);
                 // 将加密后的秘钥传输给服务器端
                 secretKeyPromise = new Promise((resolve, reject) => {
                     (this as IAjax)
