@@ -6,11 +6,11 @@ import sourceCode from '!raw-loader!./code';
 
 export default class Box extends React.PureComponent<IBoxProps> {
     componentDidMount() {
-        Array.from(document.querySelector('.ajax-loading').querySelectorAll<HTMLElement>('pre code')).map(function (
-            block
-        ) {
-            highlight.highlightBlock(block);
-        });
+        Array.from(document.querySelector('.ajax-loading').querySelectorAll<HTMLElement>('pre code')).map(
+            function (block) {
+                highlight.highlightBlock(block);
+            }
+        );
     }
 
     render(): React.ReactNode {
@@ -24,10 +24,12 @@ export default class Box extends React.PureComponent<IBoxProps> {
                         <li>启用loading</li>
                         <li>需先添加 loading 扩展</li>
                         <li>
-                            <code>import loadingExtend from 'http-ajax/dist/loading-extend';</code>
-                        </li>
-                        <li>
-                            <code>ajax.extend(loadingExtend());</code>
+                            <pre>
+                                <code>
+                                    {`import loadingExtend from 'http-ajax/dist/loading-extend';
+ajax.extend(loadingExtend());`}
+                                </code>
+                            </pre>
                         </li>
                         <li>需要自定义显示/隐藏 loading 时， loadingExtend 传入控制函数即可</li>
                         <li>

@@ -1,27 +1,34 @@
 import { get, post } from 'koa-router-decors';
-import * as RSA from 'node-rsa';
+import * as crypto from 'crypto';
 import * as _ from 'lodash';
 import utils from '../../utils/index';
 
-// ------ 固定 key start ------//
-// const PUBLIC_KEY = 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCkjn1xHFOG8cGK47N8ZKvWn5pKFDUQ09pptq9Ja3zgzzWOtmJcSdNdJsCTiHyVSXDah1Y3A3xUzIKU03q5dg9UXq794VvJc4RpaSBD5gYmuCWBVtxjAf+mepfOlcy6kxiuxR8A6P7rwsoiXjpJgxN9y3IGfS1aNuCoNvRa2MLOAQIDAQAB';
-// const PRIVATE_KEY = 'MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAKSOfXEcU4bxwYrjs3xkq9afmkoUNRDT2mm2r0lrfODPNY62YlxJ010mwJOIfJVJcNqHVjcDfFTMgpTTerl2D1Rerv3hW8lzhGlpIEPmBia4JYFW3GMB/6Z6l86VzLqTGK7FHwDo/uvCyiJeOkmDE33LcgZ9LVo24Kg29FrYws4BAgMBAAECgYEAiwDSdfm3lQYit3Ag7bMcdO/dJTZsnQpYNXRcHWju0/g1BZiK/epe4REbG4TvuCuRaQdpjI8lN3yJ0a3SvVc9Gmk2WlL98Xc48qi6mffi3UxyLhXcOBDSeB9Xh29ZkdMi5cAysX5YaesVTJhfxI7IH/eJo35q5JHI7IOh99iPtQECQQDueRCODvI7O+uGSgXpZ57cWhF6xyXTxpTPZyaTtXvwLBVFuXTHeEU8FAtG8az0DunxQfx9stuv5H5M5kjQ/wprAkEAsKarSNRd7c16LczCVzIdGLCHy3Y/VwQNS4ZNteDIo90+Lnz+cDQwbKvFMk5ll4q5cKK+fhSGPMlEffcBxzY8QwJBAJU0EfOPzmbZOqcusTwzpOVhRQZ4i2ZRHNIXS7+nEQBX1IdnXXVf/pF0SQn+M6QPoLdd/cf3nBQU9iDPBEgfCjkCQBoWIsk4gz5wz5Af4rsZrW5N81+6cJQbBxOWG7e2ICsCqwIWd0R+kIAbxZ0uMpZ0Z/oYLmVUBpbHahPn/B09Bx0CQEft9YNnS8EfDL8gFVhiQ8ahFPEI4Ify1N6vSZf1bCVf+0dQp5Fwbo9MP1vbFtN6gBsimhvMaJUBT4fD+Q18u50=';
-
-// const rsaKey = new RSA('-----BEGIN PRIVATE KEY-----' +
-//     PRIVATE_KEY +
-//     '-----END PRIVATE KEY-----');
-// rsaKey.setOptions({
-//     encryptionScheme: 'pkcs1'
-// });
-// ------ 固定 key end ------//
-
 // ------ 生成 key start ------//
-const rsaKey = new RSA({ b: 512 });
-rsaKey.setOptions({
-    encryptionScheme: 'pkcs1',
-});
-const PUBLIC_KEY = Buffer.from(rsaKey.exportKey('pkcs8-public-der')).toString('base64');
+function getKeyPair() {
+    return crypto.generateKeyPairSync('rsa', {
+        modulusLength: 3072, // 模数的位数，即密钥的位数，2048 或以上一般是安全的
+        publicExponent: 0x10001, // 指数值，必须为奇数，默认值为 0x10001，即 65537
+        publicKeyEncoding: {
+            type: 'spki',
+            format: 'pem',
+        },
+        privateKeyEncoding: {
+            type: 'pkcs8', // 用于存储私钥信息的标准语法标准
+            format: 'pem', // base64 编码的 DER 证书格式
+        },
+    });
+}
+const { publicKey: PUBLIC_KEY, privateKey: PRIVATE_KEY } = getKeyPair();
 // ------ 生成 key end ------//
+
+function privateDecrypt(privateKey: string, encryptBuffer: NodeJS.ArrayBufferView) {
+    const msgBuffer = crypto.privateDecrypt(
+        { key: privateKey, padding: crypto.constants.RSA_PKCS1_OAEP_PADDING, oaepHash: 'sha256' },
+        encryptBuffer
+    );
+
+    return String.fromCharCode.apply(null, msgBuffer);
+}
 
 function checkSecretKey(ctx: any): boolean {
     if (!ctx.request.header.uuid || !ctx.session.secretKey) {
@@ -55,7 +62,8 @@ export default class Encryption {
         // 生产环境中请使用 redis 集群，key 为请求 header 中的 uuid。
         // 所有项目请共用该 redis
         const token = ctx.request.body.token;
-        const secretKey = rsaKey.decrypt(token, 'utf8');
+        const arrayBufferToken = Buffer.from(token, 'base64');
+        const secretKey = privateDecrypt(PRIVATE_KEY, arrayBufferToken);
         ctx.session.secretKey = secretKey;
 
         ctx.body = {

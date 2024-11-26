@@ -42,7 +42,7 @@ export default class Load {
 
     @post('/bigpipe/ajax')
     public async bigPipeByAjax(ctx) {
-        ctx.res.writeHead(200, { 'Content-Type': 'text/html' });
+        ctx.res.writeHead(200, { 'Content-Type': 'text/html', 'Transfer-Encoding': 'chunked' });
         for (let i = 0; i < 10; i++) {
             await sleep(1000);
             const chunk = `<chunk>${i}</chunk>`;

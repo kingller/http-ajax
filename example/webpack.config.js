@@ -1,14 +1,15 @@
 const path = require('path');
 
 const webpack = require('webpack');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const LessPluginAutoPrefix = require('less-plugin-autoprefix');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const args = require('node-args');
+const DevServer = require('webpack-dev-server');
 
 const isAnalyzer = args.analyzer;
 
@@ -21,150 +22,158 @@ const port = 9700;
 
 const alias = require('./webpack.alias.js');
 
-let config = {
-    mode,
-    entry: {},
-    stats: isAnalyzer? 'normal': 'errors-warnings',
-    output: {
-        path: TARGET,
-        filename: '[name].[hash:8].js',
-    },
-    resolve: {
-        alias,
-        extensions: ['.js', '.jsx', '.ts', '.tsx']
-    },
-    module: {
-        rules: [
-            {
-                test: /\.tsx?$/,
-                use: {
-                    loader: 'babel-loader',
+module.exports = function (env, args = {}) {
+    let config = {
+        mode,
+        entry: {},
+        stats: isAnalyzer ? 'normal' : 'errors-warnings',
+        output: {
+            path: TARGET,
+            filename: '[name].[contenthash:8].js',
+            clean: true,
+        },
+        resolve: {
+            alias,
+            extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.tsx?$/,
+                    use: {
+                        loader: 'babel-loader',
+                    },
+                    exclude: /\/node_modules\//,
                 },
-                exclude: /\/node_modules\//
+                {
+                    test: /\.less$/,
+                    use: [
+                        MiniCssExtractPlugin.loader,
+                        'css-loader',
+                        {
+                            loader: 'less-loader',
+                            options: {
+                                sourceMap: false,
+                                lessOptions: {
+                                    math: 'strict',
+                                    plugins: [
+                                        new LessPluginAutoPrefix({
+                                            browsers: ['ie >= 11', 'last 2 versions'],
+                                        }),
+                                    ],
+                                },
+                            },
+                        },
+                    ],
+                },
+                {
+                    test: /\.css$/,
+                    use: [MiniCssExtractPlugin.loader, 'css-loader'],
+                },
+                {
+                    test: /\.(svg?)(\?[a-z0-9]+)?$/,
+                    type: 'asset/inline',
+                },
+                {
+                    test: /\.woff$/,
+                    type: 'asset/inline',
+                },
+            ],
+        },
+        optimization: {
+            runtimeChunk: {
+                name: 'manifest',
             },
-            {
-                test: /\.less$/,
-                use: [
-                    MiniCssExtractPlugin.loader,
-                    'css-loader',
-                    {
-                        loader: 'less-loader',
-                        options: {
-                            math: 'strict',
-                            plugins: [
-                                new LessPluginAutoPrefix({
-                                    browsers: ['ie >= 10', 'last 1 version'],
-                                }),
-                            ],
-                        }
-                    }
-                ]
+            splitChunks: {
+                chunks: 'async',
+                minSize: 30000,
+                minChunks: 1,
+                maxAsyncRequests: 5,
+                maxInitialRequests: 3,
+                name: false,
+                cacheGroups: {
+                    vendor: {
+                        name: 'vendor',
+                        chunks: 'initial',
+                        priority: -10,
+                        reuseExistingChunk: false,
+                        test: /node_modules\/(.*)\.js[x]?/,
+                    },
+                    styles: {
+                        name: 'styles',
+                        test: /\.(less|css)$/,
+                        minChunks: 1,
+                        reuseExistingChunk: true,
+                        enforce: true,
+                    },
+                },
             },
-            {
-                test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader']
-            },
-            {
-                test: /\.(svg?)(\?[a-z0-9]+)?$/,
-                loader: 'url-loader'
-            },
-            {
-                test: /\.woff$/,
-                loader: 'url-loader'
-            },
+        },
+        plugins: [
+            new MiniCssExtractPlugin({
+                // Options similar to the same options in webpackOptions.output
+                // both options are optional
+                filename: '[name].css',
+                chunkFilename: '[name].[contenthash:8].css', // use contenthash *
+            }),
+            new NodePolyfillPlugin(),
         ],
-    },
-    optimization: {
-        runtimeChunk: {
-            name: 'manifest',
-        },
-        splitChunks: {
-            chunks: 'async',
-            minSize: 30000,
-            minChunks: 1,
-            maxAsyncRequests: 5,
-            maxInitialRequests: 3,
-            name: false,
-            cacheGroups: {
-                vendor: {
-                    name: 'vendor',
-                    chunks: 'initial',
-                    priority: -10,
-                    reuseExistingChunk: false,
-                    test: /node_modules\/(.*)\.js[x]?/,
-                },
-                styles: {
-                    name: 'styles',
-                    test: /\.(less|css)$/,
-                    minChunks: 1,
-                    reuseExistingChunk: true,
-                    enforce: true,
-                },
-            },
-        },
-    },
-    plugins: [
-        new MiniCssExtractPlugin({
-            // Options similar to the same options in webpackOptions.output
-            // both options are optional
-            filename: '[name].css',
-            chunkFilename: '[name].[contenthash:8].css' // use contenthash *
-        })
-    ],
-};
+    };
 
-function addEntries() {
-    let pages = require('./pages.js');
-    pages.forEach(function (page) {
-        config.entry[page.name] = [`${ROOT_PATH}/src/${page.name}.tsx`];
-        let plugin = new HtmlWebpackPlugin({
-            filename: `${page.name}.html`,
-            template: `${ROOT_PATH}/template.ejs`,
-            favicon: 'images/favicon.ico',
-            chunks: ['manifest', 'vendor', page.name],
-            name: page.name,
-            title: page.title,
+    function addEntries() {
+        let pages = require('./pages.js');
+        pages.forEach(function (page) {
+            config.entry[page.name] = [`${ROOT_PATH}/src/${page.name}.tsx`];
+            let plugin = new HtmlWebpackPlugin({
+                filename: `${page.name}.html`,
+                template: `${ROOT_PATH}/template.ejs`,
+                favicon: 'images/favicon.ico',
+                chunks: ['manifest', 'vendor', page.name],
+                name: page.name,
+                title: page.title,
+            });
+            config.plugins.push(plugin);
         });
-        config.plugins.push(plugin);
-    });
-}
-addEntries();
+    }
+    addEntries();
 
-switch (mode) {
-    case 'production':
-        config = merge(config, {
-            optimization: {
+    switch (mode) {
+        case 'production':
+            config = merge(config, {
+                minimize: true,
                 minimizer: [
-                    new UglifyJsPlugin({
-                        cache: true,
-                        parallel: true,
-                        sourceMap: true
+                    new TerserPlugin({
+                        terserOptions: {
+                            format: {
+                                comments: false,
+                            },
+                        },
+                        extractComments: false,
                     }),
-                    new OptimizeCSSAssetsPlugin({}) // use OptimizeCSSAssetsPlugin
-                ]
-            },
-            plugins: [new CleanWebpackPlugin([TARGET])]
-        });
-        break;
+                    new CssMinimizerPlugin(),
+                ],
+            });
+            break;
 
-    case 'development':
-        config = merge(config, {
-            devServer: {
-                host: '0.0.0.0',
-                port: port,
-                open: true,
-                openPage: 'app',
-                hot: true,
-                disableHostCheck: true,
-                useLocalIp: true,
-                proxy: {
-                    '/app'  : {target: `http://localhost:${port}`, pathRewrite: { '^/app': '/index.html' }},
-                    '/api/*': { target: `http://localhost:${port + 1}` },
-                }
-            },
-            devtool: '#source-map'
-        });
-        break;
-}
+        case 'development':
+            const localIPv4 = DevServer.internalIPSync('v4');
+            config = merge(config, {
+                devServer: {
+                    host: '0.0.0.0',
+                    port: port,
+                    open: `http://${localIPv4}:${port}/app`,
+                    hot: true,
+                    compress: false,
+                    proxy: {
+                        '/app': { target: `http://localhost:${port}`, pathRewrite: { '^/app': '/index.html' } },
+                        '/api/*': { target: `http://localhost:${port + 1}` },
+                    },
+                    historyApiFallback: true,
+                },
+                devtool: 'source-map',
+            });
+            break;
+    }
 
-module.exports = config;
+    return config;
+};
