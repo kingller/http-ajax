@@ -7,7 +7,8 @@
         "analyzer": "webpack --mode=production --analyzer=true --progress --profile --json > stats.json && webpack-bundle-analyzer stats.json ./dist/",
         "build": "webpack --mode=production --progress",
         "deploy": "npm run build && gh-pages -d dist",
-        "start": "webpack serve --mode=development --config ./webpack.config.js --hot --progress"
+        "start": "webpack serve --mode=development --config ./webpack.config.js --hot --progress",
+        "start:dev": "webpack serve --mode=development --config ./webpack.dev.js --hot --progress"
     },
     "devDependencies": {
         "@babel/cli": "7.7.0",

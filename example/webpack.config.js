@@ -42,6 +42,9 @@ module.exports = function (env, args = {}) {
                     test: /\.tsx?$/,
                     use: {
                         loader: 'babel-loader',
+                        options: {
+                            presets: [['@babel/preset-typescript']],
+                        },
                     },
                     exclude: /\/node_modules\//,
                 },
@@ -177,5 +180,5 @@ module.exports = function (env, args = {}) {
             break;
     }
 
-    return config;
+    return Promise.resolve(config);
 };
