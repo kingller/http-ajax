@@ -140,18 +140,20 @@ module.exports = function (env, args = {}) {
     switch (mode) {
         case 'production':
             config = merge(config, {
-                minimize: true,
-                minimizer: [
-                    new TerserPlugin({
-                        terserOptions: {
-                            format: {
-                                comments: false,
+                optimization: {
+                    minimize: true,
+                    minimizer: [
+                        new TerserPlugin({
+                            terserOptions: {
+                                format: {
+                                    comments: false,
+                                },
                             },
-                        },
-                        extractComments: false,
-                    }),
-                    new CssMinimizerPlugin(),
-                ],
+                            extractComments: false,
+                        }),
+                        new CssMinimizerPlugin(),
+                    ],
+                },
             });
             break;
 
