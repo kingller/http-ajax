@@ -238,7 +238,8 @@ var AjaxBase = /** @class */ (function () {
                         key === 'processData' ||
                         key === 'responseEnd' ||
                         key === 'processError' ||
-                        key === 'catchError') {
+                        key === 'catchError' ||
+                        key === 'transformRequest') {
                         if (key === 'prefix') {
                             if (typeof value_1 === 'string') {
                                 _this.prefix = value_1;
@@ -384,6 +385,7 @@ var AjaxBase = /** @class */ (function () {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ) {
         var _this = this;
+        var _a, _b, _c, _d, _e;
         var method;
         var _retryTimes = 0;
         /** 链路追踪 ID */
@@ -415,6 +417,22 @@ var AjaxBase = /** @class */ (function () {
         }
         if (!options) {
             options = {};
+        }
+        if (this.transformRequest) {
+            var transformed = this.transformRequest({
+                method: method,
+                url: url,
+                params: params,
+                options: options,
+                loading: loading,
+            });
+            if (transformed) {
+                method = (_a = transformed.method) !== null && _a !== void 0 ? _a : method;
+                url = (_b = transformed.url) !== null && _b !== void 0 ? _b : url;
+                params = (_c = transformed.params) !== null && _c !== void 0 ? _c : params;
+                options = (_d = transformed.options) !== null && _d !== void 0 ? _d : options;
+                loading = (_e = transformed.loading) !== null && _e !== void 0 ? _e : loading;
+            }
         }
         var _opts = {
             method: method,
