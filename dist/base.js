@@ -238,7 +238,8 @@ var AjaxBase = /** @class */ (function () {
                         key === 'processData' ||
                         key === 'responseEnd' ||
                         key === 'processError' ||
-                        key === 'catchError') {
+                        key === 'catchError' ||
+                        key === 'transformRequest') {
                         if (key === 'prefix') {
                             if (typeof value_1 === 'string') {
                                 _this.prefix = value_1;
@@ -415,6 +416,20 @@ var AjaxBase = /** @class */ (function () {
         }
         if (!options) {
             options = {};
+        }
+        if (this.transformRequest) {
+            var transformed = this.transformRequest({
+                method: method,
+                url: url,
+                params: params,
+                options: options,
+                loading: loading,
+            });
+            method = transformed.method;
+            url = transformed.url;
+            params = transformed.params;
+            options = transformed.options;
+            loading = transformed.loading;
         }
         var _opts = {
             method: method,

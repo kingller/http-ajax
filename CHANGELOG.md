@@ -8,6 +8,7 @@
 
 # Next
 
+1. <font color=blue>增强</font> `config` 配置项添加 `transformRequest` 自定义请求配置，可对请求的 url、请求参数、请求头等进行修改
 
 # 9.0.0
 > 2024.11.25  

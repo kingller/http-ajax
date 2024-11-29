@@ -110,6 +110,8 @@ class AjaxBase {
 
     public $loading: string | symbol = '$loading';
 
+    public transformRequest: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions;
+
     /** 请求发送前 */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     public beforeSend = function (props: Ajax.IAjaxArgsOptions): Ajax.IRequestResult | void {};
@@ -501,6 +503,20 @@ class AjaxBase {
         }
         if (!options) {
             options = {};
+        }
+        if (this.transformRequest) {
+            const transformed = this.transformRequest({
+                method,
+                url,
+                params,
+                options,
+                loading,
+            });
+            method = transformed.method;
+            url = transformed.url;
+            params = transformed.params;
+            options = transformed.options;
+            loading = transformed.loading;
         }
         const _opts = {
             method,
@@ -978,6 +994,8 @@ class AjaxBase {
             processError?: (xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions) => void | boolean;
             /** 捕获错误 */
             catchError?: (props: Ajax.ICatchErrorOptions) => void;
+            /** 修改请求配置 */
+            transformRequest?: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions;
         } = {}
     ): void => {
         if (typeof options.noCache !== 'undefined') {
@@ -995,7 +1013,8 @@ class AjaxBase {
                     key === 'processData' ||
                     key === 'responseEnd' ||
                     key === 'processError' ||
-                    key === 'catchError'
+                    key === 'catchError' ||
+                    key === 'transformRequest'
                 ) {
                     if (key === 'prefix') {
                         if (typeof value === 'string') {
