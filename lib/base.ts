@@ -430,7 +430,7 @@ class AjaxBase {
     ): // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Promise<any>;
 
-    public sendRequest<T>(
+    public async sendRequest<T>(
         /* eslint-disable @typescript-eslint/indent */
         props:
             | Ajax.IMethod
@@ -505,7 +505,7 @@ class AjaxBase {
             options = {};
         }
         if (this.transformRequest) {
-            promisify(
+            const transformed = await promisify(
                 this.transformRequest({
                     method,
                     url,
@@ -513,13 +513,12 @@ class AjaxBase {
                     options,
                     loading,
                 })
-            ).then((transformed) => {
-                method = transformed.method;
-                url = transformed.url;
-                params = transformed.params;
-                options = transformed.options;
-                loading = transformed.loading;
-            });
+            );
+            method = transformed.method;
+            url = transformed.url;
+            params = transformed.params;
+            options = transformed.options;
+            loading = transformed.loading;
         }
         const _opts = {
             method,
