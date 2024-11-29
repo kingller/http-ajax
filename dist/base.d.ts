@@ -18,7 +18,7 @@ declare class AjaxBase {
     };
     prefix: string;
     $loading: string | symbol;
-    transformRequest: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions | Promise<Ajax.IAjaxArgsOptions>;
+    transformRequest: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions;
     /** 请求发送前 */
     beforeSend: (props: Ajax.IAjaxArgsOptions) => Ajax.IRequestResult | void;
     /** 数据处理 */
@@ -198,7 +198,7 @@ declare class AjaxBase {
         /** 捕获错误 */
         catchError?: (props: Ajax.ICatchErrorOptions) => void;
         /** 修改请求配置 */
-        transformRequest?: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions | Promise<Ajax.IAjaxArgsOptions>;
+        transformRequest?: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions;
     }) => void;
 }
 export default AjaxBase;

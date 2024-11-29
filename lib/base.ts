@@ -110,7 +110,7 @@ class AjaxBase {
 
     public $loading: string | symbol = '$loading';
 
-    public transformRequest: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions | Promise<Ajax.IAjaxArgsOptions>;
+    public transformRequest: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions;
 
     /** 请求发送前 */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -430,7 +430,7 @@ class AjaxBase {
     ): // eslint-disable-next-line @typescript-eslint/no-explicit-any
     Promise<any>;
 
-    public async sendRequest<T>(
+    public sendRequest<T>(
         /* eslint-disable @typescript-eslint/indent */
         props:
             | Ajax.IMethod
@@ -505,15 +505,13 @@ class AjaxBase {
             options = {};
         }
         if (this.transformRequest) {
-            const transformed = await promisify(
-                this.transformRequest({
-                    method,
-                    url,
-                    params,
-                    options,
-                    loading,
-                })
-            );
+            const transformed = this.transformRequest({
+                method,
+                url,
+                params,
+                options,
+                loading,
+            });
             method = transformed.method;
             url = transformed.url;
             params = transformed.params;
@@ -997,7 +995,7 @@ class AjaxBase {
             /** 捕获错误 */
             catchError?: (props: Ajax.ICatchErrorOptions) => void;
             /** 修改请求配置 */
-            transformRequest?: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions | Promise<Ajax.IAjaxArgsOptions>;
+            transformRequest?: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions;
         } = {}
     ): void => {
         if (typeof options.noCache !== 'undefined') {

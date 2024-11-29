@@ -266,7 +266,7 @@ export interface IConfigOptions {
     /** 捕获错误 */
     catchError?: (props: ICatchErrorOptions) => void;
     /** 修改请求配置 */
-    transformRequest?: (props: IAjaxArgsOptions) => IAjaxArgsOptions | Promise<IAjaxArgsOptions>;
+    transformRequest?: (props: IAjaxArgsOptions) => IAjaxArgsOptions;
 }
 export interface IAjax {
     readonly get: IRequest;
@@ -281,7 +281,7 @@ export interface IAjax {
     };
     prefix: string;
     $loading: string | symbol;
-    transformRequest: (props: IAjaxArgsOptions) => IAjaxArgsOptions | Promise<IAjaxArgsOptions>;
+    transformRequest: (props: IAjaxArgsOptions) => IAjaxArgsOptions;
     beforeSend: (props: {
         method: IMethod;
         url: string;
