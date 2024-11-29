@@ -110,7 +110,7 @@ class AjaxBase {
 
     public $loading: string | symbol = '$loading';
 
-    public transformRequest: (props: Ajax.IAjaxArgsOptions) => Partial<Ajax.IAjaxArgsOptions> | void;
+    public transformRequest: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions | Promise<Ajax.IAjaxArgsOptions>;
 
     /** 请求发送前 */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -505,20 +505,21 @@ class AjaxBase {
             options = {};
         }
         if (this.transformRequest) {
-            const transformed = this.transformRequest({
-                method,
-                url,
-                params,
-                options,
-                loading,
+            promisify(
+                this.transformRequest({
+                    method,
+                    url,
+                    params,
+                    options,
+                    loading,
+                })
+            ).then((transformed) => {
+                method = transformed.method;
+                url = transformed.url;
+                params = transformed.params;
+                options = transformed.options;
+                loading = transformed.loading;
             });
-            if (transformed) {
-                method = transformed.method ?? method;
-                url = transformed.url ?? url;
-                params = transformed.params ?? params;
-                options = transformed.options ?? options;
-                loading = transformed.loading ?? loading;
-            }
         }
         const _opts = {
             method,
@@ -997,7 +998,7 @@ class AjaxBase {
             /** 捕获错误 */
             catchError?: (props: Ajax.ICatchErrorOptions) => void;
             /** 修改请求配置 */
-            transformRequest?: (props: Ajax.IAjaxArgsOptions) => Partial<Ajax.IAjaxArgsOptions> | void;
+            transformRequest?: (props: Ajax.IAjaxArgsOptions) => Ajax.IAjaxArgsOptions | Promise<Ajax.IAjaxArgsOptions>;
         } = {}
     ): void => {
         if (typeof options.noCache !== 'undefined') {

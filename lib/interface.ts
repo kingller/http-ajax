@@ -328,7 +328,7 @@ export interface IConfigOptions {
     /** 捕获错误 */
     catchError?: (props: ICatchErrorOptions) => void;
     /** 修改请求配置 */
-    transformRequest?: (props: IAjaxArgsOptions) => Partial<IAjaxArgsOptions> | void;
+    transformRequest?: (props: IAjaxArgsOptions) => IAjaxArgsOptions | Promise<IAjaxArgsOptions>;
 }
 
 // Ajax
@@ -345,7 +345,7 @@ export interface IAjax {
     };
     prefix: string;
     $loading: string | symbol;
-    transformRequest: (props: IAjaxArgsOptions) => Partial<IAjaxArgsOptions> | void;
+    transformRequest: (props: IAjaxArgsOptions) => IAjaxArgsOptions | Promise<IAjaxArgsOptions>;
     beforeSend: (props: {
         method: IMethod;
         url: string;
