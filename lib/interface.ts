@@ -523,8 +523,12 @@ export interface IOptions {
 
 // ----- loading start ------- //
 
+export interface ILoadingOptions {
+    estimatedDuration?: number;
+}
+
 export interface ILoading {
-    start: () => void;
+    start: (options?: ILoadingOptions) => void;
     finish: (num?: number) => void;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [name: string]: any;

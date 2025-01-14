@@ -45,7 +45,7 @@ function loadingExtend(argsOptions?: {
                 const { options } = props;
                 const loadingComponent = getLoading(options);
                 if (loadingComponent) {
-                    loadingComponent.start();
+                    loadingComponent.start({ estimatedDuration: options.estimatedDuration });
                 }
             }
             if (beforeSend) {
