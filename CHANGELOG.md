@@ -8,6 +8,10 @@
 
 # Next
 
+# 9.2.0
+> 2025.01.16
+1. <font color=green>新增</font> `options` 增加参数 `estimatedDuration`，用来给带进度条的 `loading` 设置预计时间
+
 # 9.1.0
 > 2024.11.29  
 1. <font color=blue>增强</font> `config` 配置项添加 `transformRequest` 自定义请求配置，可对请求的 url、请求参数、请求头等进行修改
@@ -145,13 +149,13 @@ ajax.extend(loadingExtend());
 
 # 5.1.0
 > 2021.06.29  
-1. <font color=blue>增强</font> 增加链路追踪ID传参`xCorrelationID`
+1. <font color=blue>增强</font> 增加链路追踪 ID 传参`xCorrelationID`
 2. <font color=green>新增</font> `responseEnd`请求结束回调方法
 
 
 # 5.0.1
 > 2021.05.13  
-1. <font color=red>修复</font> IE安全模式下获取`window.localStorage`报错，添加`try catch`捕获错误
+1. <font color=red>修复</font> IE 安全模式下获取`window.localStorage`报错，添加`try catch`捕获错误
 
 
 # 5.0.0
@@ -166,7 +170,7 @@ ajax.extend(loadingExtend());
 
 # 4.0.3
 > 2021.01.08  
-1. <font color=red>修复</font> `ajax`使用缓存且设置了loadable时，第二次取cache会显示loading，且loading不会消失
+1. <font color=red>修复</font> `ajax`使用缓存且设置了 loadable 时，第二次取 cache 会显示 loading，且 loading 不会消失
 
 
 # 4.0.2
@@ -187,7 +191,7 @@ ajax.extend(loadingExtend());
 
 # 3.6.2
 > 2020.10.29  
-1. <font color=red>修复</font> 加解密请求同时发送多个并返回状态470（密钥过期）时，重新获取秘钥请求发送了多个，改为发送一个
+1. <font color=red>修复</font> 加解密请求同时发送多个并返回状态 470（密钥过期）时，重新获取秘钥请求发送了多个，改为发送一个
 
 
 # 3.6.1
@@ -234,7 +238,7 @@ ajax.extend(loadingExtend());
 # 3.3.0
 > 2020.07.30  
 1. <font color=orange>修改</font> 参数`options`的`responseType`有值时，不再调用`JSON.parse`处理返回值
-2. <font color=orange>修改</font> 参数`options`的`headers`属性`X-Request-Id`和`token`传递空值时，不再将其设至Request Header
+2. <font color=orange>修改</font> 参数`options`的`headers`属性`X-Request-Id`和`token`传递空值时，不再将其设至 Request Header
 
 
 # 3.2.1
@@ -244,8 +248,8 @@ ajax.extend(loadingExtend());
 
 # 3.2.0
 > 2020.07.21  
-1. <font color=orange>修改</font> `noCache`默认值改为false，阻止IE缓存改为添加请求头`Cache-Control:no-cache`,`Pragma:no-cache`，并且`noCache`参数将会在下个版本`4.0.0`废弃。
-2. <font color=orange>修改</font> `processResponse`在http状态码`204`时也执行。
+1. <font color=orange>修改</font> `noCache`默认值改为 false，阻止 IE 缓存改为添加请求头`Cache-Control:no-cache`,`Pragma:no-cache`，并且`noCache`参数将会在下个版本`4.0.0`废弃。
+2. <font color=orange>修改</font> `processResponse`在 http 状态码`204`时也执行。
 3. <font color=orange>修改</font> 加解密扩展的`processErrorResponse`改为先执行原`processErrorResponse`
 4. <font color=orange>修改</font> `request`从`private`方法改为`public`方法
 5. <font color=green>新增</font> 导出`isFormData`方法，用来判断是否`FormData`
@@ -259,17 +263,17 @@ ajax.extend(loadingExtend());
 
 # 3.1.1
 > 2020.06.02  
-1. <font color=red>修复</font> 打包时把node crypto module也打包进了文件中
+1. <font color=red>修复</font> 打包时把 node crypto module 也打包进了文件中
 
 
 # 3.1.0
 > 2020.06.02  
-1. <font color=blue>增强</font> 将`lodash`引用从ajax基础包里移除, 减少基础包大小。加解密及签名扩展仍保持该依赖。
+1. <font color=blue>增强</font> 将`lodash`引用从 ajax 基础包里移除，减少基础包大小。加解密及签名扩展仍保持该依赖。
 
 
 # 3.0.0
 > 2020.05.29  
-1. <font color=orange>修改</font> 发送`GET`请求时签名不再对value使用`encodeURIComponent`编码
+1. <font color=orange>修改</font> 发送`GET`请求时签名不再对 value 使用`encodeURIComponent`编码
 
 
 # 2.1.0

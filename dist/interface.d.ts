@@ -419,8 +419,11 @@ export interface IOptions {
     /** 文件是否要签名 */
     isSignFile?: (file: File) => boolean;
 }
+export interface ILoadingOptions {
+    estimatedDuration?: number;
+}
 export interface ILoading {
-    start: () => void;
+    start: (options?: ILoadingOptions) => void;
     finish: (num?: number) => void;
     [name: string]: any;
 }
