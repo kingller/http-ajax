@@ -8,6 +8,8 @@
 
 # Next
 
+# 9.2.0
+> 2025.01.16
 1. <font color=green>新增</font> `options` 增加参数 `estimatedDuration`，用来给带进度条的 `loading` 设置预计时间
 
 # 9.1.0
