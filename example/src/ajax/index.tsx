@@ -7,6 +7,7 @@ import Crypto from './crypto/box';
 import Signature from './signature/box';
 import ErrorRequest from './error/box';
 import BigPipe from './bigpipe/box';
+import Stream from './stream/box';
 import TransformResponse from './transform-response/box';
 import UrlParams from './url-params/box';
 import OptionsParams from './option-params/box';
@@ -41,6 +42,7 @@ export default class Ajax extends React.PureComponent {
                             <Signature />
                             <ErrorRequest />
                             <BigPipe />
+                            <Stream />
                             <TransformResponse />
                             <UrlParams />
                             <OptionsParams />

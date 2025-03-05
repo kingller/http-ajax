@@ -597,34 +597,35 @@ class AjaxBase {
                         return;
                     }
                     const xhr = new XMLHttpRequest();
-                    let chunked: string[] = [];
+                    // 记录已处理的字符数
+                    let lastLength = 0;
                     const ajaxThis = this;
                     xhr.onreadystatechange = function (): void {
                         if (options.onData) {
                             if (this.readyState === 3 || this.readyState === 4) {
-                                // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
+                                // 因为请求响应较快时，会出现一次返回多个块，所以使用取出新增项的做法
                                 if (this.response) {
-                                    let chunks: string[] = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
-                                    if (chunks) {
-                                        chunks = chunks.map((item: string): string => item.replace(/<\/?chunk>/g, ''));
-                                        // 取出新增的数据
-                                        const data: string[] = chunks.slice(chunked.length);
-                                        data.forEach((item: string): void => {
+                                    // 取出新增的数据
+                                    const newText = this.response.substring(lastLength);
+                                    lastLength = this.response.length;
+
+                                    let newChunks: string[] = [];
+
+                                    // 解析 <chunk> 包裹的格式
+                                    const chunkMatches = newText.match(/<chunk>([\s\S]*?)<\/chunk>/g);
+                                    if (chunkMatches) {
+                                        newChunks = chunkMatches.map((item) => item.replace(/<\/?chunk>/g, ''));
+                                    } else if (newText) {
+                                        newChunks.push(newText.trim());
+                                    }
+                                    if (newChunks.length) {
+                                        newChunks.forEach((item) => {
                                             try {
                                                 options.onData(JSON.parse(item));
                                             } catch (e) {
                                                 options.onData(item);
                                             }
                                         });
-                                        chunked = chunks;
-                                    } else {
-                                        const consoleMethod: 'error' | 'warn' =
-                                            this.readyState === 4 ? 'error' : 'warn';
-                                        // eslint-disable-next-line no-console
-                                        if (console && console[consoleMethod]) {
-                                            // eslint-disable-next-line no-console
-                                            console[consoleMethod](`${method} ${url} Incorrect response`);
-                                        }
                                     }
                                 }
                             }
@@ -895,7 +896,7 @@ class AjaxBase {
 
     public clearCacheByUrl(url: string): void {
         const keys = Object.keys(this._cache);
-        // 匹配 url 或者以 url? 开头的key
+        // 匹配 url 或者以 url? 开头的 key
         const urlPattern = new RegExp(`^${url}(\\?|$)`);
 
         for (const key of keys) {

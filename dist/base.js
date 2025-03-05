@@ -505,21 +505,30 @@ var AjaxBase = /** @class */ (function () {
                     return;
                 }
                 var xhr = new XMLHttpRequest();
-                var chunked = [];
+                // 记录已处理的字符数
+                var lastLength = 0;
                 var ajaxThis = _this;
                 xhr.onreadystatechange = function () {
                     var _a;
                     var _this = this;
                     if (options.onData) {
                         if (this.readyState === 3 || this.readyState === 4) {
-                            // 因为请求响应较快时，会出现一次返回多个块，所以使用取出数组新增项的做法
+                            // 因为请求响应较快时，会出现一次返回多个块，所以使用取出新增项的做法
                             if (this.response) {
-                                var chunks = this.response.match(/<chunk>([\s\S]*?)<\/chunk>/g);
-                                if (chunks) {
-                                    chunks = chunks.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
-                                    // 取出新增的数据
-                                    var data = chunks.slice(chunked.length);
-                                    data.forEach(function (item) {
+                                // 取出新增的数据
+                                var newText = this.response.substring(lastLength);
+                                lastLength = this.response.length;
+                                var newChunks = [];
+                                // 解析 <chunk> 包裹的格式
+                                var chunkMatches = newText.match(/<chunk>([\s\S]*?)<\/chunk>/g);
+                                if (chunkMatches) {
+                                    newChunks = chunkMatches.map(function (item) { return item.replace(/<\/?chunk>/g, ''); });
+                                }
+                                else if (newText) {
+                                    newChunks.push(newText.trim());
+                                }
+                                if (newChunks.length) {
+                                    newChunks.forEach(function (item) {
                                         try {
                                             options.onData(JSON.parse(item));
                                         }
@@ -527,15 +536,6 @@ var AjaxBase = /** @class */ (function () {
                                             options.onData(item);
                                         }
                                     });
-                                    chunked = chunks;
-                                }
-                                else {
-                                    var consoleMethod = this.readyState === 4 ? 'error' : 'warn';
-                                    // eslint-disable-next-line no-console
-                                    if (console && console[consoleMethod]) {
-                                        // eslint-disable-next-line no-console
-                                        console[consoleMethod]("".concat(method, " ").concat(url, " Incorrect response"));
-                                    }
                                 }
                             }
                         }
@@ -779,7 +779,7 @@ var AjaxBase = /** @class */ (function () {
     };
     AjaxBase.prototype.clearCacheByUrl = function (url) {
         var keys = Object.keys(this._cache);
-        // 匹配 url 或者以 url? 开头的key
+        // 匹配 url 或者以 url? 开头的 key
         var urlPattern = new RegExp("^".concat(url, "(\\?|$)"));
         for (var _i = 0, keys_1 = keys; _i < keys_1.length; _i++) {
             var key = keys_1[_i];

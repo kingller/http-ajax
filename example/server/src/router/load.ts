@@ -1,4 +1,5 @@
 import { get, post } from 'koa-router-decors';
+import { Readable } from 'stream';
 import utils from '../utils/index';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -49,5 +50,42 @@ export default class Load {
             ctx.res.write(chunk);
         }
         ctx.res.end();
+    }
+
+    @post('/bigpipe/stream')
+    public async streamData(ctx) {
+        ctx.set('Content-Type', 'text/event-stream; charset=utf-8'); // SSE 流
+        ctx.set('Cache-Control', 'no-cache');
+        ctx.set('Connection', 'keep-alive');
+
+        const stream = new Readable({
+            read() {},
+        });
+
+        ctx.status = 200;
+        ctx.body = stream;
+
+        const messages = [
+            '你好，',
+            '我是一个 AI 模型，',
+            '正在模拟流式响应。',
+            '这是一条测试消息，',
+            '数据将逐步返回，',
+            '以模拟 OpenAI API 的效果。',
+            '你可以使用 onData 监听流数据，',
+            '让界面实时显示 AI 生成的文本。',
+            '流式数据传输结束。',
+        ];
+
+        let index = 0;
+        const interval = setInterval(() => {
+            if (index < messages.length) {
+                stream.push(messages[index] + '\n'); // 逐步推送
+                index++;
+            } else {
+                clearInterval(interval);
+                stream.push(null); // 结束流
+            }
+        }, 300);
     }
 }
