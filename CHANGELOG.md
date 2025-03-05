@@ -8,6 +8,10 @@
 
 # Next
 
+# 9.3.0
+> 2025.03.05
+1. <font color=blue>增强</font> 支持流式响应
+
 # 9.2.0
 > 2025.01.16
 1. <font color=green>新增</font> `options` 增加参数 `estimatedDuration`，用来给带进度条的 `loading` 设置预计时间
