@@ -32,6 +32,8 @@ declare class AjaxBase {
     private _cache;
     /** 私有变量，请勿使用 */
     private _cacheCancel;
+    /** 私有变量，存储 correlation ID */
+    private _correlationIds;
     onSuccess<T = any>(xhr: XMLHttpRequest, { response, options, resolve, reject, }: {
         response: Ajax.IResult;
         options: Ajax.IOptions;
@@ -61,9 +63,12 @@ declare class AjaxBase {
     /** 移除缓存的 cancel 请求 */
     private removeCacheCancel;
     private getProcessedParams;
-    responseEnd(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { success }: {
-        success: any;
+    responseEnd(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, props: {
+        success: boolean;
+        remark?: string;
     }): void;
+    /** 请求发送后 */
+    requestSend(_opts: Ajax.IRequestOptions): void;
     /**
      * 发送请求
      */
