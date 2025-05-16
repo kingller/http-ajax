@@ -140,6 +140,8 @@ var AjaxBase = /** @class */ (function () {
         /** 私有变量，请勿使用 */
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         this._cacheCancel = {};
+        /** 私有变量，存储 correlation ID */
+        this._correlationIds = {};
         /** 将参数拼成 key1=val1&key2=val2 的格式 */
         this.fillQueryParams = function (_a) {
             var params = _a.params, encodeValue = _a.encodeValue;
@@ -374,9 +376,9 @@ var AjaxBase = /** @class */ (function () {
         };
     };
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    AjaxBase.prototype.responseEnd = function (xhr, _opts, _a) {
-        var boolean = _a.success;
-    };
+    AjaxBase.prototype.responseEnd = function (xhr, _opts, props) { };
+    /** 请求发送后 */
+    AjaxBase.prototype.requestSend = function (_opts) { };
     AjaxBase.prototype.sendRequest = function (
     /* eslint-disable @typescript-eslint/indent */
     props, 
@@ -692,8 +694,23 @@ var AjaxBase = /** @class */ (function () {
                 if (typeof options.timeout === 'number') {
                     xhr.timeout = options.timeout;
                 }
+                // 检查是否存在重复的 Correlation Id
+                if (_opts.xCorrelationID && !_opts._retryTimes) {
+                    if (_this._correlationIds[_opts.xCorrelationID]) {
+                        // 阻止请求发送
+                        reject(createError('Duplicate request detected', Ajax.CODE.CANCEL));
+                        _this.responseEnd(undefined, _opts, {
+                            success: false,
+                            remark: 'Duplicate correlation ID',
+                        });
+                        return;
+                    }
+                    // 记录 Correlation ID
+                    _this._correlationIds[_opts.xCorrelationID] = true;
+                }
                 // prettier-ignore
                 xhr.send(requestBody);
+                _this.requestSend(_opts);
                 if (cancelExecutor) {
                     cancelExecutor(function () {
                         if (xhr.readyState === XMLHttpRequest.DONE) {

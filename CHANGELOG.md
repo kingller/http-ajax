@@ -8,6 +8,11 @@
 
 # Next
 
+# 9.4.0
+> 2025.05.16
+1. <font color=green>新增</font> `requestSend` 请求发送回调方法
+1. <font color=green>新增</font> 重复 `correlationId` 的检测，用于排查请求重复问题
+
 # 9.3.0
 > 2025.03.05
 1. <font color=blue>增强</font> 支持流式响应

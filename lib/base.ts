@@ -148,6 +148,9 @@ class AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private _cacheCancel: { [name: string]: Ajax.IPromise<any> } = {};
 
+    /** 私有变量，存储 correlation ID */
+    private _correlationIds: { [name: string]: boolean } = {};
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     public onSuccess<T = any>(
         xhr: XMLHttpRequest,
@@ -367,7 +370,14 @@ class AjaxBase {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    public responseEnd(xhr: XMLHttpRequest, _opts: Ajax.IRequestOptions, { success: boolean }): void {}
+    public responseEnd(
+        xhr: XMLHttpRequest,
+        _opts: Ajax.IRequestOptions,
+        props: { success: boolean; remark?: string }
+    ): void {}
+
+    /** 请求发送后 */
+    public requestSend(_opts: Ajax.IRequestOptions): void {}
 
     /**
      * 发送请求
@@ -780,10 +790,28 @@ class AjaxBase {
                         xhr.timeout = options.timeout;
                     }
 
+                    // 检查是否存在重复的 Correlation Id
+                    if (_opts.xCorrelationID && !_opts._retryTimes) {
+                        if (this._correlationIds[_opts.xCorrelationID]) {
+                            // 阻止请求发送
+                            reject(createError('Duplicate request detected', Ajax.CODE.CANCEL));
+                            this.responseEnd(undefined, _opts, {
+                                success: false,
+                                remark: 'Duplicate correlation ID',
+                            });
+                            return;
+                        }
+
+                        // 记录 Correlation ID
+                        this._correlationIds[_opts.xCorrelationID] = true;
+                    }
+
                     // prettier-ignore
                     xhr.send(
                         requestBody as Document | Blob | BufferSource | FormData | URLSearchParams | string | null
                     );
+
+                    this.requestSend(_opts);
 
                     if (cancelExecutor) {
                         cancelExecutor(function (): void {
