@@ -630,9 +630,13 @@ class AjaxBase {
                                     }
                                     if (newChunks.length) {
                                         newChunks.forEach((item) => {
-                                            try {
-                                                options.onData(JSON.parse(item));
-                                            } catch (e) {
+                                            if (options.parseData !== false) {
+                                                try {
+                                                    options.onData(JSON.parse(item));
+                                                } catch (e) {
+                                                    options.onData(item);
+                                                }
+                                            } else {
                                                 options.onData(item);
                                             }
                                         });

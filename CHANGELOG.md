@@ -7,6 +7,8 @@
 
 
 # Next
+> 2025.07.24
+1. <font color=blue>增强</font> `options` 增加参数 `parseData` 用于设置是否对 `onData` 的数据自动执行 `JSON.parse`，默认为 `true`。设置为 `false` 时，`onData` 回调会收到原始数据
 
 # 9.4.0
 > 2025.05.16
