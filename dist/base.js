@@ -531,10 +531,15 @@ var AjaxBase = /** @class */ (function () {
                                 }
                                 if (newChunks.length) {
                                     newChunks.forEach(function (item) {
-                                        try {
-                                            options.onData(JSON.parse(item));
+                                        if (options.parseData !== false) {
+                                            try {
+                                                options.onData(JSON.parse(item));
+                                            }
+                                            catch (e) {
+                                                options.onData(item);
+                                            }
                                         }
-                                        catch (e) {
+                                        else {
                                             options.onData(item);
                                         }
                                     });

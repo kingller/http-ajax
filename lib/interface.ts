@@ -45,6 +45,11 @@ export interface IOptions extends IOptionsBase {
     /** 当陆陆续续获取数据片段时的回调函数 */
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onData?: (data: any) => void;
+    /**
+     * 是否对 onData 的数据自动执行 JSON.parse，默认 true。
+     * 为 false 时，onData 回调会收到原始字符串。
+     */
+    parseData?: boolean;
     /** 上传文件进度 */
     onProgress?: (e?: ProgressEvent) => void;
     /** 自定义响应数据 */
