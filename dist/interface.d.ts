@@ -36,7 +36,9 @@ export interface IOptions extends IOptionsBase {
     /** 设置为 true，缓存本次请求到的数据 */
     cache?: boolean | string;
     /** 当陆陆续续获取数据片段时的回调函数 */
-    onData?: (data: any) => void;
+    onData?: (data: any, options?: {
+        correlationId: string;
+    }) => void;
     /**
      * 是否对 onData 的数据自动执行 JSON.parse，默认 true。
      * 为 false 时，onData 回调会收到原始字符串。

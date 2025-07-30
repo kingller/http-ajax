@@ -530,17 +530,18 @@ var AjaxBase = /** @class */ (function () {
                                     newChunks.push(newText.trim());
                                 }
                                 if (newChunks.length) {
+                                    var dataOptions_1 = { correlationId: _opts.xCorrelationID };
                                     newChunks.forEach(function (item) {
                                         if (options.parseData !== false) {
                                             try {
-                                                options.onData(JSON.parse(item));
+                                                options.onData(JSON.parse(item), dataOptions_1);
                                             }
                                             catch (e) {
-                                                options.onData(item);
+                                                options.onData(item, dataOptions_1);
                                             }
                                         }
                                         else {
-                                            options.onData(item);
+                                            options.onData(item, dataOptions_1);
                                         }
                                     });
                                 }

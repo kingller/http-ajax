@@ -629,15 +629,16 @@ class AjaxBase {
                                         newChunks.push(newText.trim());
                                     }
                                     if (newChunks.length) {
+                                        const dataOptions = { correlationId: _opts.xCorrelationID };
                                         newChunks.forEach((item) => {
                                             if (options.parseData !== false) {
                                                 try {
-                                                    options.onData(JSON.parse(item));
+                                                    options.onData(JSON.parse(item), dataOptions);
                                                 } catch (e) {
-                                                    options.onData(item);
+                                                    options.onData(item, dataOptions);
                                                 }
                                             } else {
-                                                options.onData(item);
+                                                options.onData(item, dataOptions);
                                             }
                                         });
                                     }
