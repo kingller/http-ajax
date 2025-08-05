@@ -1,6 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 var _localStorage = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 var _sessionStorage = {};
 var createStoragePolyfill = function (type) {
     var _storage = _localStorage;
@@ -11,6 +13,7 @@ var createStoragePolyfill = function (type) {
         getItem: function (key) {
             return _storage[key];
         },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setItem: function (key, val) {
             _storage[key] = val;
         },
