@@ -2,8 +2,10 @@ import * as Ajax from './interface';
 import AjaxBase from './base';
 import { getResponseData } from './utils/response-data';
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-window.$feedback = window.$feedback || function (): void {};
+if (typeof window !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    window.$feedback = window.$feedback || function (): void {};
+}
 
 export class HttpAjax extends AjaxBase {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,7 +39,7 @@ export class HttpAjax extends AjaxBase {
                     resolve(response as T);
                 } else {
                     if (response.warnMsg) {
-                        window.$feedback(response.warnMsg, 'warning');
+                        window?.$feedback(response.warnMsg, 'warning');
                     }
                     resolve(response.data as T);
                 }
@@ -46,7 +48,7 @@ export class HttpAjax extends AjaxBase {
                 if (options && options.autoPopupErrorMsg === false) {
                     return;
                 }
-                window.$feedback(response.errorMsg);
+                window?.$feedback(response.errorMsg);
             }
         } else {
             resolve(getResponseData<T>({ response, statusField }));

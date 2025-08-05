@@ -28,7 +28,7 @@ function cryptoExtend() {
     (function () {
         var secretKey = storage_1.default.getItem(enums_1.STORAGE_KEY.SECRET_KEY, 'session');
         if (secretKey) {
-            client_crypto_1.default.AES.setKey(window.atob(secretKey));
+            client_crypto_1.default.AES.setKey(atob(secretKey));
         }
     })();
     return function crypto() {
@@ -89,11 +89,11 @@ function cryptoExtend() {
                         },
                     })
                         .then(function () {
-                        if (!window.btoa) {
+                        if (!btoa) {
                             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                             console && console.error('`window.btoa` is undefined');
                         }
-                        storage_1.default.setItem(enums_1.STORAGE_KEY.SECRET_KEY, window.btoa(newSecretKey), 'session');
+                        storage_1.default.setItem(enums_1.STORAGE_KEY.SECRET_KEY, btoa(newSecretKey), 'session');
                         storage_1.default.setItem(enums_1.STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
                         waitingPublicKeyPromise.forEach(function (p) {
                             p.resolve();

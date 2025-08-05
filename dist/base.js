@@ -633,7 +633,7 @@ var AjaxBase = /** @class */ (function () {
                 if ((!options.headers || typeof options.headers.token === 'undefined') && !options.simple) {
                     var token = '';
                     try {
-                        token = window.localStorage.getItem('token') || '';
+                        token = (window === null || window === void 0 ? void 0 : window.localStorage.getItem('token')) || '';
                     }
                     catch (e) {
                         // eslint-disable-next-line @typescript-eslint/no-unused-expressions

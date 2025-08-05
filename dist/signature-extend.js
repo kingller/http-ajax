@@ -67,7 +67,7 @@ function snExtend() {
         var processParamsAfter = this.processParamsAfter;
         var getKey = function (splits) {
             var keyStr = splits.join('');
-            return window.atob(keyStr);
+            return atob(keyStr);
         };
         // 参数混淆，增加签名方式代码被分析出难度
         // app-nonce 只使用一次标识码

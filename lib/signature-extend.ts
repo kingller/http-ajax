@@ -21,7 +21,7 @@ function snExtend(): () => void {
 
         const getKey = (splits: string[]): string => {
             const keyStr = splits.join('');
-            return window.atob(keyStr);
+            return atob(keyStr);
         };
 
         // 参数混淆，增加签名方式代码被分析出难度

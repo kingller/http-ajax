@@ -728,7 +728,7 @@ class AjaxBase {
                     if ((!options.headers || typeof options.headers.token === 'undefined') && !options.simple) {
                         let token = '';
                         try {
-                            token = window.localStorage.getItem('token') || '';
+                            token = window?.localStorage.getItem('token') || '';
                         } catch (e) {
                             // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                             console && console.error('Failed to get token from localStorage');

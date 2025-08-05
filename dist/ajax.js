@@ -21,8 +21,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.HttpAjax = void 0;
 var base_1 = __importDefault(require("./base"));
 var response_data_1 = require("./utils/response-data");
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-window.$feedback = window.$feedback || function () { };
+if (typeof window !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    window.$feedback = window.$feedback || function () { };
+}
 var HttpAjax = /** @class */ (function (_super) {
     __extends(HttpAjax, _super);
     function HttpAjax() {
@@ -79,7 +81,7 @@ var HttpAjax = /** @class */ (function (_super) {
                 }
                 else {
                     if (response.warnMsg) {
-                        window.$feedback(response.warnMsg, 'warning');
+                        window === null || window === void 0 ? void 0 : window.$feedback(response.warnMsg, 'warning');
                     }
                     resolve(response.data);
                 }
@@ -89,7 +91,7 @@ var HttpAjax = /** @class */ (function (_super) {
                 if (options && options.autoPopupErrorMsg === false) {
                     return;
                 }
-                window.$feedback(response.errorMsg);
+                window === null || window === void 0 ? void 0 : window.$feedback(response.errorMsg);
             }
         }
         else {

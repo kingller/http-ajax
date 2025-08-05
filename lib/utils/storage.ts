@@ -1,9 +1,42 @@
-function getStorageByType(type?: string): Storage {
-    let _storage = localStorage;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const _localStorage: { [key: string]: any } = {};
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const _sessionStorage: { [key: string]: any } = {};
+const createStoragePolyfill = function (type?: 'local' | 'session') {
+    let _storage = _localStorage;
     if (type === 'session') {
-        _storage = sessionStorage;
+        _storage = _sessionStorage;
     }
-    return _storage;
+    return {
+        getItem(key: string): string | number | boolean | object {
+            return _storage[key];
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setItem(key: string, val: any): void {
+            _storage[key] = val;
+        },
+        removeItem(key: string): void {
+            delete _storage[key];
+        },
+        clear(): void {
+            Object.keys(_storage).forEach((key) => {
+                delete _storage[key];
+            });
+        },
+    } as Storage;
+};
+
+function getStorageByType(type?: 'local' | 'session'): Storage {
+    if (typeof window !== 'undefined') {
+        let _storage = localStorage;
+        if (type === 'session') {
+            _storage = sessionStorage;
+        }
+        if (_storage) {
+            return _storage;
+        }
+    }
+    return createStoragePolyfill(type);
 }
 
 const storage = {

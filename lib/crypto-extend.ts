@@ -42,7 +42,7 @@ function cryptoExtend(): () => void {
     (function (): void {
         const secretKey = storage.getItem(STORAGE_KEY.SECRET_KEY, 'session') as string;
         if (secretKey) {
-            Crypto.AES.setKey(window.atob(secretKey));
+            Crypto.AES.setKey(atob(secretKey));
         }
     })();
 
@@ -111,11 +111,11 @@ function cryptoExtend(): () => void {
                             }
                         )
                         .then(function () {
-                            if (!window.btoa) {
+                            if (!btoa) {
                                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
                                 console && console.error('`window.btoa` is undefined');
                             }
-                            storage.setItem(STORAGE_KEY.SECRET_KEY, window.btoa(newSecretKey), 'session');
+                            storage.setItem(STORAGE_KEY.SECRET_KEY, btoa(newSecretKey), 'session');
                             storage.setItem(STORAGE_KEY.UUID, publicKeyResponse.uuid, 'session');
                             waitingPublicKeyPromise.forEach(function (p) {
                                 p.resolve();

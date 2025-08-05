@@ -8,6 +8,10 @@
 
 # Next
 
+# 9.6.0
+> 2025.08.05
+1. <font color=blue>增强</font> 支持在 `Worker` 中使用
+
 # 9.5.1
 > 2025.07.30
 1. <font color=blue>增强</font> `onData` 增加第二个参数暴露出 `correlationId`

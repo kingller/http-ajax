@@ -1,11 +1,40 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-function getStorageByType(type) {
-    var _storage = localStorage;
+var _localStorage = {};
+var _sessionStorage = {};
+var createStoragePolyfill = function (type) {
+    var _storage = _localStorage;
     if (type === 'session') {
-        _storage = sessionStorage;
+        _storage = _sessionStorage;
     }
-    return _storage;
+    return {
+        getItem: function (key) {
+            return _storage[key];
+        },
+        setItem: function (key, val) {
+            _storage[key] = val;
+        },
+        removeItem: function (key) {
+            delete _storage[key];
+        },
+        clear: function () {
+            Object.keys(_storage).forEach(function (key) {
+                delete _storage[key];
+            });
+        },
+    };
+};
+function getStorageByType(type) {
+    if (typeof window !== 'undefined') {
+        var _storage = localStorage;
+        if (type === 'session') {
+            _storage = sessionStorage;
+        }
+        if (_storage) {
+            return _storage;
+        }
+    }
+    return createStoragePolyfill(type);
 }
 var storage = {
     getItem: function (key, type) {
