@@ -80,8 +80,8 @@ var HttpAjax = /** @class */ (function (_super) {
                     resolve(response);
                 }
                 else {
-                    if (response.warnMsg) {
-                        window === null || window === void 0 ? void 0 : window.$feedback(response.warnMsg, 'warning');
+                    if (response.warnMsg && typeof window !== 'undefined') {
+                        window.$feedback(response.warnMsg, 'warning');
                     }
                     resolve(response.data);
                 }
@@ -91,7 +91,9 @@ var HttpAjax = /** @class */ (function (_super) {
                 if (options && options.autoPopupErrorMsg === false) {
                     return;
                 }
-                window === null || window === void 0 ? void 0 : window.$feedback(response.errorMsg);
+                if (typeof window !== 'undefined') {
+                    window.$feedback(response.errorMsg);
+                }
             }
         }
         else {

@@ -1,6 +1,6 @@
 {
     "name": "http-ajax",
-    "version": "9.6.0",
+    "version": "9.6.1",
     "description": "Promise based HTTP client for the browser",
     "keywords": [
         "ajax",
@@ -65,7 +65,7 @@
         "lint-staged": "^10.2.11",
         "prettier": "^3.0.3",
         "rimraf": "^3.0.2",
-        "typescript": "^4.6.4"
+        "typescript": "^5.4.3"
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.org"

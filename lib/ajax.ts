@@ -38,8 +38,8 @@ export class HttpAjax extends AjaxBase {
                     delete response[statusField];
                     resolve(response as T);
                 } else {
-                    if (response.warnMsg) {
-                        window?.$feedback(response.warnMsg, 'warning');
+                    if (response.warnMsg && typeof window !== 'undefined') {
+                        window.$feedback(response.warnMsg, 'warning');
                     }
                     resolve(response.data as T);
                 }
@@ -48,7 +48,9 @@ export class HttpAjax extends AjaxBase {
                 if (options && options.autoPopupErrorMsg === false) {
                     return;
                 }
-                window?.$feedback(response.errorMsg);
+                if (typeof window !== 'undefined') {
+                    window.$feedback(response.errorMsg);
+                }
             }
         } else {
             resolve(getResponseData<T>({ response, statusField }));

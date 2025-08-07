@@ -8,6 +8,10 @@
 
 # Next
 
+# 9.6.1
+> 2025.08.07
+1. <font color=red>修复</font> `ajax` 在 `Worker` 中使用报错 `window is not defined`
+
 # 9.6.0
 > 2025.08.05
 1. <font color=blue>增强</font> 支持在 `Worker` 中使用
