@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseHeaders = exports.trim = void 0;
+exports.trim = trim;
+exports.parseHeaders = parseHeaders;
 function trim(str) {
     return str.replace(/^\s*/, '').replace(/\s*$/, '');
 }
-exports.trim = trim;
 function parseHeaders(headers
 /* eslint-disable @typescript-eslint/indent */
 ) {
@@ -37,4 +37,3 @@ function parseHeaders(headers
     });
     return headerMap;
 }
-exports.parseHeaders = parseHeaders;

@@ -31,7 +31,7 @@ function cryptoExtend() {
             client_crypto_1.default.AES.setKey(atob(secretKey));
         }
     })();
-    return function crypto() {
+    return function cryptoFunc() {
         var _this = this;
         var _a = this, beforeSend = _a.beforeSend, processParams = _a.processParams, processResponse = _a.processResponse, processErrorResponse = _a.processErrorResponse, clear = _a.clear;
         // 校验该扩展是否已添加过

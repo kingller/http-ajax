@@ -11,7 +11,9 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setResponseData = exports.getResponseData = exports.isOpenApi = void 0;
+exports.isOpenApi = isOpenApi;
+exports.getResponseData = getResponseData;
+exports.setResponseData = setResponseData;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function _isOpenApi(response) {
     return response.code !== undefined && response.details !== undefined;
@@ -23,7 +25,6 @@ function isOpenApi(response) {
     }
     return false;
 }
-exports.isOpenApi = isOpenApi;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getResponseData(_a) {
     var response = _a.response, statusField = _a.statusField;
@@ -37,7 +38,6 @@ function getResponseData(_a) {
     }
     return response;
 }
-exports.getResponseData = getResponseData;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setResponseData(_a) {
     var response = _a.response, data = _a.data, statusField = _a.statusField;
@@ -51,4 +51,3 @@ function setResponseData(_a) {
     }
     return data;
 }
-exports.setResponseData = setResponseData;

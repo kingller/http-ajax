@@ -46,7 +46,7 @@ function cryptoExtend(): () => void {
         }
     })();
 
-    return function crypto(): void {
+    return function cryptoFunc(): void {
         const { beforeSend, processParams, processResponse, processErrorResponse, clear } = this as IAjax;
 
         // 校验该扩展是否已添加过

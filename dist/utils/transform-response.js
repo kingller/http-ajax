@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.transformResponse = void 0;
+exports.transformResponse = transformResponse;
 var parse_headers_1 = require("./parse-headers");
 var response_data_1 = require("./response-data");
 function transformResponse(_a) {
@@ -13,4 +13,3 @@ function transformResponse(_a) {
     }
     return response;
 }
-exports.transformResponse = transformResponse;

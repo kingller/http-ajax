@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.promisify = void 0;
+exports.promisify = promisify;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function promisify(value) {
     if (!value || typeof value.then !== 'function') {
@@ -8,4 +8,3 @@ function promisify(value) {
     }
     return value;
 }
-exports.promisify = promisify;

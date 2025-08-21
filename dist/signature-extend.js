@@ -9,8 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -85,118 +85,111 @@ function snExtend() {
         }
         // 添加标志符用来校验该扩展是否已添加
         this._snExtendAdded = true;
-        var signData = function (_a) {
-            var params = _a.params, paramsInOptions = _a.paramsInOptions, method = _a.method, options = _a.options, processData = _a.processData;
-            return __awaiter(_this, void 0, void 0, function () {
-                var toSnStr, fileSum, _b, requestBody, queryParams, formData, formDataEntries_2, isSignFileField, _c, formDataEntries_1, formDataEntries_1_1, key, value, fileHash, e_1_1, timestamp, appNonce, headers;
-                var _d;
-                var _this = this;
-                var _e, e_1, _f, _g;
-                return __generator(this, function (_h) {
-                    switch (_h.label) {
-                        case 0:
-                            toSnStr = '';
-                            fileSum = '';
-                            _b = this.stringifyParams({
-                                params: params,
-                                paramsInOptions: paramsInOptions,
-                                method: method,
-                                cache: true,
-                                encodeValue: false,
-                                processData: processData,
-                            }), requestBody = _b.requestBody, queryParams = _b.queryParams;
-                            if (!(method === interface_1.METHODS.get)) return [3 /*break*/, 1];
-                            if (queryParams) {
-                                toSnStr = queryParams;
-                            }
-                            return [3 /*break*/, 21];
-                        case 1:
-                            if (!(requestBody && typeof requestBody === 'string')) return [3 /*break*/, 2];
-                            toSnStr = requestBody;
-                            return [3 /*break*/, 21];
-                        case 2:
-                            formData = [];
-                            if (!(0, form_1.isFormData)(requestBody)) return [3 /*break*/, 21];
-                            formDataEntries_2 = [];
-                            requestBody.forEach(function (value, key) { return __awaiter(_this, void 0, void 0, function () {
-                                return __generator(this, function (_a) {
-                                    formDataEntries_2.push([key, value]);
-                                    return [2 /*return*/];
-                                });
-                            }); });
-                            isSignFileField = getKey(['aXNT', 'aWdu', 'Rm', 'ls', 'ZQ', '=', '=']);
-                            _h.label = 3;
-                        case 3:
-                            _h.trys.push([3, 14, 15, 20]);
-                            _c = true, formDataEntries_1 = __asyncValues(formDataEntries_2);
-                            _h.label = 4;
-                        case 4: return [4 /*yield*/, formDataEntries_1.next()];
-                        case 5:
-                            if (!(formDataEntries_1_1 = _h.sent(), _e = formDataEntries_1_1.done, !_e)) return [3 /*break*/, 13];
-                            _g = formDataEntries_1_1.value;
-                            _c = false;
-                            _h.label = 6;
-                        case 6:
-                            _h.trys.push([6, , 11, 12]);
-                            key = _g[0], value = _g[1];
-                            if (!(value instanceof File)) return [3 /*break*/, 9];
-                            if (!(!options[isSignFileField] || options[isSignFileField](value))) return [3 /*break*/, 8];
-                            return [4 /*yield*/, (0, sign_file_1.default)(value)];
-                        case 7:
-                            fileHash = _h.sent();
-                            formData.push("".concat(key, "=").concat(fileHash, ",").concat(value.size));
-                            _h.label = 8;
-                        case 8: return [3 /*break*/, 10];
-                        case 9:
-                            formData.push("".concat(key, "=").concat(value));
-                            _h.label = 10;
-                        case 10: return [3 /*break*/, 12];
-                        case 11:
-                            _c = true;
-                            return [7 /*endfinally*/];
-                        case 12: return [3 /*break*/, 4];
-                        case 13: return [3 /*break*/, 20];
-                        case 14:
-                            e_1_1 = _h.sent();
-                            e_1 = { error: e_1_1 };
-                            return [3 /*break*/, 20];
-                        case 15:
-                            _h.trys.push([15, , 18, 19]);
-                            if (!(!_c && !_e && (_f = formDataEntries_1.return))) return [3 /*break*/, 17];
-                            return [4 /*yield*/, _f.call(formDataEntries_1)];
-                        case 16:
-                            _h.sent();
-                            _h.label = 17;
-                        case 17: return [3 /*break*/, 19];
-                        case 18:
-                            if (e_1) throw e_1.error;
-                            return [7 /*endfinally*/];
-                        case 19: return [7 /*endfinally*/];
-                        case 20:
-                            formData.sort();
-                            toSnStr = formData.join('&');
-                            fileSum = (0, sha256_1.default)(toSnStr);
-                            toSnStr = fileSum;
-                            _h.label = 21;
-                        case 21:
-                            timestamp = new Date().getTime();
-                            appNonce = (0, uuid_1.v4)();
-                            headers = (_d = {},
-                                _d[signField] = (0, sha256_1.default)("".concat(toSnStr).concat(timestamp).concat((0, nonce_1.default)(appNonce))),
-                                _d[timestampField] = timestamp,
-                                _d[appNonceField] = appNonce,
-                                _d);
-                            if (fileSum) {
-                                headers[fileSumField] = fileSum;
-                            }
-                            lodash_1.default.merge(options, {
-                                headers: headers,
+        var signData = function (_a) { return __awaiter(_this, [_a], void 0, function (_b) {
+            var toSnStr, fileSum, _c, requestBody, queryParams, formData, formDataEntries_2, isSignFileField, _d, formDataEntries_1, formDataEntries_1_1, key, value, fileHash, e_1_1, timestamp, appNonce, headers;
+            var _e;
+            var _this = this;
+            var _f, e_1, _g, _h;
+            var params = _b.params, paramsInOptions = _b.paramsInOptions, method = _b.method, options = _b.options, processData = _b.processData;
+            return __generator(this, function (_j) {
+                switch (_j.label) {
+                    case 0:
+                        toSnStr = '';
+                        fileSum = '';
+                        _c = this.stringifyParams({
+                            params: params,
+                            paramsInOptions: paramsInOptions,
+                            method: method,
+                            cache: true,
+                            encodeValue: false,
+                            processData: processData,
+                        }), requestBody = _c.requestBody, queryParams = _c.queryParams;
+                        if (!(method === interface_1.METHODS.get)) return [3 /*break*/, 1];
+                        if (queryParams) {
+                            toSnStr = queryParams;
+                        }
+                        return [3 /*break*/, 18];
+                    case 1:
+                        if (!(requestBody && typeof requestBody === 'string')) return [3 /*break*/, 2];
+                        toSnStr = requestBody;
+                        return [3 /*break*/, 18];
+                    case 2:
+                        formData = [];
+                        if (!(0, form_1.isFormData)(requestBody)) return [3 /*break*/, 18];
+                        formDataEntries_2 = [];
+                        requestBody.forEach(function (value, key) { return __awaiter(_this, void 0, void 0, function () {
+                            return __generator(this, function (_a) {
+                                formDataEntries_2.push([key, value]);
+                                return [2 /*return*/];
                             });
-                            return [2 /*return*/];
-                    }
-                });
+                        }); });
+                        isSignFileField = getKey(['aXNT', 'aWdu', 'Rm', 'ls', 'ZQ', '=', '=']);
+                        _j.label = 3;
+                    case 3:
+                        _j.trys.push([3, 11, 12, 17]);
+                        _d = true, formDataEntries_1 = __asyncValues(formDataEntries_2);
+                        _j.label = 4;
+                    case 4: return [4 /*yield*/, formDataEntries_1.next()];
+                    case 5:
+                        if (!(formDataEntries_1_1 = _j.sent(), _f = formDataEntries_1_1.done, !_f)) return [3 /*break*/, 10];
+                        _h = formDataEntries_1_1.value;
+                        _d = false;
+                        key = _h[0], value = _h[1];
+                        if (!(value instanceof File)) return [3 /*break*/, 8];
+                        if (!(!options[isSignFileField] || options[isSignFileField](value))) return [3 /*break*/, 7];
+                        return [4 /*yield*/, (0, sign_file_1.default)(value)];
+                    case 6:
+                        fileHash = _j.sent();
+                        formData.push("".concat(key, "=").concat(fileHash, ",").concat(value.size));
+                        _j.label = 7;
+                    case 7: return [3 /*break*/, 9];
+                    case 8:
+                        formData.push("".concat(key, "=").concat(value));
+                        _j.label = 9;
+                    case 9:
+                        _d = true;
+                        return [3 /*break*/, 4];
+                    case 10: return [3 /*break*/, 17];
+                    case 11:
+                        e_1_1 = _j.sent();
+                        e_1 = { error: e_1_1 };
+                        return [3 /*break*/, 17];
+                    case 12:
+                        _j.trys.push([12, , 15, 16]);
+                        if (!(!_d && !_f && (_g = formDataEntries_1.return))) return [3 /*break*/, 14];
+                        return [4 /*yield*/, _g.call(formDataEntries_1)];
+                    case 13:
+                        _j.sent();
+                        _j.label = 14;
+                    case 14: return [3 /*break*/, 16];
+                    case 15:
+                        if (e_1) throw e_1.error;
+                        return [7 /*endfinally*/];
+                    case 16: return [7 /*endfinally*/];
+                    case 17:
+                        formData.sort();
+                        toSnStr = formData.join('&');
+                        fileSum = (0, sha256_1.default)(toSnStr);
+                        toSnStr = fileSum;
+                        _j.label = 18;
+                    case 18:
+                        timestamp = new Date().getTime();
+                        appNonce = (0, uuid_1.v4)();
+                        headers = (_e = {},
+                            _e[signField] = (0, sha256_1.default)("".concat(toSnStr).concat(timestamp).concat((0, nonce_1.default)(appNonce))),
+                            _e[timestampField] = timestamp,
+                            _e[appNonceField] = appNonce,
+                            _e);
+                        if (fileSum) {
+                            headers[fileSumField] = fileSum;
+                        }
+                        lodash_1.default.merge(options, {
+                            headers: headers,
+                        });
+                        return [2 /*return*/];
+                }
             });
-        };
+        }); };
         this.processParamsAfter = function (props) { return __awaiter(_this, void 0, void 0, function () {
             var params, paramsInOptions, method, options, processData;
             return __generator(this, function (_a) {

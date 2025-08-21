@@ -11,7 +11,10 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.splitUrlParams = exports.needFormatData = exports.processParamsInUrl = exports.addPrefixToUrl = void 0;
+exports.addPrefixToUrl = addPrefixToUrl;
+exports.processParamsInUrl = processParamsInUrl;
+exports.needFormatData = needFormatData;
+exports.splitUrlParams = splitUrlParams;
 var form_1 = require("./form");
 function addPrefixToUrl(url, globalPrefix, optionsPrefix) {
     if (typeof optionsPrefix === 'string') {
@@ -22,7 +25,6 @@ function addPrefixToUrl(url, globalPrefix, optionsPrefix) {
     }
     return "".concat(globalPrefix).concat(url);
 }
-exports.addPrefixToUrl = addPrefixToUrl;
 function getParamsInUrl(url) {
     var modules = url.split('/');
     var params = [];
@@ -71,12 +73,10 @@ urlParams) {
         url: url,
     };
 }
-exports.processParamsInUrl = processParamsInUrl;
 function needFormatData(_a) {
     var params = _a.params, processData = _a.processData;
     return processData !== false && !(0, form_1.isFormData)(params);
 }
-exports.needFormatData = needFormatData;
 function splitUrlParams(_a) {
     var url = _a.url, params = _a.params, paramsInOptions = _a.paramsInOptions, processData = _a.processData;
     var urlParamNames = getParamsInUrl(url);
@@ -123,4 +123,3 @@ function splitUrlParams(_a) {
         paramsInOptions: paramsInOptions,
     };
 }
-exports.splitUrlParams = splitUrlParams;

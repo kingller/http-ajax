@@ -8,6 +8,10 @@
 
 # Next
 
+# 9.6.2
+> 2025.08.21
+1. <font color=red>修复</font> `ajax` 在 `Worker` 中使用加解密报错 `generator isn't seeded`
+
 # 9.6.1
 > 2025.08.07
 1. <font color=red>修复</font> `ajax` 在 `Worker` 中使用报错 `window is not defined`

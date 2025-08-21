@@ -12,9 +12,9 @@ declare class AjaxBase {
     readonly del: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T>;
     readonly loadable: {
         get: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T>;
-        post: <T_1 = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T_1>;
-        put: <T_2 = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T_2>;
-        del: <T_3 = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T_3>;
+        post: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T>;
+        put: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T>;
+        del: <T = any>(url: string, params?: Ajax.IParams, options?: Ajax.IOptions) => Ajax.IRequestResult<T>;
     };
     prefix: string;
     $loading: string | symbol;
